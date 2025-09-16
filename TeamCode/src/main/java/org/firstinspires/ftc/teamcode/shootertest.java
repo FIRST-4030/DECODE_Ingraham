@@ -99,7 +99,6 @@ public class shootertest extends LinearOpMode {
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
             // shooterPower  = -gamepad1.left_stick_y ;
             // rightPower = -gamepad1.right_stick_y ;
-
             // Send calculated power to wheels
             shooter.setPower(shooterPower);
 

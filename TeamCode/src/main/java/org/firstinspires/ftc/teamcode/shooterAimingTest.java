@@ -51,7 +51,7 @@ public class shooterAimingTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        shooter.setPower(0.2);
+        shooter.setPower(0);
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 if (gamepad1.y) {
@@ -193,6 +193,7 @@ public class shooterAimingTest extends LinearOpMode {
 
                 //telemetry.addLine("Motor Speed", )
                 rangeAprilTag = detection.ftcPose.range;
+                System.out.println(rangeAprilTag);
                 newValue = rangeAprilTag;
 
                 // Check if the robot has moved significantly

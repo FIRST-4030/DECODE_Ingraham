@@ -18,7 +18,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 
 import java.util.List;
-@TeleOp(name = "GoalTag")
+//@TeleOp(name = "GoalTag")
+//@Disabled
 public class GoalTag {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;

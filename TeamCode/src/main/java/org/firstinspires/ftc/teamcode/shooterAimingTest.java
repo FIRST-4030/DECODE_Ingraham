@@ -54,11 +54,11 @@ public class shooterAimingTest extends LinearOpMode {
         shooter.setPower(0);
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                if (gamepad1.y) {
-                    shooterPower += 0.005;
+                if (gamepad1.yWasPressed()) {
+                    shooterPower += 0.05;
                     shooter.setPower(shooterPower);
-                } else if (gamepad1.a){
-                    shooterPower -= 0.005;
+                } else if (gamepad1.aWasPressed()) {
+                    shooterPower -= 0.05;
                     shooter.setPower(shooterPower);
                 }
 

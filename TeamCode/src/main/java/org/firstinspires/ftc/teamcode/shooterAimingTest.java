@@ -23,6 +23,7 @@ public class shooterAimingTest extends LinearOpMode {
     private static final int maxRange = 100;
     private static double shooterPower = 0;
     /**
+     *
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;

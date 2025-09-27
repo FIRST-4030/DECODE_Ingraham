@@ -28,6 +28,9 @@ public class ShooterDataLogger extends LinearOpMode{
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // wait for start command
+        waitForStart();
+
         // display info to user
         while (opModeIsActive()) {
             /*

@@ -24,10 +24,10 @@ public class PIDF_Example extends LinearOpMode {
     // our DC motor
     DcMotorEx shooter;
 
-    public static final double NEW_P = 12.0; // default is 10.0
-    public static final double NEW_I = 4.0; // default is 3.0
-    public static final double NEW_D = 1.0; // default is 0.0
-    public static final double NEW_F = 0.0; // default is 0.0
+    public static final double NEW_P = 150; // default is 10.0
+    public static final double NEW_I = 0; // default is 3.0
+    public static final double NEW_D = 0; // default is 0.0
+    public static final double NEW_F = 15; // default is 0.0
 
     static final double   COUNTS_PER_REV = 28 ;  // REV HD Hex 1:1 Motor Encoder
 

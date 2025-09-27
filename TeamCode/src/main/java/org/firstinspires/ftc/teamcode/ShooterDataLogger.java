@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name = "ShooterDataLogger")
@@ -23,6 +24,11 @@ public class ShooterDataLogger extends LinearOpMode{
 
     private int i = 0; // loop counter
 
+    public static final double NEW_P = 12.0; // default is 10.0
+    public static final double NEW_I = 4.0; // default is 3.0
+    public static final double NEW_D = 1.0; // default is 0.0
+    public static final double NEW_F = 0.0; // default is 0.0
+
     public void runOpMode() {
         shooter = (DcMotorEx) hardwareMap.get(DcMotor.class, "shooter");
         shooter.setDirection(DcMotor.Direction.FORWARD);
@@ -32,6 +38,23 @@ public class ShooterDataLogger extends LinearOpMode{
         AimTestDatalog = new Datalog("launch log");
         // wait for start command
         waitForStart();
+
+        // Get the PIDF coefficients for the RUN_USING_ENCODER RunMode.
+        PIDFCoefficients pidfOrig = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Change coefficients using methods included with DcMotorEx class.
+        PIDFCoefficients pidfNew = new PIDFCoefficients(NEW_P, NEW_I, NEW_D, NEW_F);
+        shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfNew);
+
+        // Re-read coefficients and verify change.
+        PIDFCoefficients pidfModified = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Not sure if setVelocity is working properly
+        // angular rate in counts (ticks) per second
+        shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
+
+        // setPower is required, in addition to setVelocity
+        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
 
         // display info to user
         while (opModeIsActive()) {

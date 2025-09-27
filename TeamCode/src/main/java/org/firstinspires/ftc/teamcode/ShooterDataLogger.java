@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class ShooterDataLogger extends LinearOpMode{
 
     DcMotorEx shooter;
-    PIDF_Example.Datalog datalog; // create the data logger object
+    Datalog AimTestDatalog; // create the data logger object
     private double targetVelocity = 30; // rotations per second (max is 60)
 
     private boolean goal;
@@ -28,6 +28,8 @@ public class ShooterDataLogger extends LinearOpMode{
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Initialize the datalog
+        AimTestDatalog = new Datalog("launch log");
         // wait for start command
         waitForStart();
 
@@ -51,14 +53,14 @@ public class ShooterDataLogger extends LinearOpMode{
                 telemetry.addData("goal",goal);
                 telemetry.addData("targetVelocity", targetVelocity);
                 telemetry.update();
-                datalog.targetVelocity.set(targetVelocity);
-                datalog.writeLine();
+                AimTestDatalog.targetVelocity.set(targetVelocity);
+                AimTestDatalog.writeLine();
             }
             if (gamepad1.right_bumper)
             {
                 goal = false;
-                datalog.targetVelocity.set(targetVelocity);
-                datalog.writeLine();
+                AimTestDatalog.targetVelocity.set(targetVelocity);
+                AimTestDatalog.writeLine();
             }
 
 

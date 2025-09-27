@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name = "ShooterDataLogger")
 public class ShooterDataLogger extends LinearOpMode{
@@ -70,28 +71,34 @@ public class ShooterDataLogger extends LinearOpMode{
             telemetry.update();
             */
 
-            if (gamepad1.leftBumperWasPressed())
-            {
+            if (gamepad1.leftBumperWasPressed()) {
                 goal = true;
                 telemetry.addData("goal",goal);
                 telemetry.addData("targetVelocity", targetVelocity);
                 telemetry.update();
-                AimTestDatalog.targetVelocity.set(goal);
+                AimTestDatalog.goalBool.set(goal);
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.writeLine();
-            }
-            if (gamepad1.rightBumperWasPressed())
-            {
+            } else if (gamepad1.rightBumperWasPressed()) {
                 goal = false;
-                telemetry.addData("goal",goal);
+                telemetry.addData("goal", goal);
                 telemetry.addData("targetVelocity", targetVelocity);
                 telemetry.update();
-                AimTestDatalog.targetVelocity.set(goal);
+                AimTestDatalog.goalBool.set(goal);
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.writeLine();
+            } else if (gamepad1.yWasPressed()) {
+                targetVelocity += 0.25;
+                shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
+                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
+            } else if (gamepad1.aWasPressed()) {
+                targetVelocity -= 0.25;
+                shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
+                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
             }
-
-
+            telemetry.addData("targetVelocity", targetVelocity);
+            telemetry.addData("currentVelocity", shooter.getVelocity());
+            telemetry.update();
 
             // Data log
             // Note that the order in which we set datalog fields
@@ -116,7 +123,7 @@ public class ShooterDataLogger extends LinearOpMode{
         public Datalogger.GenericField deltaTime = new Datalogger.GenericField("deltaTime");
         public Datalogger.GenericField shooterVelocity = new Datalogger.GenericField("shooterVelocity");
         public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("targetVelocity");
-        public Datalogger.GenericField goal = new Datalogger.GenericField("goal");
+        public Datalogger.GenericField goalBool = new Datalogger.GenericField("goalBool");
 
         public Datalog(String name) {
             // Build the underlying datalog object
@@ -136,7 +143,7 @@ public class ShooterDataLogger extends LinearOpMode{
                             //runTime,
                             //deltaTime,
                             //shooterVelocity,
-                            goal,
+                            goalBool,
                             targetVelocity
                     )
                     .build();

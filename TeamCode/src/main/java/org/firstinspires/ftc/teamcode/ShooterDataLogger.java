@@ -70,7 +70,7 @@ public class ShooterDataLogger extends LinearOpMode{
             telemetry.update();
             */
 
-            if (gamepad1.left_bumper)
+            if (gamepad1.leftBumperWasPressed())
             {
                 goal = true;
                 telemetry.addData("goal",goal);
@@ -79,7 +79,7 @@ public class ShooterDataLogger extends LinearOpMode{
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.writeLine();
             }
-            if (gamepad1.right_bumper)
+            if (gamepad1.rightBumperWasPressed())
             {
                 goal = false;
                 AimTestDatalog.targetVelocity.set(targetVelocity);

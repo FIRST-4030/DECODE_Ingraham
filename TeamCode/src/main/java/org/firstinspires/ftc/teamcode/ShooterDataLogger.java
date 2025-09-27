@@ -76,12 +76,17 @@ public class ShooterDataLogger extends LinearOpMode{
                 telemetry.addData("goal",goal);
                 telemetry.addData("targetVelocity", targetVelocity);
                 telemetry.update();
+                AimTestDatalog.targetVelocity.set(goal);
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.writeLine();
             }
             if (gamepad1.rightBumperWasPressed())
             {
                 goal = false;
+                telemetry.addData("goal",goal);
+                telemetry.addData("targetVelocity", targetVelocity);
+                telemetry.update();
+                AimTestDatalog.targetVelocity.set(goal);
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.writeLine();
             }

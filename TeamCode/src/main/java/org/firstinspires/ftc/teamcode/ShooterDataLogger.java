@@ -29,6 +29,7 @@ public class ShooterDataLogger extends LinearOpMode{
     private GoalTag goalTag;
 
     private double goalRange;
+    private double goalBearing;
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     /**
@@ -114,6 +115,7 @@ public class ShooterDataLogger extends LinearOpMode{
                 AimTestDatalog.goalBool.set(goal);
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.goalRange.set(goalRange);
+                AimTestDatalog.goalBearing.set(goalBearing);
                 AimTestDatalog.writeLine();
             } else if (gamepad1.rightBumperWasPressed()) {
                 goal = false;
@@ -123,6 +125,7 @@ public class ShooterDataLogger extends LinearOpMode{
                 AimTestDatalog.goalBool.set(goal);
                 AimTestDatalog.targetVelocity.set(targetVelocity);
                 AimTestDatalog.goalRange.set(goalRange);
+                AimTestDatalog.goalBearing.set(goalBearing);
                 AimTestDatalog.writeLine();
             } else if (gamepad1.yWasPressed()) {
                 targetVelocity += 0.25;
@@ -136,6 +139,7 @@ public class ShooterDataLogger extends LinearOpMode{
             telemetry.addData("targetVelocity", targetVelocity);
             telemetry.addData("currentVelocity", shooter.getVelocity());
             telemetry.addData("GoalRange", (goalRange));
+            telemetry.addData("GoalBearing", (goalBearing));
             telemetry.update();
 
             // Data log
@@ -224,6 +228,7 @@ public class ShooterDataLogger extends LinearOpMode{
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 goalRange = detection.ftcPose.range;
+                goalBearing = detection.ftcPose.bearing;
 
             }
         }   // end for() loop
@@ -250,6 +255,7 @@ public class ShooterDataLogger extends LinearOpMode{
         public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("targetVelocity");
         public Datalogger.GenericField goalBool = new Datalogger.GenericField("goalBool");
         public Datalogger.GenericField goalRange = new Datalogger.GenericField("goalRange");
+        public Datalogger.GenericField goalBearing = new Datalogger.GenericField("goalBearing");
 
         public Datalog(String name) {
             // Build the underlying datalog object
@@ -271,7 +277,8 @@ public class ShooterDataLogger extends LinearOpMode{
                             //shooterVelocity,
                             goalBool,
                             targetVelocity,
-                            goalRange
+                            goalRange,
+                            goalBearing
                     )
                     .build();
         }

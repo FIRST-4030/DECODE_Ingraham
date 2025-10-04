@@ -79,10 +79,7 @@ public class ShooterDataLogger extends LinearOpMode{
 
         // Not sure if setVelocity is working properly
         // angular rate in counts (ticks) per second
-        shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
-
-        // setPower is required, in addition to setVelocity
-        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
+        // max speed is about 55 RPS (empirically determined)
 
         // display info to user
         while (opModeIsActive()) {
@@ -97,6 +94,11 @@ public class ShooterDataLogger extends LinearOpMode{
             telemetry.addData("shooterVelocity", currentVelocity);
             telemetry.update();
             */
+            //shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
+
+            // setPower is required, in addition to setVelocity
+            targetVelocity = (goalRange+241.28)/10.473;
+            shooter.setPower(targetVelocity/55);
             telemetryAprilTag();
 
             // Push telemetry to the Driver Station.
@@ -130,6 +132,7 @@ public class ShooterDataLogger extends LinearOpMode{
                 shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
                 shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
             }
+
             telemetry.addData("targetVelocity", targetVelocity);
             telemetry.addData("currentVelocity", shooter.getVelocity());
             telemetry.addData("GoalRange", (goalRange));

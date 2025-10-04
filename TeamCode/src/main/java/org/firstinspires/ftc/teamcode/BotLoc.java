@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@TeleOp(name = "BotLoc")
+//@TeleOp(name = "BotLoc")
 //@Disabled
 public class BotLoc {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
@@ -99,10 +100,12 @@ public class BotLoc {
             while (detection.metadata != null && detection.id == goalTagID) {
                 BotX = detection.robotPose.getPosition().x;
                 BotY = detection.robotPose.getPosition().y;
+                /*
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
                         getBotX(),
                         getBotY()
                         ));
+                 */
 
             }
         }

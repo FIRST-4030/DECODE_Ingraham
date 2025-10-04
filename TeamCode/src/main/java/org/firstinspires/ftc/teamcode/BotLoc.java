@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -93,9 +94,13 @@ public class BotLoc {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null && detection.id == goalTagID) {
+            while (detection.metadata != null && detection.id == goalTagID) {
                 BotX = detection.robotPose.getPosition().x;
                 BotY = detection.robotPose.getPosition().y;
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
+                        getBotX(),
+                        getBotY()
+                        ));
 
             }
         }

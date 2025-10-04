@@ -1,21 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.PIDF_Example.COUNTS_PER_REV;
 
-import static java.lang.Runtime.getRuntime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -88,7 +82,7 @@ public class ShooterDataLogger extends LinearOpMode{
         shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
 
         // setPower is required, in addition to setVelocity
-        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
+        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
 
         // display info to user
         while (opModeIsActive()) {
@@ -130,11 +124,11 @@ public class ShooterDataLogger extends LinearOpMode{
             } else if (gamepad1.yWasPressed()) {
                 targetVelocity += 0.25;
                 shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
-                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
+                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
             } else if (gamepad1.aWasPressed()) {
                 targetVelocity -= 0.25;
                 shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
-                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
+                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
             }
             telemetry.addData("targetVelocity", targetVelocity);
             telemetry.addData("currentVelocity", shooter.getVelocity());

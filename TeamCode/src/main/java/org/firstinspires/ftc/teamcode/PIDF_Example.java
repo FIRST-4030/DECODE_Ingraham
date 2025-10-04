@@ -81,7 +81,7 @@ public class PIDF_Example extends LinearOpMode {
         shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
 
         // setPower is required, in addition to setVelocity
-        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (imperically determined)
+        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
 
         runtime.reset(); // reset the clock
 

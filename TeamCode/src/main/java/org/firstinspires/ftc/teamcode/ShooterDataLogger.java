@@ -49,8 +49,8 @@ public class ShooterDataLogger extends LinearOpMode{
 
     private boolean readyToShoot = false;
     public static final double NEW_P = 150.0; // default is 10.0
-    public static final double NEW_I = 4.0; // default is 3.0
-    public static final double NEW_D = 1.0; // default is 0.0
+    public static final double NEW_I = 0; // default is 3.0
+    public static final double NEW_D = 0; // default is 0.0
     public static final double NEW_F = 15.0; // default is 0.0
 
 

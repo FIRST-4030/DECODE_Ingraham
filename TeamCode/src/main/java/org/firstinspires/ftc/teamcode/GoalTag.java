@@ -29,6 +29,10 @@ public class GoalTag {
 
     private double goalBearing; // radians
     private int goalTagID;
+
+    private double BotX; // inches
+
+    private double BotY;
     public void init(int passedGoalTagID) {
         goalTagID = passedGoalTagID;
 
@@ -102,6 +106,8 @@ public class GoalTag {
             if (detection.metadata != null && detection.id == goalTagID) {
                 goalRange = detection.ftcPose.range;
                 goalBearing = detection.ftcPose.bearing;
+                BotX = detection.robotPose.getPosition().x;
+                BotY = detection.robotPose.getPosition().y;
 
             }
         }
@@ -112,5 +118,11 @@ public class GoalTag {
 
     public double getBearing() {
         return goalBearing;
+    }
+
+    public double getBotX() { return BotX; }
+
+    public double getBotY() {
+        return BotY;
     }
 }

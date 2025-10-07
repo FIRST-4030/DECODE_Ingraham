@@ -150,7 +150,7 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
         else if(gamepad1.b) {
             moveAllMotors(0, 0, 0, 0.5);
         }
-
+        // put in button that when pressed calls GoalTag.getBearing(), which is a double, and then uses that to turn to face the goal.
 
         // If you press the left bumper, you get a drive from the point of view of the robot
         // (much like driving an RC vehicle)

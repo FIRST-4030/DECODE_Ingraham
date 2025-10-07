@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -16,23 +14,19 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-
 import java.util.List;
-//@TeleOp(name = "GoalTag")
+
+//@TeleOp(name = "BotLoc")
 //@Disabled
-public class GoalTag {
+public class BotLoc {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    private double goalRange; // inches
-
-    private double goalBearing; // radians
-    private int goalTagID;
-
     private double BotX; // inches
 
-    private double BotY;
+    private double BotY; // radians
+    private int goalTagID;
     public void init(int passedGoalTagID) {
         goalTagID = passedGoalTagID;
 
@@ -104,22 +98,18 @@ public class GoalTag {
 
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null && detection.id == goalTagID) {
-                goalRange = detection.ftcPose.range;
-                goalBearing = detection.ftcPose.bearing;
                 BotX = detection.robotPose.getPosition().x;
                 BotY = detection.robotPose.getPosition().y;
+                /*
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
+                        getBotX(),
+                        getBotY()
+                        ));
+                 */
 
             }
         }
     }
-    public double getRange() {
-        return goalRange;
-    }
-
-    public double getBearing() {
-        return goalBearing;
-    }
-
     public double getBotX() { return BotX; }
 
     public double getBotY() {

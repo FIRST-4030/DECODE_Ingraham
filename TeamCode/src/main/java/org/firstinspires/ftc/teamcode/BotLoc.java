@@ -102,7 +102,7 @@ public class BotLoc {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {
-            while (detection.metadata != null && detection.id == goalTagID) {
+            if (detection.metadata != null && detection.id == goalTagID) {
                 BotX = detection.robotPose.getPosition().x;
                 BotY = detection.robotPose.getPosition().y;
                 /*

@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ShooterDataLogger extends LinearOpMode{
 
     private DcMotorEx shooter;
+    private Servo launchFlap;
     private GoalTag goalTag;
 
     private double goalRange;
@@ -41,16 +43,24 @@ public class ShooterDataLogger extends LinearOpMode{
     private boolean goal;
 
     private int i = 0; // loop counter
+    private int j = 0;
 
+    private int k = 0;
+
+    private boolean readyToShoot = false;
     public static final double NEW_P = 150.0; // default is 10.0
-    public static final double NEW_I = 4.0; // default is 3.0
-    public static final double NEW_D = 1.0; // default is 0.0
+    public static final double NEW_I = 0; // default is 3.0
+    public static final double NEW_D = 0; // default is 0.0
     public static final double NEW_F = 15.0; // default is 0.0
 
 
     @Override
     public void runOpMode() {
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        launchFlap = hardwareMap.get(Servo.class, "launchFlap");
+        launchFlap.setPosition(1);
+        launchFlap.setDirection(Servo.Direction.FORWARD);
+
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -83,6 +93,8 @@ public class ShooterDataLogger extends LinearOpMode{
 
         // display info to user
         while (opModeIsActive()) {
+            i++;
+            k++;
             /*
             i++;
             double currentVelocity = shooter.getVelocity(AngleUnit.DEGREES) / COUNTS_PER_REV;
@@ -95,7 +107,6 @@ public class ShooterDataLogger extends LinearOpMode{
             telemetry.update();
             */
             //shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
-
             // setPower is required, in addition to setVelocity
             targetVelocity = (goalRange+241.28)/10.473;
             shooter.setPower(targetVelocity/55);
@@ -131,7 +142,33 @@ public class ShooterDataLogger extends LinearOpMode{
                 targetVelocity -= 0.25;
                 shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
                 shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
+            } else if (gamepad1.right_trigger == 1) {
+                launchFlap.setPosition(0.7);
+                i = 0;
+                readyToShoot = false;
             }
+            if (i > 500) {
+                launchFlap.setPosition(1);
+                i = 0;
+            }
+            if (readyToShoot) {
+                if (j < 1) {
+                    launchFlap.setPosition(0.3);
+                    k = 0;
+                    j++;
+                }
+                if (k > 200) {
+                    launchFlap.setPosition(0);
+                    j--;
+                }
+
+            }
+            telemetry.addData("i", i);
+            telemetry.addData("j", j);
+            telemetry.addData("k", k);
+
+            telemetry.addData("val", gamepad1.right_trigger);
+
 
             telemetry.addData("targetVelocity", targetVelocity);
             telemetry.addData("currentVelocity", shooter.getVelocity());

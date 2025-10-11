@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -18,18 +18,22 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 
 import java.util.List;
-//@TeleOp(name = "GoalTag")
-//@Disabled
 public class GoalTag {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-
     private double goalRange; // inches
-
     private double goalBearing; // radians
     private int goalTagID;
-    public void init(int passedGoalTagID) {
+
+    public boolean GPP = false; // id 21
+    public boolean PGP = false; // id 22
+    public boolean PPG = false; // id 23
+
+    private double BotX; // inches
+
+    private double BotY;
+    public void init(int passedGoalTagID, HardwareMap hardwareMap) {
         goalTagID = passedGoalTagID;
 
         // Create the AprilTag processor.
@@ -99,11 +103,23 @@ public class GoalTag {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null && detection.id == goalTagID) {
-                goalRange = detection.ftcPose.range;
-                goalBearing = detection.ftcPose.bearing;
-
+            if (detection.metadata != null) {
+                if (detection.id == goalTagID) {
+                    goalRange = detection.ftcPose.range;
+                    goalBearing = detection.ftcPose.bearing;
+                    BotX = detection.robotPose.getPosition().x;
+                    BotY = detection.robotPose.getPosition().y;
+                }
+                if (detection.id == 21) {
+                    GPP = true;
+                } else if (detection.id == 22) {
+                    PGP = true;
+                } else if (detection.id == 23) {
+                    PPG = true;
+                }
             }
+
+
         }
     }
     public double getRange() {
@@ -112,5 +128,22 @@ public class GoalTag {
 
     public double getBearing() {
         return goalBearing;
+    }
+    public String getObelisk() {
+        if (PGP == true) {
+            return "PGP";
+        } else if (GPP == true) {
+            return "GPP";
+        } else if (PPG == true) {
+            return "PPG";
+        } else {
+            return "No Tag Detected";
+        }
+    }
+
+    public double getBotX() { return BotX; }
+
+    public double getBotY() {
+        return BotY;
     }
 }

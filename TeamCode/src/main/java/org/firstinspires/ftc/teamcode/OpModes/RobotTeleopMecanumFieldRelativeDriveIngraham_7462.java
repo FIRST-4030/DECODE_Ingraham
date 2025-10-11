@@ -26,14 +26,13 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -52,7 +51,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  *
  */
-@TeleOp(name = "Robot: Field Relative Mecanum Drive", group = "Robot")
+@TeleOp(name = "J7462 Robot: Field Relative Mecanum Drive", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
 public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
     // This declares the four motors needed
@@ -105,19 +104,12 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
         //they could fit the control hub on the robot
     }
 
-    /*
-    DcMotor frontLeftDrive;
-    DcMotor frontRightDrive;
-    DcMotor backLeftDrive;
-    DcMotor backRightDrive;
-    */
-
-    public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
+    /*public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
         frontLeftDrive.setPower(frontleftpower);
         frontRightDrive.setPower(frontrightpower);
         backLeftDrive.setPower(backleftpower);
         backRightDrive.setPower(backrightpower);
-    }
+    }*/
 
     //we are using the methods from OpMode and @Override is so that we can write our own stuff for this method
     @Override
@@ -131,12 +123,12 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
-        /*if (gamepad1.a) {
+        if (gamepad1.a) {
             imu.resetYaw();
-        }*/
+        }
         //resetting the yaw is saying the yaw is at zero for whatever the current orientation of the robot is
 
-        if(gamepad1.x) {
+        /*if(gamepad1.x) {
             //moveAllMotors(0.5, 0, 0, 0);
             frontLeftDrive.setPower(0.5);
         }
@@ -149,8 +141,8 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
         }
         else if(gamepad1.b) {
             moveAllMotors(0, 0, 0, 0.5);
-        }
-        // put in button that when pressed calls GoalTag.getBearing(), which is a double, and then uses that to turn to face the goal.
+        }*/
+
 
         // If you press the left bumper, you get a drive from the point of view of the robot
         // (much like driving an RC vehicle)

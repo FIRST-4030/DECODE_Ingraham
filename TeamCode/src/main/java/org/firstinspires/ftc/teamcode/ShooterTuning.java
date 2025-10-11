@@ -55,6 +55,7 @@ public class ShooterTuning extends LinearOpMode {
             telemetry.addData("ShooterVelocity", shooter.getVelocity());
             telemetry.addData("GoalRange", (goalTag.getRange()));
             telemetry.addData("GoalBearing", (goalTag.getBearing()));
+            telemetry.addData("Obelisk?", goalTag.getObelisk());
             telemetry.update();
         }
     }

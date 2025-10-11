@@ -32,8 +32,12 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.GoalTag;
 
@@ -52,9 +56,9 @@ import org.firstinspires.ftc.teamcode.GoalTag;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  *
  */
-@TeleOp(name = "Robot: Field Relative Mecanum Drive", group = "Robot")
+//@TeleOp(name = "Robot: Field Relative Mecanum Drive", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
-public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
+public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy {
     // This declares the four motors needed
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
@@ -63,9 +67,8 @@ public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
-
-    @Override
-    public void init() {
+    //@Override
+    public RobotTeleopMecanumFieldRelativeDriveFinleyCopy(HardwareMap hardwareMap) {
         //hardwareMap is just so our code names can actually connect to what the android phone understands
         frontLeftDrive = hardwareMap.get(DcMotor.class, "leftFront");
         frontRightDrive = hardwareMap.get(DcMotor.class, "rightFront");
@@ -74,10 +77,10 @@ public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
 
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
         // wires, you should remove these
@@ -91,7 +94,7 @@ public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
@@ -120,8 +123,8 @@ public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
     }
 
     //we are using the methods from OpMode and @Override is so that we can write our own stuff for this method
-    @Override
-    public void loop() {
+    //@Override
+    public void loop(Telemetry telemetry, Gamepad gamepad1, GoalTag goalTag) {
         telemetry.addLine("Press A to reset Yaw");
         telemetry.addLine("Hold left bumper to drive in robot relative");
         telemetry.addLine("The left joystick sets the robot direction");
@@ -149,6 +152,8 @@ public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
         }
         else if(gamepad1.b) {
             moveAllMotors(0, 0, 0, 0.5);
+        } else if (gamepad1.right_bumper) {
+            turnToAprilTag(goalTag, telemetry);
         }
         // put in button that when pressed calls GoalTag.getBearing(), which is a double, and then uses that to turn to face the goal.
 
@@ -207,12 +212,13 @@ public class RobotTeleopMecanumFieldRelativeDriveFinleyCopy extends OpMode {
         backLeftDrive.setPower(maxSpeed * (backLeftPower / maxPower));
         backRightDrive.setPower(maxSpeed * (backRightPower / maxPower));
     }
-    public void turnToAprilTag(GoalTag goalTag) {
-        while (goalTag.getBearing() > 2 || goalTag.getBearing() < -2) {
-            if (goalTag.getBearing() > 2) {
-                drive(0,0,1);
-            } else if (goalTag.getBearing() < -2) {
-                drive(0, 0, -1);
+    public void turnToAprilTag(GoalTag goalTag, Telemetry telemetry) {
+        if (goalTag.getBearing() > 2 || goalTag.getBearing() < -2) {
+            telemetry.addData("bearing inside loop", goalTag.getBearing());
+            if (goalTag.getBearing() > 2) { // rotate left
+                moveAllMotors(-0.5,0.5,-0.5,0.5);
+            } else if (goalTag.getBearing() < -2) { // rotate right
+                moveAllMotors(0.5,-0.5,0.5,-0.5);
             }
         }
     }

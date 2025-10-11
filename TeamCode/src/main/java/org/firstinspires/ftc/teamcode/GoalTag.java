@@ -26,6 +26,10 @@ public class GoalTag {
     private double goalBearing; // radians
     private int goalTagID;
 
+    public boolean GPP = false; // id 21
+    public boolean PGP = false; // id 22
+    public boolean PPG = false; // id 23
+
     private double BotX; // inches
 
     private double BotY;
@@ -99,13 +103,23 @@ public class GoalTag {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null && detection.id == goalTagID) {
-                goalRange = detection.ftcPose.range;
-                goalBearing = detection.ftcPose.bearing;
-                BotX = detection.robotPose.getPosition().x;
-                BotY = detection.robotPose.getPosition().y;
-
+            if (detection.metadata != null) {
+                if (detection.id == goalTagID) {
+                    goalRange = detection.ftcPose.range;
+                    goalBearing = detection.ftcPose.bearing;
+                    BotX = detection.robotPose.getPosition().x;
+                    BotY = detection.robotPose.getPosition().y;
+                }
+                if (detection.id == 21) {
+                    GPP = true;
+                } else if (detection.id == 22) {
+                    PGP = true;
+                } else if (detection.id == 23) {
+                    PPG = true;
+                }
             }
+
+
         }
     }
     public double getRange() {
@@ -114,6 +128,17 @@ public class GoalTag {
 
     public double getBearing() {
         return goalBearing;
+    }
+    public String getObelisk() {
+        if (PGP == true) {
+            return "PGP";
+        } else if (GPP == true) {
+            return "GPP";
+        } else if (PPG == true) {
+            return "PPG";
+        } else {
+            return "No Tag Detected";
+        }
     }
 
     public double getBotX() { return BotX; }

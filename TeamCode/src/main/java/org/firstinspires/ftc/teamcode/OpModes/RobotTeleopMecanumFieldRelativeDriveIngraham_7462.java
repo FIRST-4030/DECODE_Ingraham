@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.ConceptAprilTagLocalization_7462class;
 
 /*
  * This OpMode illustrates how to program your robot to drive field relative.  This means
@@ -61,6 +62,8 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
 
+    ConceptAprilTagLocalization_7462class aprilTags;
+
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
 
@@ -81,10 +84,10 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
 
         // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
         // wires, you should remove these
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //encoder uses ticks which is revolutions which tells how much to move
 
         //connecting our name for the orientation code to the android phone to tell it about the robot orientation (imu)
@@ -103,7 +106,12 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
         //the usb ports are facing
         //because the logo or the usb could be facing up/down or right/left depending on how
         //they could fit the control hub on the robot
+
+        aprilTags = new ConceptAprilTagLocalization_7462class();
+        aprilTags.initAprilTag(hardwareMap, telemetry);
     }
+
+
 
     /*public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
         frontLeftDrive.setPower(frontleftpower);
@@ -115,6 +123,7 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
     //we are using the methods from OpMode and @Override is so that we can write our own stuff for this method
     @Override
     public void loop() {
+        aprilTags.runAprilTag();
         telemetry.addLine("Press A to reset Yaw");
         telemetry.addLine("Hold left bumper to drive in robot relative");
         telemetry.addLine("The left joystick sets the robot direction");
@@ -124,12 +133,18 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
-//        if (gamepad1.a) {
-//            imu.resetYaw();
-//        }
+        if (gamepad1.a) {
+            imu.resetYaw();
+        }
         //resetting the yaw is saying the yaw is at zero for whatever the current orientation of the robot is
 
-        if(gamepad1.x) {
+        if (gamepad1.dpad_down) {
+            aprilTags.visionPortal.stopStreaming();
+        } else if (gamepad1.dpad_up) {
+            aprilTags.visionPortal.resumeStreaming();
+        }
+
+        /*if(gamepad1.x) {
             //moveAllMotors(0.5, 0, 0, 0);
             frontLeftDrive.setPower(0.5);
         }
@@ -142,8 +157,9 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
         }
         else if(gamepad1.b) {
             backRightDrive.setPower(0.5);
-        }
+        }*/
 
+        // put in button that when pressed calls GoalTag.getBearing(), which is a double, and then uses that to turn to face the goal.
 
         // If you press the left bumper, you get a drive from the point of view of the robot
         // (much like driving an RC vehicle)

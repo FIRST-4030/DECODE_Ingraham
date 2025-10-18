@@ -113,12 +113,12 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
 
 
 
-    /*public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
+    public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
         frontLeftDrive.setPower(frontleftpower);
         frontRightDrive.setPower(frontrightpower);
         backLeftDrive.setPower(backleftpower);
         backRightDrive.setPower(backrightpower);
-    }*/
+    }
 
     //we are using the methods from OpMode and @Override is so that we can write our own stuff for this method
     @Override
@@ -133,9 +133,9 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
-        if (gamepad1.a) {
+        /*if (gamepad1.a) {
             imu.resetYaw();
-        }
+        }*/
         //resetting the yaw is saying the yaw is at zero for whatever the current orientation of the robot is
 
         if (gamepad1.dpad_down) {
@@ -144,7 +144,7 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
             aprilTags.visionPortal.resumeStreaming();
         }
 
-        /*if(gamepad1.x) {
+        if(gamepad1.x) {
             //moveAllMotors(0.5, 0, 0, 0);
             frontLeftDrive.setPower(0.5);
         }
@@ -157,7 +157,7 @@ public class RobotTeleopMecanumFieldRelativeDriveIngraham_7462 extends OpMode {
         }
         else if(gamepad1.b) {
             backRightDrive.setPower(0.5);
-        }*/
+        }
 
         // put in button that when pressed calls GoalTag.getBearing(), which is a double, and then uses that to turn to face the goal.
 

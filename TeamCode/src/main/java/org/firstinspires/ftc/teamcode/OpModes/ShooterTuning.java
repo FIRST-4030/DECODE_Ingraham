@@ -33,9 +33,14 @@ public class ShooterTuning extends LinearOpMode {
         goalTag = new GoalTag();
         robot = new RobotTeleopMecanumFieldRelativeDriveFinleyCopy(hardwareMap);
 
-        goalTag.init(20, hardwareMap);
+        goalTag.init(hardwareMap);
 
-        waitForStart();
+        do {
+            goalTag.initProcess();
+            telemetry.addData("Pattern", goalTag.getObelisk());
+            telemetry.addData("team ID", goalTag.getGoalTagID());
+            telemetry.update();
+        } while(opModeInInit());
 
         //PIDFCoefficients pidfOrig = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
 

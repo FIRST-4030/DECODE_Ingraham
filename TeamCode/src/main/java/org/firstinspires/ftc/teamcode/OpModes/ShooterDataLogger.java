@@ -59,9 +59,9 @@ public class ShooterDataLogger extends LinearOpMode{
     @Override
     public void runOpMode() {
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        launchFlap = hardwareMap.get(Servo.class, "launchFlap");
-        launchFlap.setPosition(1);
-        launchFlap.setDirection(Servo.Direction.FORWARD);
+//        launchFlap = hardwareMap.get(Servo.class, "launchFlap");
+//        launchFlap.setPosition(1);
+//        launchFlap.setDirection(Servo.Direction.FORWARD);
 
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -142,29 +142,30 @@ public class ShooterDataLogger extends LinearOpMode{
                 shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
             } else if (gamepad1.aWasPressed()) {
                 targetVelocity -= 0.25;
-                shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
-                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
-            } else if (gamepad1.right_trigger == 1) {
-                launchFlap.setPosition(0.7);
-                i = 0;
-                readyToShoot = false;
+                shooter.setVelocity(targetVelocity * COUNTS_PER_REV);
+                shooter.setPower(targetVelocity / 55); // max speed is about 55 RPS (empirically determined)
             }
-            if (i > 500) {
-                launchFlap.setPosition(1);
-                i = 0;
-            }
-            if (readyToShoot) {
-                if (j < 1) {
-                    launchFlap.setPosition(0.3);
-                    k = 0;
-                    j++;
-                }
-                if (k > 200) {
-                    launchFlap.setPosition(0);
-                    j--;
-                }
+//            } else if (gamepad1.right_trigger == 1) {
+//                launchFlap.setPosition(0.7);
+//                i = 0;
+//                readyToShoot = false;
+//            }
+//            if (i > 500) {
+//                launchFlap.setPosition(1);
+//                i = 0;
+//            }
+//            if (readyToShoot) {
+//                if (j < 1) {
+//                    launchFlap.setPosition(0.3);
+//                    k = 0;
+//                    j++;
+//                }
+//                if (k > 200) {
+//                    launchFlap.setPosition(0);
+//                    j--;
+//                }
 
-            }
+            
             telemetry.addData("i", i);
             telemetry.addData("j", j);
             telemetry.addData("k", k);

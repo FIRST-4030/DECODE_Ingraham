@@ -23,8 +23,8 @@ public class GoalTag {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private double goalRange; // inches
-    private double goalBearing; // radians
     private int goalTagID;
+    private double goalBearing; // radians
 
     public boolean GPP = false; // id 21
     public boolean PGP = false; // id 22
@@ -33,8 +33,7 @@ public class GoalTag {
     private double BotX; // inches
 
     private double BotY;
-    public void init(int passedGoalTagID, HardwareMap hardwareMap) {
-        goalTagID = passedGoalTagID;
+    public void init(HardwareMap hardwareMap) {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
@@ -110,18 +109,38 @@ public class GoalTag {
                     BotX = detection.robotPose.getPosition().x;
                     BotY = detection.robotPose.getPosition().y;
                 }
-                if (detection.id == 21) {
-                    GPP = true;
-                } else if (detection.id == 22) {
-                    PGP = true;
-                } else if (detection.id == 23) {
-                    PPG = true;
-                }
             }
 
 
         }
     }
+    public void initProcess() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == 21) {
+                    GPP = true;
+                    PGP = false;
+                    PPG = false;
+                } else if (detection.id == 22) {
+                    PGP = true;
+                    GPP = false;
+                    PPG = false;
+                } else if (detection.id == 23) {
+                    PPG = true;
+                    GPP = false;
+                    PGP = false;
+                }
+                if (detection.id == 24) {
+                    goalTagID = 24;
+                } else if (detection.id == 20) {
+                    goalTagID = 20;
+                }
+            }
+        }
+    }
+
     public double getRange() {
         return goalRange;
     }
@@ -145,5 +164,8 @@ public class GoalTag {
 
     public double getBotY() {
         return BotY;
+    }
+    public int getGoalTagID() {
+        return goalTagID;
     }
 }

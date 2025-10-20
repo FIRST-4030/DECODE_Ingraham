@@ -25,6 +25,7 @@ public class ShooterDataLogger extends LinearOpMode{
     private DcMotorEx shooter;
     private Servo launchFlap;
     private GoalTag goalTag;
+    private double initPos = 0.5;
 
     private double goalRange;
     private double goalBearing;
@@ -40,7 +41,7 @@ public class ShooterDataLogger extends LinearOpMode{
      */
     private VisionPortal visionPortal;
     Datalog AimTestDatalog; // create the data logger object
-    private double targetVelocity = 30; // rotations per second (max is 60)
+    private double targetPower = 0;
 
     private boolean goal;
 
@@ -59,9 +60,10 @@ public class ShooterDataLogger extends LinearOpMode{
     @Override
     public void runOpMode() {
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-//        launchFlap = hardwareMap.get(Servo.class, "launchFlap");
-//        launchFlap.setPosition(1);
-//        launchFlap.setDirection(Servo.Direction.FORWARD);
+        launchFlap = hardwareMap.get(Servo.class, "launchFlap");
+        launchFlap.setDirection(Servo.Direction.FORWARD);
+
+        goalTag = new GoalTag();
 
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -69,15 +71,20 @@ public class ShooterDataLogger extends LinearOpMode{
         // Initialize the datalog
         AimTestDatalog = new Datalog("launch log");
         // wait for start command
-        initAprilTag();
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch START to start OpMode");
         telemetry.update();
-        waitForStart();
 
+        goalTag.init(hardwareMap);
 
+        do {
+            goalTag.initProcess();
+            telemetry.addData("Pattern", goalTag.getObelisk());
+            telemetry.addData("team ID", goalTag.getGoalTagID());
+            telemetry.update();
+        } while(opModeInInit());
 
         // Get the PIDF coefficients for the RUN_USING_ENCODER RunMode.
         PIDFCoefficients pidfOrig = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -92,6 +99,7 @@ public class ShooterDataLogger extends LinearOpMode{
         // Not sure if setVelocity is working properly
         // angular rate in counts (ticks) per second
         // max speed is about 55 RPS (empirically determined)
+
 
         // display info to user
         while (opModeIsActive()) {
@@ -110,50 +118,50 @@ public class ShooterDataLogger extends LinearOpMode{
             */
             //shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
             // setPower is required, in addition to setVelocity
-            targetVelocity = (goalRange+241.28)/10.473;
-            shooter.setPower(targetVelocity/55);
-            telemetryAprilTag();
+            // targetPower = (goalRange+241.28)/10.473;
 
-            // Push telemetry to the Driver Station.
-            telemetry.update();
+            goalTag.process();
+            goalRange = goalTag.getRange();
+            goalBearing = goalTag.getBearing();
+            targetPower = (goalRange+319.94289)/670.11831;
+            shooter.setPower(targetPower);
+
+
             if (gamepad1.leftBumperWasPressed()) {
                 goal = true;
                 telemetry.addData("goal",goal);
-                telemetry.addData("targetVelocity", targetVelocity);
+                telemetry.addData("targetVelocity", targetPower);
                 telemetry.update();
                 AimTestDatalog.goalBool.set(goal);
-                AimTestDatalog.targetVelocity.set(targetVelocity);
+                AimTestDatalog.targetPower.set(targetPower);
                 AimTestDatalog.goalRange.set(goalRange);
                 AimTestDatalog.goalBearing.set(goalBearing);
                 AimTestDatalog.writeLine();
             } else if (gamepad1.rightBumperWasPressed()) {
                 goal = false;
                 telemetry.addData("goal", goal);
-                telemetry.addData("targetVelocity", targetVelocity);
+                telemetry.addData("targetVelocity", targetPower);
                 telemetry.update();
                 AimTestDatalog.goalBool.set(goal);
-                AimTestDatalog.targetVelocity.set(targetVelocity);
+                AimTestDatalog.targetPower.set(targetPower);
                 AimTestDatalog.goalRange.set(goalRange);
                 AimTestDatalog.goalBearing.set(goalBearing);
                 AimTestDatalog.writeLine();
             } else if (gamepad1.yWasPressed()) {
-                targetVelocity += 0.25;
-                shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
-                shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
+                targetPower += 0.005;
+                shooter.setPower(targetPower); // max speed is about 55 RPS (empirically determined)
             } else if (gamepad1.aWasPressed()) {
-                targetVelocity -= 0.25;
-                shooter.setVelocity(targetVelocity * COUNTS_PER_REV);
-                shooter.setPower(targetVelocity / 55); // max speed is about 55 RPS (empirically determined)
+                targetPower -= 0.005;
+                shooter.setPower(targetPower); // max speed is about 55 RPS (empirically determined)
+            } else if (gamepad1.right_trigger == 1) {
+                launchFlap.setPosition(0);
+                i = 0;
+                readyToShoot = false;
             }
-//            } else if (gamepad1.right_trigger == 1) {
-//                launchFlap.setPosition(0.7);
-//                i = 0;
-//                readyToShoot = false;
-//            }
-//            if (i > 500) {
-//                launchFlap.setPosition(1);
-//                i = 0;
-//            }
+            if (i > 500) {
+               launchFlap.setPosition(initPos);
+               i = 0;
+            }
 //            if (readyToShoot) {
 //                if (j < 1) {
 //                    launchFlap.setPosition(0.3);
@@ -167,14 +175,14 @@ public class ShooterDataLogger extends LinearOpMode{
 
             
             telemetry.addData("i", i);
-            telemetry.addData("j", j);
-            telemetry.addData("k", k);
+            //telemetry.addData("j", j);
+            //telemetry.addData("k", k);
 
             telemetry.addData("val", gamepad1.right_trigger);
 
 
-            telemetry.addData("targetVelocity", targetVelocity);
-            telemetry.addData("currentVelocity", shooter.getVelocity());
+            telemetry.addData("targetPower", targetPower);
+            telemetry.addData("currentPower", shooter.getPower());
             telemetry.addData("GoalRange", (goalRange));
             telemetry.addData("GoalBearing", (goalBearing));
             telemetry.update();
@@ -187,94 +195,6 @@ public class ShooterDataLogger extends LinearOpMode{
         }
 
     }
-    private void initAprilTag() {
-
-        // Create the AprilTag processor.
-        aprilTag = new AprilTagProcessor.Builder()
-
-                // The following default settings are available to un-comment and edit as needed.
-                //.setDrawAxes(false)
-                .setDrawCubeProjection(true) // defaults to false
-                //.setDrawTagOutline(true)
-                //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-                //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-
-                // == CAMERA CALIBRATION ==
-                // If you do not manually specify calibration parameters, the SDK will attempt
-                // to load a predefined calibration for your camera.
-                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
-                // ... these parameters are fx, fy, cx, cy.
-
-                .build();
-
-        // Adjust Image Decimation to trade-off detection-range for detection-rate.
-        // eg: Some typical detection data using a Logitech C920 WebCam
-        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
-        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
-        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
-        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
-        // Note: Decimation can be changed on-the-fly to adapt during a match.
-        //aprilTag.setDecimation(3);
-
-        // Create the vision portal by using a builder.
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-
-        // Choose a camera resolution. Not all cameras support all resolutions.
-        //builder.setCameraResolution(new Size(640, 480));
-
-        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableLiveView(true);
-
-        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
-
-        // Choose whether or not LiveView stops if no processors are enabled.
-        // If set "true", monitor shows solid orange screen if no processors enabled.
-        // If set "false", monitor shows camera view without annotations.
-        //builder.setAutoStopLiveView(false);
-
-        // Set and enable the processor.
-        builder.addProcessor(aprilTag);
-
-        // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
-
-        // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
-
-    }   // end method initAprilTag()
-
-
-    /**
-     * Add telemetry about AprilTag detections.
-     */
-    private void telemetryAprilTag() {
-
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
-
-        // Step through the list of detections and display info for each one.
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                goalRange = detection.ftcPose.range;
-                goalBearing = detection.ftcPose.bearing;
-
-            }
-        }   // end for() loop
-
-        // Add "key" information to telemetry
-
-
-    }   // end method telemetryAprilTag()
-
 
     /**
      * Datalog class encapsulates all the fields that will go into the datalog.
@@ -288,8 +208,8 @@ public class ShooterDataLogger extends LinearOpMode{
         public Datalogger.GenericField loopCounter = new Datalogger.GenericField("LoopCounter");
         public Datalogger.GenericField runTime = new Datalogger.GenericField("RunTime");
         public Datalogger.GenericField deltaTime = new Datalogger.GenericField("deltaTime");
-        public Datalogger.GenericField shooterVelocity = new Datalogger.GenericField("shooterVelocity");
-        public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("targetVelocity");
+        public Datalogger.GenericField shooterPower = new Datalogger.GenericField("shooterVelocity");
+        public Datalogger.GenericField targetPower = new Datalogger.GenericField("targetVelocity");
         public Datalogger.GenericField goalBool = new Datalogger.GenericField("goalBool");
         public Datalogger.GenericField goalRange = new Datalogger.GenericField("goalRange");
         public Datalogger.GenericField goalBearing = new Datalogger.GenericField("goalBearing");
@@ -313,7 +233,7 @@ public class ShooterDataLogger extends LinearOpMode{
                             //deltaTime,
                             //shooterVelocity,
                             goalBool,
-                            targetVelocity,
+                            targetPower,
                             goalRange,
                             goalBearing
                     )

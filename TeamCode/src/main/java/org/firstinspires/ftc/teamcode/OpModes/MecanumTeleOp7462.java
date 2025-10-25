@@ -131,16 +131,16 @@ public class MecanumTeleOp7462 extends OpMode {
         goalTag = new GoalTag();
         goalTag.init(hardwareMap);
 
-        collectorFront = new Shooter("collectorFront", true);
+        collectorFront = new Shooter(hardwareMap,"collectorFront", true);
         collectorFront.setControllerValues(5,0);
 
-        collectorBack = new Shooter("collectorBack", true);
+        collectorBack = new Shooter(hardwareMap,"collectorBack", true);
         collectorBack.setControllerValues(5,0);
 
-        shooterLeft = new Shooter("shooterLeft", true);
+        shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
         shooterLeft.setControllerValues(5,0);
 
-        shooterRight = new Shooter("shooterRight", true);
+        shooterRight = new Shooter(hardwareMap,"shooterRight", true);
         shooterRight.setControllerValues(5,0);
 
 

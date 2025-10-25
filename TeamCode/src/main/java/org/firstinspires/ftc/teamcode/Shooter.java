@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -22,7 +23,7 @@ public class Shooter {
 
     public double targetVelocity = 10;  // rotations per second (max is ~40)
 
-    public Shooter(String name, Boolean dir) {
+    public Shooter(HardwareMap hardwareMap, String name, Boolean dir) {
         shooter = (DcMotorEx) hardwareMap.get(DcMotor.class, name);
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -81,6 +81,9 @@ public class MecanumTeleOp7462 extends OpMode {
     private int i = 0;
     private int j = 0;
 
+    // Just for tuning
+    private double Kvelo;
+
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
 
@@ -132,16 +135,18 @@ public class MecanumTeleOp7462 extends OpMode {
         goalTag.init(hardwareMap);
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", true);
-        collectorFront.setControllerValues(5,0);
+        collectorFront.setControllerValues(0.3,0.0243);
+        collectorFront.targetVelocity = 10;
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", true);
-        collectorBack.setControllerValues(5,0);
+        collectorBack.setControllerValues(0.3,0.0243);
+        collectorBack.targetVelocity = 10;
 
         shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
-        shooterLeft.setControllerValues(5,0);
+        shooterLeft.setControllerValues(0.3,0.0243);
 
         shooterRight = new Shooter(hardwareMap,"shooterRight", true);
-        shooterRight.setControllerValues(5,0);
+        shooterRight.setControllerValues(0.3,0.0243);
 
 
     }
@@ -164,20 +169,28 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void loop() {
+        i++;
         goalTag.process();
+
+        collectorFront.overridePower();
+        collectorBack.overridePower();
+        shooterRight.overridePower();
+        shooterLeft.overridePower();
+
         telemetry.addLine("Press A to reset Yaw");
-        telemetry.addLine("Hold left bumper to drive in robot relative");
         telemetry.addLine("The left joystick sets the robot direction");
         telemetry.addLine("Moving the right joystick left and right turns the robot");
+        telemetry.addLine("To start make sure only your team's goalTag and the Obelisk can be seen");
+        telemetry.addLine("Then press init and wait for data to load");
         telemetry.update();
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
-        /*if (gamepad1.a) {
+        if (gamepad1.a) {
             imu.resetYaw();
-        }*/
+        }
         //resetting the yaw is saying the yaw is at zero for whatever the current orientation of the robot is
-
+        // Debug Driving
 //        if(gamepad1.x) {
 //            frontLeftDrive.setPower(0.5);
 //        }
@@ -190,7 +203,16 @@ public class MecanumTeleOp7462 extends OpMode {
 //        else if(gamepad1.b) {
 //            backRightDrive.setPower(0.5);
 //        }
-        i++;
+
+        // Tuning
+        if (gamepad1.xWasPressed()) {
+            Kvelo += 0.005;
+            shooterLeft.setControllerValues(0,Kvelo);
+        } else if (gamepad1.yWasPressed()) {
+            Kvelo -= 0.005;
+            shooterLeft.setControllerValues(0,Kvelo);
+        }
+        // Driver Controls
         if (gamepad1.left_trigger == 1) {
             launchFlapLeft.setPosition(0);
             i = 0;
@@ -199,9 +221,13 @@ public class MecanumTeleOp7462 extends OpMode {
             launchFlapRight.setPosition(0);
             j = 0;
         }
+
+        drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
         if (gamepad1.aWasPressed()) {
             turnToAprilTag();
         }
+        // Loop Controls
         if (i > 500) {
             launchFlapLeft.setPosition(initPos);
             i = 0;
@@ -211,7 +237,7 @@ public class MecanumTeleOp7462 extends OpMode {
             j = 0;
         }
 
-        drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
     }
     public void turnToAprilTag() {
         if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {

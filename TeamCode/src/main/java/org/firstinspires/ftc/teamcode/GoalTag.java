@@ -103,7 +103,7 @@ public class GoalTag {
 
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                if (detection.id == goalTagID) {
+                if (detection.id != goalTagID && !detection.metadata.name.contains("Obelisk")) {
                     goalRange = detection.ftcPose.range;
                     goalBearing = detection.ftcPose.bearing;
                     BotX = detection.robotPose.getPosition().x;
@@ -149,11 +149,11 @@ public class GoalTag {
         return goalBearing;
     }
     public String getObelisk() {
-        if (PGP == true) {
+        if (PGP) {
             return "PGP";
-        } else if (GPP == true) {
+        } else if (GPP) {
             return "GPP";
-        } else if (PPG == true) {
+        } else if (PPG) {
             return "PPG";
         } else {
             return "No Tag Detected";

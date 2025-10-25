@@ -38,19 +38,17 @@ public class Shooter {
         double setPower = targetVelocity * Kvelo  + veloError * Kp;
         shooter.setPower(setPower);
     }
-    public void setMotorDirection(Boolean dir) {
+    private void setMotorDirection(Boolean dir) {
         //True = forward, false = backwards
         if (dir) {
             shooter.setDirection(DcMotor.Direction.FORWARD);
         } else {
             shooter.setDirection(DcMotor.Direction.REVERSE);
         }
-
     }
-    public void setControllerValues(double Kp, double Kvelo, double targetVelocity) {
+    public void setControllerValues(double Kp, double Kvelo) {
         this.Kp = Kp;
         this.Kvelo = Kvelo;
-        this.targetVelocity = targetVelocity;
     }
     public double getPower() {
         return shooter.getPower();

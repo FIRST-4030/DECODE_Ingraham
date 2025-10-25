@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.ConceptAprilTagLocalization_7462class;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
@@ -76,6 +75,12 @@ public class MecanumTeleOp7462 extends OpMode {
 
     Shooter shooter;
 
+    private double initPos = 0.5;
+
+    // Loops
+    private int i = 0;
+    private int j = 0;
+
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
 
@@ -88,8 +93,8 @@ public class MecanumTeleOp7462 extends OpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "leftBack");
         backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
 
-
-
+        launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
+        launchFlapRight = hardwareMap.get(Servo.class, "launchFlapRight");
 
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
@@ -97,9 +102,6 @@ public class MecanumTeleOp7462 extends OpMode {
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-
-
-
 
         // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
         // wires, you should remove these
@@ -130,15 +132,19 @@ public class MecanumTeleOp7462 extends OpMode {
         goalTag.init(hardwareMap);
 
         collectorFront = new Shooter("collectorFront", true);
+        collectorFront.setControllerValues(5,0);
+
         collectorBack = new Shooter("collectorBack", true);
+        collectorBack.setControllerValues(5,0);
+
         shooterLeft = new Shooter("shooterLeft", true);
+        shooterLeft.setControllerValues(5,0);
+
         shooterRight = new Shooter("shooterRight", true);
+        shooterRight.setControllerValues(5,0);
 
 
     }
-
-
-
     public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
         frontLeftDrive.setPower(frontleftpower);
         frontRightDrive.setPower(frontrightpower);
@@ -163,8 +169,7 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addLine("Hold left bumper to drive in robot relative");
         telemetry.addLine("The left joystick sets the robot direction");
         telemetry.addLine("Moving the right joystick left and right turns the robot");
-        //telemetry is what comes up on the screen to tell the driver text of what is needed to be messaged to the driver
-        //addLine is writing this stuff out (returning to telemetry variable)
+        telemetry.update();
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
@@ -174,11 +179,9 @@ public class MecanumTeleOp7462 extends OpMode {
         //resetting the yaw is saying the yaw is at zero for whatever the current orientation of the robot is
 
 //        if(gamepad1.x) {
-//            //moveAllMotors(0.5, 0, 0, 0);
 //            frontLeftDrive.setPower(0.5);
 //        }
 //        else if(gamepad1.y) {
-//            //moveAllMotors(0, 0.5, 0, 0);
 //            frontRightDrive.setPower(0.5);
 //        }
 //        else if(gamepad1.a) {
@@ -187,45 +190,39 @@ public class MecanumTeleOp7462 extends OpMode {
 //        else if(gamepad1.b) {
 //            backRightDrive.setPower(0.5);
 //        }
-        if (gamepad1.right_trigger == 1) {
+        i++;
+        if (gamepad1.left_trigger == 1) {
             launchFlapLeft.setPosition(0);
             i = 0;
-            readyToShoot = false;
+        }
+        if (gamepad1.right_trigger == 1) {
+            launchFlapRight.setPosition(0);
+            j = 0;
+        }
+        if (gamepad1.aWasPressed()) {
+            turnToAprilTag();
         }
         if (i > 500) {
             launchFlapLeft.setPosition(initPos);
             i = 0;
         }
+        if (j > 500) {
+            launchFlapRight.setPosition(initPos);
+            j = 0;
+        }
 
-        // put in button that when pressed calls GoalTag.getBearing(), which is a double, and then uses that to turn to face the goal.
-
-        // If you press the left bumper, you get a drive from the point of view of the robot
-        // (much like driving an RC vehicle)
-//        if (gamepad1.left_bumper) {
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-//        } else {
-//            driveFieldRelative(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-//        }
     }
+    public void turnToAprilTag() {
+        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
+            if (goalTag.getBearing() > 0.6) { // rotate left
+                moveAllMotors(-0.2,0.2,-0.2,0.2);
+            } else if (goalTag.getBearing() < -0.5) { // rotate right
+                moveAllMotors(0.2,-0.2,0.2,-0.2);
 
-    // This routine drives the robot field relative
-//    private void driveFieldRelative(double forward, double right, double rotate) {
-//        // First, convert direction being asked to drive to polar coordinates
-//        double theta = Math.atan2(forward, right);
-//        double r = Math.hypot(right, forward);
-//
-//        // Second, rotate angle by the angle the robot is pointing
-//        theta = AngleUnit.normalizeRadians(theta -
-//                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
-//
-//        // Third, convert back to cartesian
-//        double newForward = r * Math.sin(theta);
-//        double newRight = r * Math.cos(theta);
-//
-//        // Finally, call the drive method with robot relative forward and right amounts
-//        drive(newForward, newRight, rotate);
-//    }
-
+            }
+        }
+    }
     // Thanks to FTC16072 for sharing this code!!
     public void drive(double forward, double right, double rotate) {
         // This calculates the power needed for each wheel based on the amount of forward,

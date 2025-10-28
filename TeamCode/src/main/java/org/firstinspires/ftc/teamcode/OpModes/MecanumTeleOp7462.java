@@ -75,7 +75,6 @@ public class MecanumTeleOp7462 extends OpMode {
 
     Shooter shooter;
 
-    private double initPos = 0.5;
 
     // Loops
     private int i = 0;
@@ -120,7 +119,7 @@ public class MecanumTeleOp7462 extends OpMode {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
         RevHubOrientationOnRobot orientationOnRobot = new
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
@@ -142,11 +141,13 @@ public class MecanumTeleOp7462 extends OpMode {
         collectorBack.setControllerValues(0.3,0.0243);
         collectorBack.targetVelocity = 10;
 
-        shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
+        shooterLeft = new Shooter(hardwareMap,"shooterLeft", false);
         shooterLeft.setControllerValues(0.3,0.0243);
+        shooterLeft.targetVelocity = 20;
 
         shooterRight = new Shooter(hardwareMap,"shooterRight", true);
         shooterRight.setControllerValues(0.3,0.0243);
+        shooterRight.targetVelocity = 20;
 
 
     }
@@ -170,6 +171,7 @@ public class MecanumTeleOp7462 extends OpMode {
     @Override
     public void loop() {
         i++;
+        j++;
         goalTag.process();
 
         collectorFront.overridePower();
@@ -186,39 +188,55 @@ public class MecanumTeleOp7462 extends OpMode {
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
-        if (gamepad1.a) {
-            imu.resetYaw();
-        }
+//        if (gamepad1.a) {
+//            imu.resetYaw();
+//        }
         //resetting the yaw is saying the yaw is at zero for whatever the current orientation of the robot is
         // Debug Driving
-//        if(gamepad1.x) {
-//            frontLeftDrive.setPower(0.5);
+        if(gamepad1.x) {
+            frontLeftDrive.setPower(0.5);
+        }
+        else if(gamepad1.y) {
+            frontRightDrive.setPower(0.5);
+        }
+        else if(gamepad1.a) {
+            backLeftDrive.setPower(0.5);
+        }
+        else if(gamepad1.b) {
+            backRightDrive.setPower(0.5);
+        }
+//        else if(gamepad1.right_trigger == 1) {
+//            shooterRight.targetVelocity = 1;
+//            shooterRight.overridePower();
 //        }
-//        else if(gamepad1.y) {
-//            frontRightDrive.setPower(0.5);
+//        else if(gamepad1.left_trigger == 1) {
+//            shooterLeft.targetVelocity = 1;
+//            shooterLeft.overridePower();
 //        }
-//        else if(gamepad1.a) {
-//            backLeftDrive.setPower(0.5);
-//        }
-//        else if(gamepad1.b) {
-//            backRightDrive.setPower(0.5);
-//        }
+        else if(gamepad1.left_bumper) {
+            collectorBack.targetVelocity = 1;
+            collectorBack.overridePower();
+        }
+        else if(gamepad1.right_bumper) {
+            collectorFront.targetVelocity = 1;
+            collectorFront.overridePower();
+        }
 
         // Tuning
-        if (gamepad1.xWasPressed()) {
-            Kvelo += 0.005;
-            shooterLeft.setControllerValues(0,Kvelo);
-        } else if (gamepad1.yWasPressed()) {
-            Kvelo -= 0.005;
-            shooterLeft.setControllerValues(0,Kvelo);
-        }
+//        if (gamepad1.xWasPressed()) {
+//            Kvelo += 0.005;
+//            shooterLeft.setControllerValues(0,Kvelo);
+//        } else if (gamepad1.yWasPressed()) {
+//            Kvelo -= 0.005;
+//            shooterLeft.setControllerValues(0,Kvelo);
+//        }
         // Driver Controls
         if (gamepad1.left_trigger == 1) {
             launchFlapLeft.setPosition(0);
             i = 0;
         }
         if (gamepad1.right_trigger == 1) {
-            launchFlapRight.setPosition(0);
+            launchFlapRight.setPosition(0.7);
             j = 0;
         }
 
@@ -227,13 +245,12 @@ public class MecanumTeleOp7462 extends OpMode {
         if (gamepad1.aWasPressed()) {
             turnToAprilTag();
         }
-        // Loop Controls
-        if (i > 500) {
-            launchFlapLeft.setPosition(initPos);
+        if (i > 300) {
+            launchFlapLeft.setPosition(0.3);
             i = 0;
         }
-        if (j > 500) {
-            launchFlapRight.setPosition(initPos);
+        if (j > 300) {
+            launchFlapRight.setPosition(0.4);
             j = 0;
         }
 

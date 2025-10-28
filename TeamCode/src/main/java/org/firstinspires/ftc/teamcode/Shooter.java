@@ -21,7 +21,7 @@ public class Shooter {
 
     static final double   COUNTS_PER_REV = 28 ;  // REV HD Hex 1:1 Motor Encoder
 
-    public double targetVelocity = 10;  // rotations per second (max is ~40)
+    public double targetVelocity = 0;  // rotations per second (max is ~40)
 
     public Shooter(HardwareMap hardwareMap, String name, Boolean dir) {
         shooter = (DcMotorEx) hardwareMap.get(DcMotor.class, name);

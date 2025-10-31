@@ -31,7 +31,6 @@ public class Shooter {
         setMotorDirection(dir);
 
     }
-
     public void overridePower() {
         double currentVelocity = shooter.getVelocity(AngleUnit.DEGREES)/COUNTS_PER_REV;
         double veloError = targetVelocity - currentVelocity;
@@ -51,10 +50,21 @@ public class Shooter {
         this.Kp = Kp;
         this.Kvelo = Kvelo;
     }
+
+    public void setTargetVelocity(double velo) {
+        this.targetVelocity = velo;
+    }
     public double getPower() {
         return shooter.getPower();
     }
     public double getVelocity() {
-        return shooter.getVelocity();
+        return shooter.getVelocity(AngleUnit.DEGREES)/COUNTS_PER_REV;
+    }
+    public boolean atSpeed() {
+        if (0.9*targetVelocity < this.getVelocity() && this.getVelocity() < 1.1*targetVelocity) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

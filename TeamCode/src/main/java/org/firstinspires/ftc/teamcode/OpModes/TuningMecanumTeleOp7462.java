@@ -32,13 +32,10 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Datalogger;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
@@ -57,9 +54,9 @@ import org.firstinspires.ftc.teamcode.Shooter;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  *
  */
-@TeleOp(name = "Mecanum TeleOp 7462", group = "Robot")
+@TeleOp(name = "TUNING Mecanum TeleOp 7462", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
-public class MecanumTeleOp7462 extends OpMode {
+public class TuningMecanumTeleOp7462 extends OpMode {
     // This declares the four motors needed
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
@@ -79,10 +76,10 @@ public class MecanumTeleOp7462 extends OpMode {
     ElapsedTime timerLeft = new ElapsedTime();
     ElapsedTime timerRight = new ElapsedTime();
 
+    Datalog tuningLog;
+
     // Just for tuning
     private double Kvelo;
-    private boolean leftIsRunning;
-    private boolean rightIsRunning;
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
@@ -136,11 +133,11 @@ public class MecanumTeleOp7462 extends OpMode {
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", true);
         collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = 20;
+        collectorFront.targetVelocity = 10;
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", true);
         collectorBack.setControllerValues(0.3,0.0243);
-        collectorBack.targetVelocity = 20;
+        collectorBack.targetVelocity = 10;
 
         shooterLeft = new Shooter(hardwareMap,"shooterLeft", false);
         shooterLeft.setControllerValues(0.3,0.0243);
@@ -151,6 +148,7 @@ public class MecanumTeleOp7462 extends OpMode {
         timerLeft.reset();
         timerRight.reset();
 
+        tuningLog = new Datalog("TuningLog");
 
     }
     public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
@@ -177,9 +175,11 @@ public class MecanumTeleOp7462 extends OpMode {
         collectorFront.overridePower();
         collectorBack.overridePower();
 
+        // Put line calculation for shooter velocity here
+        // shooterRight.targetVelocity = goalTag.getRange();
         shooterRight.overridePower();
+        // shooterLeft.targetVelocity = goalTag.getRange();
         shooterLeft.overridePower();
-
 
         telemetry.addData("shooterLeftCurrentVelocity", shooterLeft.getVelocity());
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
@@ -189,30 +189,57 @@ public class MecanumTeleOp7462 extends OpMode {
 
         telemetry.update();
 
+        // Testing Wiring
+//        if(gamepad1.rightBumperWasPressed()) {
+//            shooterRight.targetVelocity = 1;
+//            shooterRight.overridePower();
+//        }
+//        else if(gamepad1.leftBumperWasPressed()) {
+//            shooterLeft.overridePower();
+//        }
+//        else if(gamepad1.left_bumper) {
+//            collectorBack.targetVelocity = 1;
+//            collectorBack.overridePower();
+//        }
+//        else if(gamepad1.right_bumper) {
+//            collectorFront.targetVelocity = 1;
+//            collectorFront.overridePower();
+//        }
+
+        // Tuning
+//        if (gamepad1.xWasPressed()) {
+//            Kvelo += 0.005;
+//            shooterLeft.setControllerValues(0,Kvelo);
+//        } else if (gamepad1.yWasPressed()) {
+//            Kvelo -= 0.005;
+//            shooterLeft.setControllerValues(0,Kvelo);
+//        }
         // Driver Controls
-        if (gamepad1.leftBumperWasPressed()) {
-            // do math here
-            shooterLeft.targetVelocity = 40;
-            leftIsRunning = true;
+        if (gamepad1.leftBumperWasPressed() && shooterLeft.atSpeed()) {
+            launchFlapLeft.setPosition(0);
             timerLeft.reset();
         }
-        if (gamepad1.rightBumperWasPressed()) {
-            // do math here
-            shooterRight.targetVelocity = 40;
-            rightIsRunning = true;
+        if (gamepad1.rightBumperWasPressed() && shooterRight.atSpeed()) {
+            launchFlapRight.setPosition(0.7);
             timerRight.reset();
         }
-        if (leftIsRunning) {
-            if (shooterLeft.atSpeed()) {
-                launchFlapLeft.setPosition(0);
-                leftIsRunning = false;
-            }
+        if (gamepad1.left_trigger == 1) {
+            tuningLog.goalBool.set(true);
+            tuningLog.goalRange.set(goalTag.getRange());
+            tuningLog.targetVelocity.set(shooterLeft.targetVelocity);
         }
-        if (rightIsRunning) {
-            if (shooterRight.atSpeed()) {
-                launchFlapRight.setPosition(0.7);
-                rightIsRunning = false;
-            }
+        if (gamepad1.right_trigger == 1) {
+            tuningLog.goalBool.set(true);
+            tuningLog.goalRange.set(goalTag.getRange());
+            tuningLog.targetVelocity.set(shooterRight.targetVelocity);
+        }
+        if (gamepad1.aWasPressed()) {
+            shooterLeft.targetVelocity -= 0.25;
+            shooterRight.targetVelocity -= 0.25;
+        }
+        if (gamepad1.yWasPressed()) {
+            shooterLeft.targetVelocity += 0.25;
+            shooterRight.targetVelocity += 0.25;
         }
 
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
@@ -267,5 +294,43 @@ public class MecanumTeleOp7462 extends OpMode {
         frontRightDrive.setPower(maxSpeed * (frontRightPower / maxPower));
         backLeftDrive.setPower(maxSpeed * (backLeftPower / maxPower));
         backRightDrive.setPower(maxSpeed * (backRightPower / maxPower));
+    }
+    public static class Datalog {
+        // The underlying datalogger object - it cares only about an array of loggable fields
+        private final Datalogger datalogger;
+
+        // These are all of the fields that we want in the datalog.
+        // Note that order here is NOT important. The order is important in the setFields() call below
+        public Datalogger.GenericField goalBool = new Datalogger.GenericField("goalBool");
+        public Datalogger.GenericField goalRange = new Datalogger.GenericField("goalRange");
+        public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("goalBearing");
+
+        public Datalog(String name) {
+            // Build the underlying datalog object
+            datalogger = new Datalogger.Builder()
+
+                    // Pass through the filename
+                    .setFilename(name)
+
+                    // Request an automatic timestamp field
+                    .setAutoTimestamp(Datalogger.AutoTimestamp.DECIMAL_SECONDS)
+
+                    // Tell it about the fields we care to log.
+                    // Note that order *IS* important here! The order in which we list
+                    // the fields is the order in which they will appear in the log.
+                    .setFields(
+                            goalBool,
+                            targetVelocity,
+                            goalRange
+                    )
+                    .build();
+        }
+
+        // Tell the datalogger to gather the values of the fields
+        // and write a new line in the log.
+
+        public void writeLine() {
+            datalogger.writeLine();
+        }
     }
 }

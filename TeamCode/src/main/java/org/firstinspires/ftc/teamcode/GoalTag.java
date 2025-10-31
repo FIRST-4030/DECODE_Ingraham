@@ -19,12 +19,12 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 public class GoalTag {
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private double goalRange; // inches
-    private int goalTagID;
+    private int targetAprilTagID;
     private double goalBearing; // radians
+
 
     public boolean GPP = false; // id 21
     public boolean PGP = false; // id 22
@@ -66,13 +66,6 @@ public class GoalTag {
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-
         // Choose a camera resolution. Not all cameras support all resolutions.
         //builder.setCameraResolution(new Size(640, 480));
 
@@ -86,6 +79,7 @@ public class GoalTag {
         // If set "true", monitor shows solid orange screen if no processors enabled.
         // If set "false", monitor shows camera view without annotations.
         //builder.setAutoStopLiveView(false);
+        builder.setCamera(hardwareMap.get(WebcamName.class,"Webcam 1"));
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
@@ -94,7 +88,7 @@ public class GoalTag {
         visionPortal = builder.build();
 
         // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
+        visionPortal.setProcessorEnabled(aprilTag, true);
 
     }   // end method initAprilTag()
     public void process() {
@@ -103,7 +97,7 @@ public class GoalTag {
 
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                if (detection.id != goalTagID && !detection.metadata.name.contains("Obelisk")) {
+                if (detection.id == targetAprilTagID) {
                     goalRange = detection.ftcPose.range;
                     goalBearing = detection.ftcPose.bearing;
                     BotX = detection.robotPose.getPosition().x;
@@ -114,6 +108,7 @@ public class GoalTag {
 
         }
     }
+    // Move to auto
     public void initProcess() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -132,10 +127,12 @@ public class GoalTag {
                     GPP = false;
                     PGP = false;
                 }
+                // Move to Auto
+                // starting apriltag is not the one to aim at
                 if (detection.id == 24) {
-                    goalTagID = 24;
+                    targetAprilTagID = 20;
                 } else if (detection.id == 20) {
-                    goalTagID = 20;
+                    targetAprilTagID = 24;
                 }
             }
         }
@@ -166,6 +163,6 @@ public class GoalTag {
         return BotY;
     }
     public int getGoalTagID() {
-        return goalTagID;
+        return targetAprilTagID;
     }
 }

@@ -73,11 +73,13 @@ public class MecanumTeleOp7462 extends OpMode {
 
     Servo launchFlapLeft;
     Servo launchFlapRight;
+    Servo flipper;
     GoalTag goalTag;
 
     // Timers
     ElapsedTime timerLeft = new ElapsedTime();
     ElapsedTime timerRight = new ElapsedTime();
+    ElapsedTime timerFlipper = new ElapsedTime();
 
     // Just for tuning
     private double Kvelo;
@@ -98,6 +100,7 @@ public class MecanumTeleOp7462 extends OpMode {
 
         launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
         launchFlapRight = hardwareMap.get(Servo.class, "launchFlapRight");
+        flipper = hardwareMap.get(Servo.class, "flipper");
 
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
@@ -134,22 +137,23 @@ public class MecanumTeleOp7462 extends OpMode {
         goalTag = new GoalTag();
         goalTag.init(hardwareMap);
 
-        collectorFront = new Shooter(hardwareMap,"collectorFront", true);
+        collectorFront = new Shooter(hardwareMap,"collectorFront", false);
         collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = 20;
+        collectorFront.targetVelocity = 25;
 
-        collectorBack = new Shooter(hardwareMap,"collectorBack", true);
+        collectorBack = new Shooter(hardwareMap,"collectorBack", false);
         collectorBack.setControllerValues(0.3,0.0243);
-        collectorBack.targetVelocity = 20;
+        collectorBack.targetVelocity = 25;
 
-        shooterLeft = new Shooter(hardwareMap,"shooterLeft", false);
+        shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
         shooterLeft.setControllerValues(0.3,0.0243);
 
-        shooterRight = new Shooter(hardwareMap,"shooterRight", true);
+        shooterRight = new Shooter(hardwareMap,"shooterRight", false);
         shooterRight.setControllerValues(0.3,0.0243);
 
         timerLeft.reset();
         timerRight.reset();
+        timerFlipper.reset();
 
 
     }
@@ -185,6 +189,8 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
+        telemetry.addData("GoalTagRange", goalTag.getRange());
+        telemetry.addData("GoalBearing", goalTag.getBearing());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
         telemetry.update();
@@ -192,16 +198,30 @@ public class MecanumTeleOp7462 extends OpMode {
         // Driver Controls
         if (gamepad1.leftBumperWasPressed()) {
             // do math here
-            shooterLeft.targetVelocity = 40;
+            shooterLeft.targetVelocity = (goalTag.getRange()+202.17)/8.92124;
             leftIsRunning = true;
             timerLeft.reset();
         }
         if (gamepad1.rightBumperWasPressed()) {
             // do math here
-            shooterRight.targetVelocity = 40;
+            shooterRight.targetVelocity = (goalTag.getRange()+202.17)/8.92124;
             rightIsRunning = true;
             timerRight.reset();
         }
+        if (gamepad1.dpadLeftWasPressed()) {
+            flipper.setPosition(1);
+            timerFlipper.reset();
+        }
+        if (gamepad1.dpadRightWasPressed()) {
+            flipper.setPosition(0.1);
+            timerFlipper.reset();
+        }
+        if (gamepad1.a) {
+            turnToAprilTag();
+        }
+        drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
+        // Shoot when at speed
         if (leftIsRunning) {
             if (shooterLeft.atSpeed()) {
                 launchFlapLeft.setPosition(0);
@@ -214,13 +234,7 @@ public class MecanumTeleOp7462 extends OpMode {
                 rightIsRunning = false;
             }
         }
-
-        drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-
-        if (gamepad1.aWasPressed()) {
-            turnToAprilTag();
-        }
-        // Launch Flap Reset
+        // Servo Reset
         if (timerLeft.seconds() > 2) {
             launchFlapLeft.setPosition(0.3);
             shooterLeft.targetVelocity = 0;
@@ -229,13 +243,18 @@ public class MecanumTeleOp7462 extends OpMode {
             launchFlapRight.setPosition(0.4);
             shooterRight.targetVelocity = 0;
         }
+        if (timerFlipper.seconds() > 0.5) {
+            flipper.setPosition(0.525);
+        }
     }
     public void turnToAprilTag() {
+        telemetry.addLine("INSIDE FUNCTION");
+        telemetry.update();
         if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
             if (goalTag.getBearing() > 0.6) { // rotate left
-                moveAllMotors(-0.2,0.2,-0.2,0.2);
+                moveAllMotors(-0.5,0.5,-0.5,0.5);
             } else if (goalTag.getBearing() < -0.6) { // rotate right
-                moveAllMotors(0.2,-0.2,0.2,-0.2);
+                moveAllMotors(0.5,-0.5,0.5,-0.5);
 
             }
         }

@@ -133,14 +133,15 @@ public class TuningMecanumTeleOp7462 extends OpMode {
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", true);
         collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = 10;
+        collectorFront.targetVelocity = 0;
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", true);
         collectorBack.setControllerValues(0.3,0.0243);
-        collectorBack.targetVelocity = 10;
+        collectorBack.targetVelocity = 0;
 
         shooterLeft = new Shooter(hardwareMap,"shooterLeft", false);
         shooterLeft.setControllerValues(0.3,0.0243);
+        shooterLeft.targetVelocity = 20;
 
         shooterRight = new Shooter(hardwareMap,"shooterRight", true);
         shooterRight.setControllerValues(0.3,0.0243);
@@ -185,6 +186,7 @@ public class TuningMecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
+        telemetry.addData("GoalTagRange", goalTag.getRange());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
         telemetry.update();
@@ -227,34 +229,36 @@ public class TuningMecanumTeleOp7462 extends OpMode {
             tuningLog.goalBool.set(true);
             tuningLog.goalRange.set(goalTag.getRange());
             tuningLog.targetVelocity.set(shooterLeft.targetVelocity);
-        }
-        if (gamepad1.right_trigger == 1) {
-            tuningLog.goalBool.set(true);
-            tuningLog.goalRange.set(goalTag.getRange());
-            tuningLog.targetVelocity.set(shooterRight.targetVelocity);
-        }
+            tuningLog.writeLine();
+       }
+//        if (gamepad1.right_trigger == 1) {
+//            tuningLog.goalBool.set(true);
+//            tuningLog.goalRange.set(goalTag.getRange());
+//            tuningLog.targetVelocity.set(shooterRight.targetVelocity);
+//            tuningLog.writeLine();
+//        }
         if (gamepad1.aWasPressed()) {
             shooterLeft.targetVelocity -= 0.25;
-            shooterRight.targetVelocity -= 0.25;
+//            shooterRight.targetVelocity -= 0.25;
         }
         if (gamepad1.yWasPressed()) {
             shooterLeft.targetVelocity += 0.25;
-            shooterRight.targetVelocity += 0.25;
+//            shooterRight.targetVelocity += 0.25;
         }
 
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
-        if (gamepad1.aWasPressed()) {
+        if (gamepad1.xWasPressed()) {
             turnToAprilTag();
         }
         // Launch Flap Reset
         if (timerLeft.seconds() > 2) {
             launchFlapLeft.setPosition(0.3);
-            shooterLeft.targetVelocity = 0;
+//            shooterLeft.targetVelocity = 0;
         }
         if (timerRight.seconds() > 2) {
             launchFlapRight.setPosition(0.4);
-            shooterRight.targetVelocity = 0;
+//            shooterRight.targetVelocity = 0;
         }
     }
     public void turnToAprilTag() {
@@ -303,7 +307,7 @@ public class TuningMecanumTeleOp7462 extends OpMode {
         // Note that order here is NOT important. The order is important in the setFields() call below
         public Datalogger.GenericField goalBool = new Datalogger.GenericField("goalBool");
         public Datalogger.GenericField goalRange = new Datalogger.GenericField("goalRange");
-        public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("goalBearing");
+        public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("targetVelocity");
 
         public Datalog(String name) {
             // Build the underlying datalog object

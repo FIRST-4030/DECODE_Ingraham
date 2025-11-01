@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Datalogger;
  * This OpMode uses the extended/enhanced PIDF-related functions of the DcMotorEx class.
  * It also does Datalogging, to review the performance of the motor.
  */
+@Disabled
 @TeleOp(name="PIDF_example")
 public class PIDF_Example extends LinearOpMode {
 

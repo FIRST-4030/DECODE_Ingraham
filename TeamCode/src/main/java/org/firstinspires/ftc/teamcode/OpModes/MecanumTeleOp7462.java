@@ -139,7 +139,7 @@ public class MecanumTeleOp7462 extends OpMode {
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", false);
         collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = 25;
+        collectorFront.targetVelocity = 35;
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", false);
         collectorBack.setControllerValues(0.3,0.0243);
@@ -215,6 +215,14 @@ public class MecanumTeleOp7462 extends OpMode {
         if (gamepad1.dpadRightWasPressed()) {
             flipper.setPosition(0.1);
             timerFlipper.reset();
+        }
+        if (gamepad1.dpadUpWasPressed()) {
+            collectorBack.targetVelocity = -10;
+            collectorFront.targetVelocity = -10;
+        }
+        if (gamepad1.dpadDownWasPressed()){
+            collectorFront.targetVelocity = 35;
+            collectorBack.targetVelocity = 25;
         }
         if (gamepad1.a) {
             turnToAprilTag();

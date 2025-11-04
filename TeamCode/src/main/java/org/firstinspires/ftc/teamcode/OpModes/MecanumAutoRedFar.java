@@ -54,6 +54,7 @@ public class MecanumAutoRedFar extends LinearOpMode {
     Shooter shooterRight;
     Servo launchFlapLeft;
     Servo launchFlapRight;
+    Servo flipper;
 
     //private DigitalChannel redLED;
     //private DigitalChannel greenLED;
@@ -78,6 +79,7 @@ public class MecanumAutoRedFar extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "leftBack");
         backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
 
+        flipper = hardwareMap.get(Servo.class, "flipper");
         //redLED = hardwareMap.get(DigitalChannel.class, "red");
         //greenLED = hardwareMap.get(DigitalChannel.class, "green");
         //redLED.setMode(DigitalChannel.Mode.OUTPUT);
@@ -86,7 +88,7 @@ public class MecanumAutoRedFar extends LinearOpMode {
         //double currentPower = 1.0;
 
         shooterLeft = new Shooter(hardwareMap, "shooterLeft", true);
-        shooterRight = new Shooter(hardwareMap, "shooterRight", true);
+        shooterRight = new Shooter(hardwareMap, "shooterRight", false);
         ///shooterLeft.initPower(currentPower);
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
@@ -103,10 +105,8 @@ public class MecanumAutoRedFar extends LinearOpMode {
         backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
-        launchFlapLeft.setPosition(0.7);
 
         launchFlapRight= hardwareMap.get(Servo.class, "launchFlapRight");
-        launchFlapRight.setPosition(0.7);
 
         imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot
@@ -136,8 +136,23 @@ public class MecanumAutoRedFar extends LinearOpMode {
 
             //rotateTo(-(aprilTags.getBearing()));
             turn(-0.3,430);
-            fireShooterLeft(3,32.0);
-            fireShooterRight(3,32.0);
+            // P is left
+            if (goalTag.getObelisk() == "PGP") {
+                fireShooterLeft(1,32);
+                flipper.setPosition(0);
+                fireShooterRight(1,32);
+                fireShooterLeft(1,32);
+            } else if (goalTag.getObelisk() == "GPP") {
+                fireShooterRight(1,32);
+                fireShooterLeft(1,32);
+                flipper.setPosition(0);
+                fireShooterLeft(1,32);
+            } else if (goalTag.getObelisk() == "PPG") {
+                fireShooterLeft(1,32);
+                flipper.setPosition(0);
+                fireShooterLeft(1,32);
+                fireShooterRight(1, 32);
+            }
             moveForward(0.5, 400);
 
             break;

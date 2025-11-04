@@ -42,8 +42,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
-@Autonomous(name="Mecanum Auto", group="Linear OpMode")
-public class MecanumAuto extends LinearOpMode {
+@Autonomous(name="Mecanum Auto Red Far", group="Linear OpMode")
+public class MecanumAutoRedFar extends LinearOpMode {
 
     // Declare OpMode members.
     DcMotor frontLeftDrive;
@@ -136,7 +136,8 @@ public class MecanumAuto extends LinearOpMode {
 
             //rotateTo(-(aprilTags.getBearing()));
             turn(-0.3,430);
-            fireShooter(3,32.0);
+            fireShooterLeft(3,32.0);
+            fireShooterRight(3,32.0);
             moveForward(0.5, 400);
 
             break;
@@ -226,28 +227,48 @@ public class MecanumAuto extends LinearOpMode {
         backRightDrive.setPower(0);
     }
 
-    public void fireShooter(int numFire,double velocity) {
+    public void fireShooterLeft(int numFire,double velocity) {
         shooting = true;
         shooterLeft.setTargetVelocity(velocity);
-        shooterRight.setTargetVelocity(velocity);
 
         while (shooting) {
             shooterLeft.overridePower();
-            shooterRight.overridePower();
 
             if (shooterLeft.atSpeed()) {
 
                 while (numFire > 0) {
-                    launchFlapLeft.setPosition(0.0);
-                    launchFlapRight.setPosition(0);
+                    launchFlapLeft.setPosition(0);
                     sleep(500);
-                    launchFlapLeft.setPosition(0.7);
-                    launchFlapRight.setPosition(0.7);
+                    launchFlapLeft.setPosition(0.3);
                     sleep(700);
                     numFire--;
                 }
                 if (numFire == 0) {
                     shooterLeft.setTargetVelocity(0);
+                    shooting = false;
+                    break;
+                }
+
+            }
+        }
+    }
+    public void fireShooterRight(int numFire,double velocity) {
+        shooting = true;
+        shooterRight.setTargetVelocity(velocity);
+
+        while (shooting) {
+            shooterRight.overridePower();
+
+            if (shooterRight.atSpeed()) {
+
+                while (numFire > 0) {
+                    launchFlapRight.setPosition(0.7);
+                    sleep(500);
+                    launchFlapRight.setPosition(0);
+                    sleep(700);
+                    numFire--;
+                }
+                if (numFire == 0) {
                     shooterRight.setTargetVelocity(0);
                     shooting = false;
                     break;

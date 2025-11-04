@@ -248,8 +248,6 @@ public class MecanumTeleOp7462 extends OpMode {
         }
     }
     public void turnToAprilTag() {
-        telemetry.addLine("INSIDE FUNCTION");
-        telemetry.update();
         if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
             if (goalTag.getBearing() > 0.6) { // rotate left
                 moveAllMotors(-0.5,0.5,-0.5,0.5);

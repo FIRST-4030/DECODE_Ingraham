@@ -92,10 +92,10 @@ public class MecanumAutoRedFar extends LinearOpMode {
         ///shooterLeft.initPower(currentPower);
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
-        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
         // wires, you should remove these
@@ -135,23 +135,23 @@ public class MecanumAutoRedFar extends LinearOpMode {
         while (opModeIsActive()) {
 
             //rotateTo(-(aprilTags.getBearing()));
-            turn(-0.3,430);
+            turn(0.3,430);
             // P is left
             if (goalTag.getObelisk() == "PGP") {
-                fireShooterLeft(1,32);
-                flipper.setPosition(0);
-                fireShooterRight(1,32);
-                fireShooterLeft(1,32);
+                fireShooterLeft(1,36);
+                flipper.setPosition(1);
+                fireShooterRight(1,36);
+                fireShooterLeft(1,36);
             } else if (goalTag.getObelisk() == "GPP") {
-                fireShooterRight(1,32);
-                fireShooterLeft(1,32);
-                flipper.setPosition(0);
-                fireShooterLeft(1,32);
+                fireShooterRight(1,36);
+                fireShooterLeft(1,36);
+                flipper.setPosition(1);
+                fireShooterLeft(1,36);
             } else if (goalTag.getObelisk() == "PPG") {
-                fireShooterLeft(1,32);
-                flipper.setPosition(0);
-                fireShooterLeft(1,32);
-                fireShooterRight(1, 32);
+                fireShooterLeft(1,36);
+                flipper.setPosition(1);
+                fireShooterLeft(1,36);
+                fireShooterRight(1, 36);
             }
             moveForward(0.5, 400);
 
@@ -244,7 +244,7 @@ public class MecanumAutoRedFar extends LinearOpMode {
 
     public void fireShooterLeft(int numFire,double velocity) {
         shooting = true;
-        shooterLeft.setTargetVelocity(velocity);
+        shooterLeft.targetVelocity = velocity;
 
         while (shooting) {
             shooterLeft.overridePower();
@@ -269,7 +269,7 @@ public class MecanumAutoRedFar extends LinearOpMode {
     }
     public void fireShooterRight(int numFire,double velocity) {
         shooting = true;
-        shooterRight.setTargetVelocity(velocity);
+        shooterRight.targetVelocity = velocity;
 
         while (shooting) {
             shooterRight.overridePower();

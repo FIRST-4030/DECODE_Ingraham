@@ -42,8 +42,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
-@Autonomous(name="Mecanum Auto Red Far", group="Linear OpMode")
-public class MecanumAutoRedFar extends LinearOpMode {
+@Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
+public class MecanumAutoFar extends LinearOpMode {
 
     // Declare OpMode members.
     DcMotor frontLeftDrive;
@@ -250,12 +250,13 @@ public class MecanumAutoRedFar extends LinearOpMode {
     public void fireShooterLeft(int numFire,double velocity) {
         shooting = true;
         shooterLeft.targetVelocity = velocity;
+        ElapsedTime timer = new ElapsedTime();
 
         while (shooting) {
             shooterLeft.overridePower();
 
             if (shooterLeft.atSpeed()) {
-                ElapsedTime timer = new ElapsedTime();
+                timer.reset();
                 while (numFire > 0) {
                     if (timer.seconds() < 0.5) {
                         launchFlapLeft.setPosition(0);
@@ -282,6 +283,7 @@ public class MecanumAutoRedFar extends LinearOpMode {
             shooterRight.overridePower();
 
             if (shooterRight.atSpeed()) {
+                timer.reset();
                 while (numFire > 0) {
                     if (timer.seconds() < 0.5) {
                         launchFlapRight.setPosition(0.7);

@@ -135,7 +135,12 @@ public class MecanumAutoRedFar extends LinearOpMode {
         while (opModeIsActive()) {
 
             //rotateTo(-(aprilTags.getBearing()));
-            turn(0.3,430);
+            // if 20 look left
+            if (goalTag.getGoalTagID() == 20) {
+                turn(-0.3,430);
+            } else {
+                turn(0.3,430);
+            }
             // P is left
             if (goalTag.getObelisk() == "PGP") {
                 fireShooterLeft(1,36);
@@ -250,45 +255,47 @@ public class MecanumAutoRedFar extends LinearOpMode {
             shooterLeft.overridePower();
 
             if (shooterLeft.atSpeed()) {
-
+                ElapsedTime timer = new ElapsedTime();
                 while (numFire > 0) {
-                    launchFlapLeft.setPosition(0);
-                    sleep(500);
-                    launchFlapLeft.setPosition(0.3);
-                    sleep(700);
-                    numFire--;
+                    if (timer.seconds() < 0.5) {
+                        launchFlapLeft.setPosition(0);
+                    } else if (timer.seconds() < 2) {
+                        launchFlapLeft.setPosition(0.3);
+                        numFire--;
+                    }
+
                 }
                 if (numFire == 0) {
                     shooterLeft.setTargetVelocity(0);
                     shooting = false;
                     break;
                 }
-
             }
         }
     }
     public void fireShooterRight(int numFire,double velocity) {
         shooting = true;
         shooterRight.targetVelocity = velocity;
+        ElapsedTime timer = new ElapsedTime();
 
         while (shooting) {
             shooterRight.overridePower();
 
             if (shooterRight.atSpeed()) {
-
                 while (numFire > 0) {
-                    launchFlapRight.setPosition(0.7);
-                    sleep(500);
-                    launchFlapRight.setPosition(0);
-                    sleep(700);
-                    numFire--;
+                    if (timer.seconds() < 0.5) {
+                        launchFlapRight.setPosition(0.7);
+                    } else if (timer.seconds() < 2) {
+                        launchFlapRight.setPosition(0.4);
+                        numFire--;
+                    }
                 }
-                if (numFire == 0) {
+                if (numFire == 0 && timer.seconds() > 2) {
                     shooterRight.setTargetVelocity(0);
+                    timer.reset();
                     shooting = false;
                     break;
                 }
-
             }
         }
     }

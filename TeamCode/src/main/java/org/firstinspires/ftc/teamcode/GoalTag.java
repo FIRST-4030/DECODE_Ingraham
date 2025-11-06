@@ -128,11 +128,11 @@ public class GoalTag {
                     PGP = false;
                 }
                 // Move to Auto
-                // starting apriltag is not the one to aim at
+                // starting apriltag is the one to aim at
                 if (detection.id == 24) {
-                    targetAprilTagID = 20;
-                } else if (detection.id == 20) {
                     targetAprilTagID = 24;
+                } else if (detection.id == 20) {
+                    targetAprilTagID = 20;
                 }
             }
         }

@@ -157,6 +157,9 @@ public class MecanumAutoFar extends LinearOpMode {
                 flipper.setPosition(1);
                 fireShooterLeft(1,36);
                 fireShooterRight(1, 36);
+            } else {
+                fireShooterLeft(1,36);
+                fireShooterRight(1,36);
             }
             moveForward(0.5, 400);
 
@@ -267,7 +270,7 @@ public class MecanumAutoFar extends LinearOpMode {
 
                 }
                 if (numFire == 0) {
-                    shooterLeft.setTargetVelocity(0);
+                    shooterLeft.targetVelocity = 0;
                     shooting = false;
                     break;
                 }
@@ -293,7 +296,7 @@ public class MecanumAutoFar extends LinearOpMode {
                     }
                 }
                 if (numFire == 0 && timer.seconds() > 2) {
-                    shooterRight.setTargetVelocity(0);
+                    shooterRight.targetVelocity = 0;
                     timer.reset();
                     shooting = false;
                     break;

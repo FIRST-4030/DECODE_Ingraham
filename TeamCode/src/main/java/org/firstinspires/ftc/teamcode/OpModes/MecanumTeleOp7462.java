@@ -83,6 +83,8 @@ public class MecanumTeleOp7462 extends OpMode {
 
     // Just for tuning
     private double Kvelo;
+    private double frontVel = 15;
+    private double backVel = 15;
     private boolean leftIsRunning;
     private boolean rightIsRunning;
 
@@ -139,11 +141,11 @@ public class MecanumTeleOp7462 extends OpMode {
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", false);
         collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = 37.5;
+        collectorFront.targetVelocity = frontVel;
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", false);
         collectorBack.setControllerValues(0.3,0.0243);
-        collectorBack.targetVelocity = 22.5;
+        collectorBack.targetVelocity = backVel;
 
         shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
         shooterLeft.setControllerValues(0.3,0.0243);
@@ -220,9 +222,9 @@ public class MecanumTeleOp7462 extends OpMode {
             collectorBack.targetVelocity = -10;
             collectorFront.targetVelocity = -10;
         }
-        if (gamepad1.dpadDownWasPressed()){
-            collectorFront.targetVelocity = 35;
-            collectorBack.targetVelocity = 25;
+        if (gamepad1.dpadUpWasReleased()){
+            collectorFront.targetVelocity = frontVel;
+            collectorBack.targetVelocity = backVel;
         }
         if (gamepad1.a) {
             turnToAprilTag();

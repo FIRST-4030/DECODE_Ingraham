@@ -143,25 +143,39 @@ public class MecanumAutoFar extends LinearOpMode {
             }
             // P is left
             if (goalTag.getObelisk() == "PGP") {
-                fireShooterLeft(1,36);
+                fireShooterLeft(36);
+                fireShooterRight(35);
                 flipper.setPosition(1);
-                fireShooterRight(1,36);
-                fireShooterLeft(1,36);
+                sleep(1000);
+                flipper.setPosition(0);
+                fireShooterLeft(36);
             } else if (goalTag.getObelisk() == "GPP") {
-                fireShooterRight(1,36);
-                fireShooterLeft(1,36);
+                fireShooterRight(35);
+                fireShooterLeft(36);
                 flipper.setPosition(1);
-                fireShooterLeft(1,36);
+                sleep(1000);
+                flipper.setPosition(0);
+                fireShooterLeft(36);
             } else if (goalTag.getObelisk() == "PPG") {
-                fireShooterLeft(1,36);
+                fireShooterLeft(36);
+                sleep(1000);
                 flipper.setPosition(1);
-                fireShooterLeft(1,36);
-                fireShooterRight(1, 36);
+                sleep(1000);
+                flipper.setPosition(0);
+                fireShooterLeft(36);
+                fireShooterRight( 35);
             } else {
-                fireShooterLeft(1,36);
-                fireShooterRight(1,36);
+                fireShooterLeft(36);
+                fireShooterRight(35);
             }
             moveForward(0.5, 400);
+            shooterLeft.targetVelocity = 0;
+            shooterRight.targetVelocity = 0;
+
+            while (!shooterLeft.atSpeed() || !shooterRight.atSpeed()) {
+                shooterLeft.overridePower();
+                shooterRight.overridePower();
+            }
 
             break;
         }
@@ -250,58 +264,40 @@ public class MecanumAutoFar extends LinearOpMode {
         backRightDrive.setPower(0);
     }
 
-    public void fireShooterLeft(int numFire,double velocity) {
+    public void fireShooterLeft(double velocity) {
         shooting = true;
         shooterLeft.targetVelocity = velocity;
         ElapsedTime timer = new ElapsedTime();
 
-        while (shooting) {
+        while (!shooterLeft.atSpeed()) {
             shooterLeft.overridePower();
-
-            if (shooterLeft.atSpeed()) {
-                timer.reset();
-                while (numFire > 0) {
-                    if (timer.seconds() < 0.5) {
-                        launchFlapLeft.setPosition(0);
-                    } else if (timer.seconds() < 2) {
-                        launchFlapLeft.setPosition(0.3);
-                        numFire--;
-                    }
-
-                }
-                if (numFire == 0) {
-                    shooterLeft.targetVelocity = 0;
-                    shooting = false;
-                    break;
-                }
-            }
+        }
+        timer.reset();
+        launchFlapLeft.setPosition(0);
+        while (timer.seconds() < 2) {
+            shooterLeft.overridePower();
+        }
+        launchFlapLeft.setPosition(0.3);
+        while (timer.seconds() < 3) {
+            shooterLeft.overridePower();
         }
     }
-    public void fireShooterRight(int numFire,double velocity) {
+    public void fireShooterRight(double velocity) {
         shooting = true;
         shooterRight.targetVelocity = velocity;
         ElapsedTime timer = new ElapsedTime();
 
-        while (shooting) {
+        while (!shooterRight.atSpeed()) {
             shooterRight.overridePower();
-
-            if (shooterRight.atSpeed()) {
-                timer.reset();
-                while (numFire > 0) {
-                    if (timer.seconds() < 0.5) {
-                        launchFlapRight.setPosition(0.7);
-                    } else if (timer.seconds() < 2) {
-                        launchFlapRight.setPosition(0.4);
-                        numFire--;
-                    }
-                }
-                if (numFire == 0 && timer.seconds() > 2) {
-                    shooterRight.targetVelocity = 0;
-                    timer.reset();
-                    shooting = false;
-                    break;
-                }
-            }
+        }
+        timer.reset();
+        launchFlapRight.setPosition(0.7);
+        while (timer.seconds() < 2) {
+            shooterRight.overridePower();
+        }
+        launchFlapRight.setPosition(0.4);
+        while (timer.seconds() < 3) {
+            shooterRight.overridePower();
         }
     }
 }

@@ -126,10 +126,10 @@ public class MecanumAutoFar extends LinearOpMode {
             telemetry.update();
             if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 24;
-                blackboard.put(ALLIANCE_KEY, "Red");
+                blackboard.put(ALLIANCE_KEY, 24);
             } else if (gamepad1.yWasPressed()) {
                 goalTag.targetAprilTagID = 20;
-                blackboard.put(ALLIANCE_KEY, "Blue");
+                blackboard.put(ALLIANCE_KEY, 20);
             }
             telemetry.addData("Team", blackboard.get(ALLIANCE_KEY));
         } while (opModeInInit());

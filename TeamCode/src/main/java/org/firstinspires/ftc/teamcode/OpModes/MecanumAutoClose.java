@@ -147,7 +147,7 @@ public class MecanumAutoClose extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
+            startDelay.reset();
             while (startDelay.seconds() < startTimeFinal) {}
             moveForward(0.5, 1600);
             if (goalTag.getGoalTagID() == 24) {

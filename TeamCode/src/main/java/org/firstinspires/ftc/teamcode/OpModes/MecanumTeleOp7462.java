@@ -80,6 +80,7 @@ public class MecanumTeleOp7462 extends OpMode {
     ElapsedTime timerLeft = new ElapsedTime();
     ElapsedTime timerRight = new ElapsedTime();
     ElapsedTime timerFlipper = new ElapsedTime();
+    public static final String ALLIANCE_KEY = "Alliance";
 
     // Just for tuning
     private double Kvelo;
@@ -158,6 +159,8 @@ public class MecanumTeleOp7462 extends OpMode {
         timerFlipper.reset();
 
 
+
+
     }
     public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
         frontLeftDrive.setPower(frontleftpower);
@@ -176,10 +179,10 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.update();
     }
 
+
     @Override
     public void loop() {
         goalTag.process();
-
         collectorFront.overridePower();
         collectorBack.overridePower();
 

@@ -42,7 +42,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
-@Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
+@Autonomous(name="Mecanum Auto Close", group="Linear OpMode")
 public class MecanumAutoClose extends LinearOpMode {
 
     // Declare OpMode members.

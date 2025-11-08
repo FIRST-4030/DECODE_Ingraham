@@ -43,7 +43,7 @@ import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
 @Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
-public class MecanumAutoFar extends LinearOpMode {
+public class MecanumAutoClose extends LinearOpMode {
 
     // Declare OpMode members.
     DcMotor frontLeftDrive;
@@ -55,8 +55,13 @@ public class MecanumAutoFar extends LinearOpMode {
     Servo launchFlapLeft;
     Servo launchFlapRight;
     Servo flipper;
-    public static final String ALLIANCE_KEY = "Alliance";
+
+    //private DigitalChannel redLED;
+    //private DigitalChannel greenLED;
+
     ElapsedTime runtime = new ElapsedTime();
+    ElapsedTime startDelay = new ElapsedTime();
+    private double startTimeFinal = 0;
     public static int decimation = 3;
     public static double power = 0.7;
     double yawImu;
@@ -123,15 +128,18 @@ public class MecanumAutoFar extends LinearOpMode {
             telemetry.addData("Pattern", goalTag.getObelisk());
             telemetry.addData("team ID", goalTag.getGoalTagID());
             telemetry.addLine("Press x for red, y for blue, a adds delay, b removes delay");
+            telemetry.addData("Your Team:", goalTag.getGoalTagID());
+            telemetry.addData("Start Delay", startTimeFinal);
             telemetry.update();
             if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 24;
-                blackboard.put(ALLIANCE_KEY, "Red");
             } else if (gamepad1.yWasPressed()) {
                 goalTag.targetAprilTagID = 20;
-                blackboard.put(ALLIANCE_KEY, "Blue");
+            } else if (gamepad1.aWasPressed()) {
+                startTimeFinal += 1;
+            } else if (gamepad1.bWasPressed()) {
+                startTimeFinal -= 1;
             }
-            telemetry.addData("Team", blackboard.get(ALLIANCE_KEY));
         } while (opModeInInit());
 
         runtime.reset();
@@ -140,14 +148,22 @@ public class MecanumAutoFar extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            //rotateTo(-(aprilTags.getBearing()));
-            // if 20 look left
-            if (goalTag.getGoalTagID() == 20) {
-                turn(-0.3,430);
+            while (startDelay.seconds() < startTimeFinal) {}
+            moveForward(0.5, 1600);
+            if (goalTag.getGoalTagID() == 24) {
+                turn(0.3, 800);
             } else {
-                turn(0.3,430);
+                turn(-0.3, 800);
             }
-            // P is left
+
+            sleep(500); // Test if needed to read obl.
+            if (goalTag.getGoalTagID() == 24) {
+                turn(0.3, 400);
+            } else {
+                turn(-0.3, 400);
+            }
+            turn(0.3, 200);
+
             if (goalTag.getObelisk() == "PGP") {
                 fireShooterLeft(36);
                 fireShooterRight(35);

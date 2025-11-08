@@ -22,7 +22,7 @@ public class GoalTag {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private double goalRange; // inches
-    private int targetAprilTagID;
+    public int targetAprilTagID;
     private double goalBearing; // radians
 
 

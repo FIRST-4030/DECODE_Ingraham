@@ -28,6 +28,8 @@
  */
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import android.opengl.EGLObjectHandle;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -154,6 +156,9 @@ public class MecanumTeleOp7462 extends OpMode {
         shooterRight = new Shooter(hardwareMap,"shooterRight", false);
         shooterRight.setControllerValues(0.3,0.0243);
 
+        if ((GlobalStorage.getAlliance() != -1)) {
+            goalTag.targetAprilTagID = GlobalStorage.getAlliance();
+        }
         timerLeft.reset();
         timerRight.reset();
         timerFlipper.reset();
@@ -173,7 +178,6 @@ public class MecanumTeleOp7462 extends OpMode {
 // Move to auto
     @Override
     public void init_loop() {
-        goalTag.targetAprilTagID = GlobalStorage.getAlliance();
         telemetry.addData("Pattern", goalTag.getObelisk());
         telemetry.addData("team ID", goalTag.getGoalTagID());
         telemetry.addLine("Press b for red, x for blue");

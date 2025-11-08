@@ -154,9 +154,9 @@ public class MecanumAutoFar extends LinearOpMode {
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
             if (goalTag.getGoalTagID() == 20) {
-                turn(-0.3,500);
+                turn(-0.3,450);
             } else {
-                turn(0.3,500);
+                turn(0.3,450);
             }
             // P is left
             if (goalTag.getObelisk().equals("PGP")) {
@@ -164,21 +164,18 @@ public class MecanumAutoFar extends LinearOpMode {
                 fireShooterRight(velRight);
                 flipper.setPosition(1);
                 sleep(1000);
-                flipper.setPosition(0);
                 fireShooterLeft(velLeft-1);
             } else if (goalTag.getObelisk().equals("GPP")) {
                 fireShooterRight(velRight);
                 fireShooterLeft(velLeft);
                 flipper.setPosition(1);
                 sleep(1000);
-                flipper.setPosition(0);
                 fireShooterLeft(velLeft);
             } else if (goalTag.getObelisk().equals("PPG")) {
                 fireShooterLeft(velLeft);
                 sleep(1000);
                 flipper.setPosition(1);
                 sleep(1000);
-                flipper.setPosition(0);
                 fireShooterLeft(velLeft);
                 fireShooterRight(velRight);
             }
@@ -192,11 +189,6 @@ public class MecanumAutoFar extends LinearOpMode {
 
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
-
-            while (!shooterLeft.atSpeed() || !shooterRight.atSpeed()) {
-                shooterLeft.overridePower();
-                shooterRight.overridePower();
-            }
 
             break;
         }

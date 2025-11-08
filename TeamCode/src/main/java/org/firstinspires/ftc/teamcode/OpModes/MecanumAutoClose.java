@@ -185,11 +185,6 @@ public class MecanumAutoClose extends LinearOpMode {
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
 
-            while (!shooterLeft.atSpeed() || !shooterRight.atSpeed()) {
-                shooterLeft.overridePower();
-                shooterRight.overridePower();
-            }
-
             break;
         }
     }

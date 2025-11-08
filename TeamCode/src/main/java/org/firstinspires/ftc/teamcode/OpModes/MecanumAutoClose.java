@@ -148,10 +148,10 @@ public class MecanumAutoClose extends LinearOpMode {
         while (opModeIsActive()) {
             sleep(startDelay*1000);
             if (goalTag.getGoalTagID() == 24) {
-                turn(0.5, 1200);
+                turn(0.5, 1400);
                 moveForward(-0.5, 1600);
             } else {
-                turn(-0.5, 1200);
+                turn(-0.5, 1400);
                 moveForward(-0.5, 1600);
             }
 
@@ -181,6 +181,7 @@ public class MecanumAutoClose extends LinearOpMode {
                 fireShooterLeft(26);
                 fireShooterRight(25);
             }
+            flipper.setPosition(0.525);
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
 

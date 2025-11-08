@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.ThreadPool;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -55,7 +56,10 @@ public class MecanumAutoFar extends LinearOpMode {
     Servo launchFlapLeft;
     Servo launchFlapRight;
     Servo flipper;
+
+    public static final String TIMES_STARTED_KEY = "Times started";
     public static final String ALLIANCE_KEY = "Alliance";
+
     ElapsedTime runtime = new ElapsedTime();
     public static int decimation = 3;
     public static double power = 0.7;

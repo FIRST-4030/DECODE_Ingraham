@@ -9,6 +9,11 @@ public class GlobalStorage {
     public static void setPattern(String p) {pattern = p;}
     public static String getAlliance(){return alliance;}
 
-    public static void setAlliance(String p) {alliance = p;}
+    public static void setAlliance(String a) {alliance = a;}
 
+    //put at the beginning auto init to stop it from carry over variable from previous matches: GlobalStorage.setPattern(null);
+    // when you read the obelisk: GlobalStorage.setPattern(p);
+    // in teleop: myPattern = getPattern();
+    //WARNING: in case of errors in obelisk reading or inproper set-up of class, pattern can equal null, plan for that case and
+    //MAKE SURE, there is no chance of a null pointer exeception. (this is not solved by removing setting it to null in init, it could still load wrong)
 }

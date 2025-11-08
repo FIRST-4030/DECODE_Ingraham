@@ -137,6 +137,27 @@ public class GoalTag {
             }
         }
     }
+    public void initProcessNoGoal() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == 21) {
+                    GPP = true;
+                    PGP = false;
+                    PPG = false;
+                } else if (detection.id == 22) {
+                    PGP = true;
+                    GPP = false;
+                    PPG = false;
+                } else if (detection.id == 23) {
+                    PPG = true;
+                    GPP = false;
+                    PGP = false;
+                }
+            }
+        }
+    }
 
     public double getRange() {
         return goalRange;

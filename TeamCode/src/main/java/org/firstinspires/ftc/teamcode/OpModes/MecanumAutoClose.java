@@ -151,16 +151,24 @@ public class MecanumAutoClose extends LinearOpMode {
             while (startDelay.seconds() < startTimeFinal) {}
             moveForward(0.5, 1600);
             if (goalTag.getGoalTagID() == 24) {
+                telemetry.addData("turn 1, power 0.3","");
+                telemetry.update();
                 turn(0.3, 800);
             } else {
                 turn(-0.3, 800);
+                telemetry.addData("turn 1, power -0.3","");
+                telemetry.update();
             }
 
             sleep(500); // Test if needed to read obl.
             if (goalTag.getGoalTagID() == 24) {
                 turn(0.3, 400);
+                telemetry.addData("turn 1, power 0.3","");
+                telemetry.update();
             } else {
                 turn(-0.3, 400);
+                telemetry.addData("turn 1, power -0.3","");
+                telemetry.update();
             }
             turn(0.3, 200);
 

@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
@@ -120,9 +121,12 @@ public class MecanumAutoFar extends LinearOpMode {
 
         goalTag = new GoalTag();
         goalTag.init(hardwareMap);
+        GlobalStorage.setPattern(null);
+        GlobalStorage.setAlliance(-1);
 
         do {
             goalTag.initProcess();
+            GlobalStorage.setPattern(goalTag.getObelisk());
             telemetry.addData("Pattern", goalTag.getObelisk());
             telemetry.addData("team ID", goalTag.getGoalTagID());
             telemetry.addData("StartDelay:", startDelay);
@@ -130,8 +134,10 @@ public class MecanumAutoFar extends LinearOpMode {
             telemetry.update();
             if (gamepad1.bWasPressed()) {
                 goalTag.targetAprilTagID = 24;
+                GlobalStorage.setAlliance(24);
             } else if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 20;
+                GlobalStorage.setAlliance(20);
             } else if (gamepad1.yWasPressed()) {
                 startDelay += 2;
             } else if (gamepad1.aWasPressed()) {
@@ -148,9 +154,9 @@ public class MecanumAutoFar extends LinearOpMode {
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
             if (goalTag.getGoalTagID() == 20) {
-                turn(-0.3,430);
+                turn(-0.3,500);
             } else {
-                turn(0.3,430);
+                turn(0.3,500);
             }
             // P is left
             if (goalTag.getObelisk() == "PGP") {
@@ -174,10 +180,8 @@ public class MecanumAutoFar extends LinearOpMode {
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(velLeft);
-                fireShooterRight( velRight);
+                fireShooterRight(velRight);
             }
-            fireShooterLeft(velLeft);
-            fireShooterRight(velRight);
             flipper.setPosition(0.525);
             moveForward(0.5, 400);
             shooterLeft.targetVelocity = 0;

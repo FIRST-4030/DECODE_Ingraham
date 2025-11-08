@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 public class GlobalStorage {
     private static String pattern;
-    private static String alliance;
+    private static int alliance;
 
     public static String getPattern(){return pattern;}
 
     public static void setPattern(String p) {pattern = p;}
-    public static String getAlliance(){return alliance;}
+    public static int getAlliance(){return alliance;}
 
-    public static void setAlliance(String a) {alliance = a;}
+    public static void setAlliance(int a) {alliance = a;}
 
     //put at the beginning auto init to stop it from carry over variable from previous matches: GlobalStorage.setPattern(null);
     // when you read the obelisk: GlobalStorage.setPattern(p);

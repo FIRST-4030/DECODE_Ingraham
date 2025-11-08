@@ -40,6 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Datalogger;
+import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
@@ -173,7 +174,7 @@ public class MecanumTeleOp7462 extends OpMode {
 // Move to auto
     @Override
     public void init_loop() {
-        goalTag.initProcess();
+        goalTag.targetAprilTagID = GlobalStorage.getAlliance();
         telemetry.addData("Pattern", goalTag.getObelisk());
         telemetry.addData("team ID", goalTag.getGoalTagID());
         telemetry.addLine("Press b for red, x for blue");

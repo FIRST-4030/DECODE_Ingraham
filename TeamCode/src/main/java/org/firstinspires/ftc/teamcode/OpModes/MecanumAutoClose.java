@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
 
@@ -121,9 +122,12 @@ public class MecanumAutoClose extends LinearOpMode {
 
         goalTag = new GoalTag();
         goalTag.init(hardwareMap);
+        GlobalStorage.setPattern(null);
+        GlobalStorage.setAlliance(-1);
 
         do {
             goalTag.initProcessNoGoal();
+            GlobalStorage.setPattern(goalTag.getObelisk());
             telemetry.addData("Pattern", goalTag.getObelisk());
             telemetry.addData("team ID", goalTag.getGoalTagID());
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
@@ -132,8 +136,10 @@ public class MecanumAutoClose extends LinearOpMode {
             telemetry.update();
             if (gamepad1.bWasPressed()) {
                 goalTag.targetAprilTagID = 24;
+                GlobalStorage.setAlliance(24);
             } else if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 20;
+                GlobalStorage.setAlliance(20);
             } else if (gamepad1.yWasPressed()) {
                 startDelay += 2;
             } else if (gamepad1.aWasPressed()) {
@@ -156,30 +162,30 @@ public class MecanumAutoClose extends LinearOpMode {
             }
 
             if (goalTag.getObelisk() == "PGP") {
-                fireShooterLeft(26);
-                fireShooterRight(25);
+                fireShooterLeft(27);
+                fireShooterRight(28);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
-                fireShooterLeft(26);
+                fireShooterLeft(27);
             } else if (goalTag.getObelisk() == "GPP") {
-                fireShooterRight(25);
-                fireShooterLeft(26);
+                fireShooterRight(28);
+                fireShooterLeft(27);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
-                fireShooterLeft(26);
+                fireShooterLeft(27);
             } else if (goalTag.getObelisk() == "PPG") {
-                fireShooterLeft(26);
+                fireShooterLeft(27);
                 sleep(1000);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
-                fireShooterLeft(26);
-                fireShooterRight( 25);
+                fireShooterLeft(27);
+                fireShooterRight( 28);
             } else {
-                fireShooterLeft(26);
-                fireShooterRight(25);
+                fireShooterLeft(27);
+                fireShooterRight(28);
             }
             flipper.setPosition(0.525);
             shooterLeft.targetVelocity = 0;

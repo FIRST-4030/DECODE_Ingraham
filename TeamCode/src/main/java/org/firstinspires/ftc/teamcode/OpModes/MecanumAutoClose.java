@@ -126,17 +126,17 @@ public class MecanumAutoClose extends LinearOpMode {
             goalTag.initProcessNoGoal();
             telemetry.addData("Pattern", goalTag.getObelisk());
             telemetry.addData("team ID", goalTag.getGoalTagID());
-            telemetry.addLine("Press x for red, y for blue, a adds delay, b removes delay");
+            telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
             telemetry.addData("Your Team:", goalTag.getGoalTagID());
             telemetry.addData("Start Delay", startDelay);
             telemetry.update();
-            if (gamepad1.xWasPressed()) {
+            if (gamepad1.bWasPressed()) {
                 goalTag.targetAprilTagID = 24;
-            } else if (gamepad1.yWasPressed()) {
+            } else if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 20;
-            } else if (gamepad1.aWasPressed()) {
+            } else if (gamepad1.yWasPressed()) {
                 startDelay += 2;
-            } else if (gamepad1.bWasPressed()) {
+            } else if (gamepad1.aWasPressed()) {
                 startDelay -= 1;
             }
         } while (opModeInInit());

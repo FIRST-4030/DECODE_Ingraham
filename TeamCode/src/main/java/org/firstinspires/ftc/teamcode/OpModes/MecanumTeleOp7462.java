@@ -176,7 +176,13 @@ public class MecanumTeleOp7462 extends OpMode {
         goalTag.initProcess();
         telemetry.addData("Pattern", goalTag.getObelisk());
         telemetry.addData("team ID", goalTag.getGoalTagID());
+        telemetry.addLine("Press b for red, x for blue");
         telemetry.update();
+        if (gamepad1.bWasPressed()) {
+            goalTag.targetAprilTagID = 24;
+        } else if (gamepad1.xWasPressed()) {
+            goalTag.targetAprilTagID = 20;
+        }
     }
 
 
@@ -213,19 +219,19 @@ public class MecanumTeleOp7462 extends OpMode {
             rightIsRunning = true;
             timerRight.reset();
         }
-        if (gamepad1.dpadLeftWasPressed()) {
+        if (gamepad2.dpadLeftWasPressed()) {
             flipper.setPosition(1);
             timerFlipper.reset();
         }
-        if (gamepad1.dpadRightWasPressed()) {
+        if (gamepad2.dpadRightWasPressed()) {
             flipper.setPosition(0.1);
             timerFlipper.reset();
         }
-        if (gamepad1.dpadUpWasPressed()) {
+        if (gamepad2.dpadUpWasPressed()) {
             collectorBack.targetVelocity = -10;
             collectorFront.targetVelocity = -10;
         }
-        if (gamepad1.dpadUpWasReleased()){
+        if (gamepad2.dpadUpWasReleased()){
             collectorFront.targetVelocity = frontVel;
             collectorBack.targetVelocity = backVel;
         }

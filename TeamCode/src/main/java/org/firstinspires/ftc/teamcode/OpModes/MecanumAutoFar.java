@@ -63,6 +63,7 @@ public class MecanumAutoFar extends LinearOpMode {
     YawPitchRollAngles orientation;
 
     GoalTag goalTag;
+    private int startDelay = 0;
 
     private boolean shooting = false;
 
@@ -122,16 +123,18 @@ public class MecanumAutoFar extends LinearOpMode {
             goalTag.initProcess();
             telemetry.addData("Pattern", goalTag.getObelisk());
             telemetry.addData("team ID", goalTag.getGoalTagID());
-            telemetry.addLine("Press x for red, y for blue, a adds delay, b removes delay");
+            telemetry.addData("StartDelay:", startDelay);
+            telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
             telemetry.update();
-            if (gamepad1.xWasPressed()) {
+            if (gamepad1.bWasPressed()) {
                 goalTag.targetAprilTagID = 24;
-                blackboard.put(ALLIANCE_KEY, 24);
-            } else if (gamepad1.yWasPressed()) {
+            } else if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 20;
-                blackboard.put(ALLIANCE_KEY, 20);
+            } else if (gamepad1.yWasPressed()) {
+                startDelay += 2;
+            } else if (gamepad1.aWasPressed()) {
+                startDelay -= 1;
             }
-            telemetry.addData("Team", blackboard.get(ALLIANCE_KEY));
         } while (opModeInInit());
 
         runtime.reset();
@@ -139,7 +142,7 @@ public class MecanumAutoFar extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
+            sleep(startDelay);
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
             if (goalTag.getGoalTagID() == 20) {

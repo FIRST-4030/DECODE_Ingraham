@@ -58,7 +58,7 @@ public class MecanumAutoFar extends LinearOpMode {
     Servo flipper;
     private int velLeft = 35;
     private int velRight = 34;
-    public static final String ALLIANCE_KEY = "Alliance";
+
     ElapsedTime runtime = new ElapsedTime();
     public static int decimation = 3;
     public static double power = 0.7;
@@ -159,21 +159,21 @@ public class MecanumAutoFar extends LinearOpMode {
                 turn(0.3,500);
             }
             // P is left
-            if (goalTag.getObelisk() == "PGP") {
+            if (goalTag.getObelisk().equals("PGP")) {
                 fireShooterLeft(velLeft);
                 fireShooterRight(velRight);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(velLeft-1);
-            } else if (goalTag.getObelisk() == "GPP") {
+            } else if (goalTag.getObelisk().equals("GPP")) {
                 fireShooterRight(velRight);
                 fireShooterLeft(velLeft);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(velLeft);
-            } else if (goalTag.getObelisk() == "PPG") {
+            } else if (goalTag.getObelisk().equals("PPG")) {
                 fireShooterLeft(velLeft);
                 sleep(1000);
                 flipper.setPosition(1);
@@ -183,7 +183,13 @@ public class MecanumAutoFar extends LinearOpMode {
                 fireShooterRight(velRight);
             }
             flipper.setPosition(0.525);
+            if (goalTag.getGoalTagID() == 20) {
+                turn(0.3, 200);
+            } else {
+                turn(0.3,200);
+            }
             moveForward(0.5, 400);
+
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
 

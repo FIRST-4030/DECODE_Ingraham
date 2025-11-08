@@ -82,12 +82,6 @@ public class MecanumAutoClose extends LinearOpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
 
         flipper = hardwareMap.get(Servo.class, "flipper");
-        //redLED = hardwareMap.get(DigitalChannel.class, "red");
-        //greenLED = hardwareMap.get(DigitalChannel.class, "green");
-        //redLED.setMode(DigitalChannel.Mode.OUTPUT);
-        //greenLED.setMode(DigitalChannel.Mode.OUTPUT);
-
-        //double currentPower = 1.0;
 
         shooterLeft = new Shooter(hardwareMap, "shooterLeft", true);
         shooterRight = new Shooter(hardwareMap, "shooterRight", false);
@@ -161,21 +155,21 @@ public class MecanumAutoClose extends LinearOpMode {
                 moveForward(-0.5, 1600);
             }
 
-            if (goalTag.getObelisk() == "PGP") {
+            if (goalTag.getObelisk().equals("PGP")) {
                 fireShooterLeft(27);
                 fireShooterRight(28);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
-            } else if (goalTag.getObelisk() == "GPP") {
+            } else if (goalTag.getObelisk().equals("GPP")) {
                 fireShooterRight(28);
                 fireShooterLeft(27);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
-            } else if (goalTag.getObelisk() == "PPG") {
+            } else if (goalTag.getObelisk().equals("PPG")) {
                 fireShooterLeft(27);
                 sleep(1000);
                 flipper.setPosition(1);

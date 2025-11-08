@@ -81,7 +81,6 @@ public class MecanumTeleOp7462 extends OpMode {
     ElapsedTime timerLeft = new ElapsedTime();
     ElapsedTime timerRight = new ElapsedTime();
     ElapsedTime timerFlipper = new ElapsedTime();
-    public static final String ALLIANCE_KEY = "Alliance";
 
     // Just for tuning
     private double Kvelo;

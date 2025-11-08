@@ -60,8 +60,7 @@ public class MecanumAutoClose extends LinearOpMode {
     //private DigitalChannel greenLED;
 
     ElapsedTime runtime = new ElapsedTime();
-    ElapsedTime startDelay = new ElapsedTime();
-    private double startTimeFinal = 0;
+    private int startDelay = 0;
     public static int decimation = 3;
     public static double power = 0.7;
     double yawImu;
@@ -124,21 +123,21 @@ public class MecanumAutoClose extends LinearOpMode {
         goalTag.init(hardwareMap);
 
         do {
-            goalTag.initProcess();
+            goalTag.initProcessNoGoal();
             telemetry.addData("Pattern", goalTag.getObelisk());
             telemetry.addData("team ID", goalTag.getGoalTagID());
             telemetry.addLine("Press x for red, y for blue, a adds delay, b removes delay");
             telemetry.addData("Your Team:", goalTag.getGoalTagID());
-            telemetry.addData("Start Delay", startTimeFinal);
+            telemetry.addData("Start Delay", startDelay);
             telemetry.update();
             if (gamepad1.xWasPressed()) {
                 goalTag.targetAprilTagID = 24;
             } else if (gamepad1.yWasPressed()) {
                 goalTag.targetAprilTagID = 20;
             } else if (gamepad1.aWasPressed()) {
-                startTimeFinal += 1;
+                startDelay += 2;
             } else if (gamepad1.bWasPressed()) {
-                startTimeFinal -= 1;
+                startDelay -= 1;
             }
         } while (opModeInInit());
 
@@ -147,58 +146,41 @@ public class MecanumAutoClose extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            startDelay.reset();
-            while (startDelay.seconds() < startTimeFinal) {}
-            moveForward(0.5, 1600);
+            sleep(startDelay*1000);
             if (goalTag.getGoalTagID() == 24) {
-                telemetry.addData("turn 1, power 0.3","");
-                telemetry.update();
-                turn(0.3, 800);
+                turn(0.5, 1200);
+                moveForward(-0.5, 1600);
             } else {
-                turn(-0.3, 800);
-                telemetry.addData("turn 1, power -0.3","");
-                telemetry.update();
+                turn(-0.5, 1200);
+                moveForward(-0.5, 1600);
             }
-
-            sleep(500); // Test if needed to read obl.
-            if (goalTag.getGoalTagID() == 24) {
-                turn(0.3, 400);
-                telemetry.addData("turn 1, power 0.3","");
-                telemetry.update();
-            } else {
-                turn(-0.3, 400);
-                telemetry.addData("turn 1, power -0.3","");
-                telemetry.update();
-            }
-            turn(0.3, 200);
 
             if (goalTag.getObelisk() == "PGP") {
-                fireShooterLeft(36);
-                fireShooterRight(35);
+                fireShooterLeft(26);
+                fireShooterRight(25);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
-                fireShooterLeft(36);
+                fireShooterLeft(26);
             } else if (goalTag.getObelisk() == "GPP") {
-                fireShooterRight(35);
-                fireShooterLeft(36);
+                fireShooterRight(25);
+                fireShooterLeft(26);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
-                fireShooterLeft(36);
+                fireShooterLeft(26);
             } else if (goalTag.getObelisk() == "PPG") {
-                fireShooterLeft(36);
+                fireShooterLeft(26);
                 sleep(1000);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
-                fireShooterLeft(36);
-                fireShooterRight( 35);
+                fireShooterLeft(26);
+                fireShooterRight( 25);
             } else {
-                fireShooterLeft(36);
-                fireShooterRight(35);
+                fireShooterLeft(26);
+                fireShooterRight(25);
             }
-            moveForward(0.5, 400);
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
 

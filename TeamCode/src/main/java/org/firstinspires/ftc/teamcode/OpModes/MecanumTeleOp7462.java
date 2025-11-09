@@ -239,6 +239,10 @@ public class MecanumTeleOp7462 extends OpMode {
             collectorFront.targetVelocity = frontVel;
             collectorBack.targetVelocity = backVel;
         }
+        if (gamepad2.aWasPressed()){
+            flipper.setPosition(flipper.getPosition());
+
+        }
         if (gamepad1.a) {
             turnToAprilTag();
         }

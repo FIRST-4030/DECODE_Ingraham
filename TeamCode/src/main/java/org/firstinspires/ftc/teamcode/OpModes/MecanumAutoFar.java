@@ -175,7 +175,7 @@ public class MecanumAutoFar extends LinearOpMode {
                 fireShooterLeft(velLeft);
                 sleep(1000);
                 flipper.setPosition(1);
-                sleep(1000);
+                sleep(2000);
                 fireShooterLeft(velLeft);
                 fireShooterRight(velRight);
             }

@@ -149,10 +149,11 @@ public class MecanumAutoClose extends LinearOpMode {
             sleep(startDelay*1000);
             if (goalTag.getGoalTagID() == 24) {
                 turn(0.5, 1400);
-                moveForward(-0.5, 1600);
+                //moveForward(-0.5, 1600);
+                moveForward(-0.5, 1200);
             } else {
                 turn(-0.5, 1400);
-                moveForward(-0.5, 1600);
+                moveForward(-0.5, 1200);
             }
 
             if (goalTag.getObelisk().equals("PGP")) {

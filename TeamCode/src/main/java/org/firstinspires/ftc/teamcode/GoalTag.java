@@ -29,6 +29,7 @@ public class GoalTag {
     public boolean GPP = false; // id 21
     public boolean PGP = false; // id 22
     public boolean PPG = false; // id 23
+    public boolean isDataCurrent;
 
     private double BotX; // inches
 
@@ -94,15 +95,22 @@ public class GoalTag {
     public void process() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-
+        if (currentDetections.isEmpty()) {
+            isDataCurrent = false;
+        }
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 if (detection.id == targetAprilTagID) {
+                    isDataCurrent = true;
                     goalRange = detection.ftcPose.range;
                     goalBearing = detection.ftcPose.bearing;
                     BotX = detection.robotPose.getPosition().x;
                     BotY = detection.robotPose.getPosition().y;
+                } else {
+                    isDataCurrent = false;
                 }
+            } else {
+                isDataCurrent = false;
             }
 
 

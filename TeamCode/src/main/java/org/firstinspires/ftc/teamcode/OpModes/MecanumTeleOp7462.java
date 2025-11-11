@@ -41,10 +41,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Datalogger;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.Shooter;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import java.util.List;
 
 /*
  * This OpMode illustrates how to program your robot to drive field relative.  This means
@@ -63,6 +70,7 @@ import org.firstinspires.ftc.teamcode.Shooter;
 @TeleOp(name = "Mecanum TeleOp 7462", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
 public class MecanumTeleOp7462 extends OpMode {
+    Limelight3A limelight;
     // This declares the four motors needed
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
@@ -97,6 +105,16 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void init() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+
+        telemetry.setMsTransmissionInterval(11);
+
+        limelight.pipelineSwitch(0);
+
+        /*
+         * Starts polling for data.
+         */
+        limelight.start();
         //hardwareMap is just so our code names can actually connect to what the android phone understands
         frontLeftDrive = hardwareMap.get(DcMotor.class, "leftFront");
         frontRightDrive = hardwareMap.get(DcMotor.class, "rightFront");
@@ -206,6 +224,7 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
         telemetry.addData("GoalTagRange", goalTag.getRange());
         telemetry.addData("GoalBearing", goalTag.getBearing());
+        telemetry.addData("See Goal?", goalTag.isDataCurrent);
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
         telemetry.update();
@@ -213,13 +232,13 @@ public class MecanumTeleOp7462 extends OpMode {
         // Driver Controls
         if (gamepad1.leftBumperWasPressed()) {
             // do math here
-            shooterLeft.targetVelocity = (goalTag.getRange()+202.17)/8.92124;
+            shooterLeft.targetVelocity = (goalTag.getRange() + 202.17) / 8.92124;
             leftIsRunning = true;
             timerLeft.reset();
         }
         if (gamepad1.rightBumperWasPressed()) {
             // do math here
-            shooterRight.targetVelocity = (goalTag.getRange()+202.17)/8.92124;
+            shooterRight.targetVelocity = (goalTag.getRange() + 202.17) / 8.92124;
             rightIsRunning = true;
             timerRight.reset();
         }
@@ -235,15 +254,15 @@ public class MecanumTeleOp7462 extends OpMode {
             collectorBack.targetVelocity = -10;
             collectorFront.targetVelocity = -10;
         }
-        if (gamepad2.dpadUpWasReleased()){
+        if (gamepad2.dpadUpWasReleased()) {
             collectorFront.targetVelocity = frontVel;
             collectorBack.targetVelocity = backVel;
         }
-        if (gamepad2.aWasPressed()){
+        if (gamepad2.aWasPressed()) {
             flipper.setPosition(flipper.getPosition());
 
         }
-        if (gamepad1.a) {
+        if (gamepad1.a && goalTag.isDataCurrent) {
             turnToAprilTag();
         }
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
@@ -274,6 +293,38 @@ public class MecanumTeleOp7462 extends OpMode {
         }
         if (timerFlipper.seconds() > 0.5) {
             flipper.setPosition(0.525);
+        }
+
+        // Limelight Stuff
+        LLResult result = limelight.getLatestResult();
+        if (result != null && result.isValid()) {
+            double tx = result.getTx(); // How far left or right the target is (degrees)
+            double ty = result.getTy(); // How far up or down the target is (degrees)
+            double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+
+            telemetry.addData("Target X", tx);
+            telemetry.addData("Target Y", ty);
+            telemetry.addData("Target Area", ta);
+        } else {
+            telemetry.addData("Limelight", "No Targets");
+        }
+        // First, tell Limelight which way your robot is facing
+        double robotYaw = imu.getRobotYawPitchRollAngles().getYaw();
+        limelight.updateRobotOrientation(robotYaw);
+        if (result != null && result.isValid()) {
+            Pose3D botpose_mt2 = result.getBotpose_MT2();
+            if (botpose_mt2 != null) {
+                double x = botpose_mt2.getPosition().x;
+                double y = botpose_mt2.getPosition().y;
+                telemetry.addData("MT2 Location:", "(" + x + ", " + y + ")");
+            }
+        }
+
+        List<LLResultTypes.BarcodeResult> barcodes = result.getBarcodeResults();
+        for (LLResultTypes.BarcodeResult barcode : barcodes) {
+            String data = barcode.getData(); // What the barcode says
+            String family = barcode.getFamily(); // What type of barcode it is
+            telemetry.addData("Barcode", data + " (" + family + ")");
         }
     }
     public void turnToAprilTag() {

@@ -102,7 +102,7 @@ public class MecanumAutoClose extends LinearOpMode {
 
         launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
 
-        launchFlapRight= hardwareMap.get(Servo.class, "launchFlapRight");
+        launchFlapRight = hardwareMap.get(Servo.class, "launchFlapRight");
 
         imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot

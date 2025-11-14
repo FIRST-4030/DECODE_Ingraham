@@ -7,47 +7,113 @@ import java.util.List;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 
 
 public class GoalTagLimelight {
     Limelight3A limelight;
+    private double goalYaw; // inches
+    private double goalRange; // in
+
+
+    public boolean GPP = false; // id 21
+    public boolean PGP = false; // id 22
+    public boolean PPG = false; // id 23
+    private double tx;
+    private double ty;
+    private double camera_height = 16; // in
+    private double target_height = 34; // in
+    private double camera_angle = 30; // degrees
+
+    public boolean isDataCurrent;
     //Pipeline 0 is 20(blue) pipeline 1 is 24(red)
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, int id) {
+    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         telemetry.setMsTransmissionInterval(11);
-        setTeam(id);
         limelight.start(); // This tells Limelight to start looking!
     }
 
-    public void loop(Telemetry telemetry) {
+    public void readObelisk() {
+        limelight.pipelineSwitch(2); //PGP
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            PGP = true;
+            PPG = false;
+            GPP = false;
+            } else {
+            limelight.pipelineSwitch(3); //PPG
+            LLResult result2 = limelight.getLatestResult();
+            if (result2 != null) {
+                PGP = false;
+                PPG = true;
+                GPP = false;
+            } else {
+                limelight.pipelineSwitch(4); //GPP
+                LLResult result3 = limelight.getLatestResult();
+                if (result3 != null) {
+                    PGP = false;
+                    PPG = false;
+                    GPP = true;
+                }
+            }
+        }
+    }
+    public void process(Telemetry telemetry) {
         LLResult result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
-            double tx = result.getTx(); // How far left or right the target is (degrees)
-            double ty = result.getTy(); // How far up or down the target is (degrees)
+            tx = result.getTx(); // How far left or right the target is (degrees)
+            ty = result.getTy(); // How far up or down the target is (degrees)
+
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
             Pose3D botpose = result.getBotpose();
             if (botpose != null) {
                 double x = botpose.getPosition().x;
                 double y = botpose.getPosition().y;
-                double range = Math.sqrt(Math.pow((ty-y),2) + Math.pow((tx-x),2));
+
+                goalYaw = botpose.getOrientation().getYaw();
+                goalRange = (target_height - camera_height) / Math.tan(Math.toRadians(camera_angle + ty));
+                isDataCurrent = true;
 
                 telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");
+            } else {
+                isDataCurrent = false;
             }
 
             telemetry.addData("Target X", tx);
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);
         } else {
+            isDataCurrent = false;
             telemetry.addData("Limelight", "No Targets");
         }
     }
+
     public void setTeam(int id) {
         if (id == 24) {
             limelight.pipelineSwitch(0);
         } else if (id == 20) {
             limelight.pipelineSwitch(1);
         }
+    }
+
+    public String getObelisk() {
+        if (PGP) {
+            return "PGP";
+        } else if (GPP) {
+            return "GPP";
+        } else if (PPG) {
+            return "PPG";
+        } else {
+            return "No Tag Detected";
+        }
+    }
+    public double getRange() {
+        return goalRange;
+    }
+    public double getTx() {
+        return tx;
     }
 }

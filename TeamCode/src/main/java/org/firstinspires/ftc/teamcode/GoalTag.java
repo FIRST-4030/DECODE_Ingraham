@@ -112,8 +112,6 @@ public class GoalTag {
             } else {
                 isDataCurrent = false;
             }
-
-
         }
     }
     // Move to auto

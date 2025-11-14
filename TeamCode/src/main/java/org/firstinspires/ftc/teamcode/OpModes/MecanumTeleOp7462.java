@@ -45,6 +45,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Datalogger;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
+import org.firstinspires.ftc.teamcode.GoalTagLimelight;
 import org.firstinspires.ftc.teamcode.Shooter;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -70,7 +71,7 @@ import java.util.List;
 @TeleOp(name = "Mecanum TeleOp 7462", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
 public class MecanumTeleOp7462 extends OpMode {
-    Limelight3A limelight;
+    GoalTagLimelight limelight;
     // This declares the four motors needed
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
@@ -105,16 +106,6 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void init() {
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
-        telemetry.setMsTransmissionInterval(11);
-
-        limelight.pipelineSwitch(0);
-
-        /*
-         * Starts polling for data.
-         */
-        limelight.start();
         //hardwareMap is just so our code names can actually connect to what the android phone understands
         frontLeftDrive = hardwareMap.get(DcMotor.class, "leftFront");
         frontRightDrive = hardwareMap.get(DcMotor.class, "rightFront");
@@ -174,8 +165,12 @@ public class MecanumTeleOp7462 extends OpMode {
         shooterRight = new Shooter(hardwareMap,"shooterRight", false);
         shooterRight.setControllerValues(0.3,0.0243);
 
+        limelight = new GoalTagLimelight();
+        limelight.init(hardwareMap, telemetry);
+
         if ((GlobalStorage.getAlliance() != -1)) {
             goalTag.targetAprilTagID = GlobalStorage.getAlliance();
+            limelight.setTeam(GlobalStorage.getAlliance());
         }
         timerLeft.reset();
         timerRight.reset();
@@ -202,8 +197,10 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.update();
         if (gamepad1.bWasPressed()) {
             goalTag.targetAprilTagID = 24;
+            limelight.setTeam(24);
         } else if (gamepad1.xWasPressed()) {
             goalTag.targetAprilTagID = 20;
+            limelight.setTeam(20);
         }
     }
 
@@ -211,6 +208,7 @@ public class MecanumTeleOp7462 extends OpMode {
     @Override
     public void loop() {
         goalTag.process();
+        limelight.process(telemetry);
         collectorFront.overridePower();
         collectorBack.overridePower();
 
@@ -222,8 +220,9 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
-        telemetry.addData("GoalTagRange", goalTag.getRange());
-        telemetry.addData("GoalBearing", goalTag.getBearing());
+        telemetry.addData("AprilTagRange", goalTag.getRange());
+        telemetry.addData("AprilTagBearing", goalTag.getBearing());
+
         telemetry.addData("See Goal?", goalTag.isDataCurrent);
         telemetry.addData("TimerLeft", timerLeft.seconds());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
@@ -233,13 +232,13 @@ public class MecanumTeleOp7462 extends OpMode {
         // Driver Controls
         if (gamepad1.leftBumperWasPressed()) {
             // do math here
-            shooterLeft.targetVelocity = (goalTag.getRange() + 202.17) / 8.92124;
+            shooterLeft.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
             leftIsRunning = true;
             timerLeft.reset();
         }
         if (gamepad1.rightBumperWasPressed()) {
             // do math here
-            shooterRight.targetVelocity = (goalTag.getRange() + 202.17) / 8.92124;
+            shooterRight.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
             rightIsRunning = true;
             timerRight.reset();
         }
@@ -259,8 +258,11 @@ public class MecanumTeleOp7462 extends OpMode {
             collectorFront.targetVelocity = frontVel;
             collectorBack.targetVelocity = backVel;
         }
-        if (gamepad1.a && goalTag.isDataCurrent) {
-            turnToAprilTag();
+//        if (gamepad1.a && goalTag.isDataCurrent) {
+//            turnToAprilTag();
+//        }
+        if (gamepad1.a && limelight.isDataCurrent) {
+            turnToAprilTagLimelight();
         }
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
@@ -292,44 +294,22 @@ public class MecanumTeleOp7462 extends OpMode {
             flipper.setPosition(0.525);
         }
 
-        // Limelight Stuff
-        LLResult result = limelight.getLatestResult();
-        if (result != null && result.isValid()) {
-            double tx = result.getTx(); // How far left or right the target is (degrees)
-            double ty = result.getTy(); // How far up or down the target is (degrees)
-            double ta = result.getTa(); // How big the target looks (0%-100% of the image)
-
-            telemetry.addData("Target X", tx);
-            telemetry.addData("Target Y", ty);
-            telemetry.addData("Target Area", ta);
-        } else {
-            telemetry.addData("Limelight", "No Targets");
-        }
-        // First, tell Limelight which way your robot is facing
-        double robotYaw = imu.getRobotYawPitchRollAngles().getYaw();
-        limelight.updateRobotOrientation(robotYaw);
-        if (result != null && result.isValid()) {
-            Pose3D botpose_mt2 = result.getBotpose_MT2();
-            if (botpose_mt2 != null) {
-                double x = botpose_mt2.getPosition().x;
-                double y = botpose_mt2.getPosition().y;
-                telemetry.addData("MT2 Location:", "(" + x + ", " + y + ")");
-            }
-        }
-
-        List<LLResultTypes.BarcodeResult> barcodes = result.getBarcodeResults();
-        for (LLResultTypes.BarcodeResult barcode : barcodes) {
-            String data = barcode.getData(); // What the barcode says
-            String family = barcode.getFamily(); // What type of barcode it is
-            telemetry.addData("Barcode", data + " (" + family + ")");
-        }
-        telemetry.update();
     }
     public void turnToAprilTag() {
         if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
             if (goalTag.getBearing() > 0.6) { // rotate left
                 moveAllMotors(-0.5,0.5,-0.5,0.5);
             } else if (goalTag.getBearing() < -0.6) { // rotate right
+                moveAllMotors(0.5,-0.5,0.5,-0.5);
+
+            }
+        }
+    }
+    public void turnToAprilTagLimelight() {
+        if (limelight.getTx() > 0.6 || limelight.getTx() < -0.6) {
+            if (limelight.getTx() > 0.6) { // rotate left
+                moveAllMotors(-0.5,0.5,-0.5,0.5);
+            } else if (limelight.getTx() < -0.6) { // rotate right
                 moveAllMotors(0.5,-0.5,0.5,-0.5);
 
             }

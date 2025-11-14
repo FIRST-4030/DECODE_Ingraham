@@ -225,6 +225,7 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("GoalTagRange", goalTag.getRange());
         telemetry.addData("GoalBearing", goalTag.getBearing());
         telemetry.addData("See Goal?", goalTag.isDataCurrent);
+        telemetry.addData("TimerLeft", timerLeft.seconds());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
 
@@ -257,10 +258,6 @@ public class MecanumTeleOp7462 extends OpMode {
         if (gamepad2.dpadUpWasReleased()) {
             collectorFront.targetVelocity = frontVel;
             collectorBack.targetVelocity = backVel;
-        }
-        if (gamepad2.aWasPressed()) {
-            flipper.setPosition(flipper.getPosition());
-
         }
         if (gamepad1.a && goalTag.isDataCurrent) {
             turnToAprilTag();

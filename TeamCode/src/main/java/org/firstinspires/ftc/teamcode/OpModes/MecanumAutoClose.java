@@ -148,11 +148,11 @@ public class MecanumAutoClose extends LinearOpMode {
         while (opModeIsActive()) {
             sleep(startDelay*1000);
             if (goalTag.getGoalTagID() == 24) {
-                turn(0.5, 1400);
+                turn(0.5, 1300);
                 //moveForward(-0.5, 1600);
                 moveForward(-0.5, 1200);
             } else {
-                turn(-0.5, 1400);
+                turn(-0.5, 1300);
                 moveForward(-0.5, 1200);
             }
 

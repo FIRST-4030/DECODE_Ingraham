@@ -227,7 +227,7 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("See Goal?", goalTag.isDataCurrent);
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
-        telemetry.update();
+
 
         // Driver Controls
         if (gamepad1.leftBumperWasPressed()) {
@@ -285,11 +285,11 @@ public class MecanumTeleOp7462 extends OpMode {
         // Servo Reset
         if (timerLeft.seconds() > 2) {
             launchFlapLeft.setPosition(0.3);
-            shooterLeft.targetVelocity = 0;
+            //shooterLeft.targetVelocity = 0;
         }
         if (timerRight.seconds() > 2) {
             launchFlapRight.setPosition(0.4);
-            shooterRight.targetVelocity = 0;
+            //shooterRight.targetVelocity = 0;
         }
         if (timerFlipper.seconds() > 0.5) {
             flipper.setPosition(0.525);
@@ -326,6 +326,7 @@ public class MecanumTeleOp7462 extends OpMode {
             String family = barcode.getFamily(); // What type of barcode it is
             telemetry.addData("Barcode", data + " (" + family + ")");
         }
+        telemetry.update();
     }
     public void turnToAprilTag() {
         if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {

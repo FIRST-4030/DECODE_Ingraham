@@ -22,9 +22,9 @@ public class GoalTagLimelight {
     public boolean PPG = false; // id 23
     private double tx;
     private double ty;
-    private double camera_height = 16; // in
+    private double camera_height = 17.5; // in
     private double target_height = 34; // in
-    private double camera_angle = 30; // degrees
+    private double camera_angle = 0; // degrees
 
     public boolean isDataCurrent;
     //Pipeline 0 is 20(blue) pipeline 1 is 24(red)
@@ -37,21 +37,21 @@ public class GoalTagLimelight {
     }
 
     public void readObelisk() {
-        limelight.pipelineSwitch(2); //PGP
+        limelight.pipelineSwitch(3); //PGP
         LLResult result = limelight.getLatestResult();
         if (result != null) {
             PGP = true;
             PPG = false;
             GPP = false;
             } else {
-            limelight.pipelineSwitch(3); //PPG
+            limelight.pipelineSwitch(4); //PPG
             LLResult result2 = limelight.getLatestResult();
             if (result2 != null) {
                 PGP = false;
                 PPG = true;
                 GPP = false;
             } else {
-                limelight.pipelineSwitch(4); //GPP
+                limelight.pipelineSwitch(2); //GPP
                 LLResult result3 = limelight.getLatestResult();
                 if (result3 != null) {
                     PGP = false;
@@ -93,9 +93,9 @@ public class GoalTagLimelight {
     }
 
     public void setTeam(int id) {
-        if (id == 24) {
-            limelight.pipelineSwitch(0);
-        } else if (id == 20) {
+        if (id == 20) {
+            limelight.pipelineSwitch(5);
+        } else if (id == 24) {
             limelight.pipelineSwitch(1);
         }
     }

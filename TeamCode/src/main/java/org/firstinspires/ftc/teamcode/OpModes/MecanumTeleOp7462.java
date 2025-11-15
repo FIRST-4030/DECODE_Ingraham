@@ -191,8 +191,9 @@ public class MecanumTeleOp7462 extends OpMode {
 // Move to auto
     @Override
     public void init_loop() {
-//        telemetry.addData("Pattern", goalTag.getObelisk());
-//        telemetry.addData("team ID", goalTag.getGoalTagID());
+        telemetry.addData("Pattern", limelight.getObelisk());
+        telemetry.addData("team ID", limelight.getID());
+
         telemetry.addLine("Press b for red, x for blue");
         telemetry.update();
         if (gamepad1.bWasPressed()) {

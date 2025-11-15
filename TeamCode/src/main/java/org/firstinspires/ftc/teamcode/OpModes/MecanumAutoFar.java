@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import android.app.slice.SliceMetrics;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -41,6 +43,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
+import org.firstinspires.ftc.teamcode.GoalTagLimelight;
 import org.firstinspires.ftc.teamcode.Shooter;
 
 @Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
@@ -65,8 +68,10 @@ public class MecanumAutoFar extends LinearOpMode {
     double yawImu;
     YawPitchRollAngles orientation;
 
-    GoalTag goalTag;
+    //GoalTag goalTag;
+    GoalTagLimelight limelight;
     private int startDelay = 0;
+    private int teamID;
 
     private boolean shooting = false;
 
@@ -81,16 +86,10 @@ public class MecanumAutoFar extends LinearOpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
 
         flipper = hardwareMap.get(Servo.class, "flipper");
-        //redLED = hardwareMap.get(DigitalChannel.class, "red");
-        //greenLED = hardwareMap.get(DigitalChannel.class, "green");
-        //redLED.setMode(DigitalChannel.Mode.OUTPUT);
-        //greenLED.setMode(DigitalChannel.Mode.OUTPUT);
-
-        //double currentPower = 1.0;
 
         shooterLeft = new Shooter(hardwareMap, "shooterLeft", true);
         shooterRight = new Shooter(hardwareMap, "shooterRight", false);
-        ///shooterLeft.initPower(currentPower);
+
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -98,8 +97,6 @@ public class MecanumAutoFar extends LinearOpMode {
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
-        // wires, you should remove these
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -119,24 +116,32 @@ public class MecanumAutoFar extends LinearOpMode {
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        goalTag = new GoalTag();
-        goalTag.init(hardwareMap);
+//        goalTag = new GoalTag();
+//        goalTag.init(hardwareMap);
+        limelight = new GoalTagLimelight();
+        limelight.init(hardwareMap,telemetry);
+
+
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
 
         do {
-            goalTag.initProcess();
-            GlobalStorage.setPattern(goalTag.getObelisk());
-            telemetry.addData("Pattern", goalTag.getObelisk());
-            telemetry.addData("team ID", goalTag.getGoalTagID());
-            telemetry.addData("StartDelay:", startDelay);
+            limelight.readObelisk(telemetry);
+            //GlobalStorage.setPattern(goalTag.getObelisk());
+            GlobalStorage.setPattern(limelight.getObelisk());
+
+            telemetry.addData("Pattern", limelight.getObelisk());
+            telemetry.addData("team ID", teamID);
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
+            telemetry.addData("Start Delay", startDelay);
             telemetry.update();
             if (gamepad1.bWasPressed()) {
-                goalTag.targetAprilTagID = 24;
+                //goalTag.targetAprilTagID = 24;
+                teamID = 24;
                 GlobalStorage.setAlliance(24);
             } else if (gamepad1.xWasPressed()) {
-                goalTag.targetAprilTagID = 20;
+                //goalTag.targetAprilTagID = 20;
+                teamID = 20;
                 GlobalStorage.setAlliance(20);
             } else if (gamepad1.yWasPressed()) {
                 startDelay += 2;
@@ -153,25 +158,25 @@ public class MecanumAutoFar extends LinearOpMode {
             sleep(startDelay*1000);
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
-            if (goalTag.getGoalTagID() == 20) {
+            if (teamID == 20) {
                 turn(-0.3,450);
             } else {
                 turn(0.3,450);
             }
             // P is left
-            if (goalTag.getObelisk().equals("PGP")) {
+            if (limelight.getObelisk().equals("PGP")) {
                 fireShooterLeft(velLeft);
                 fireShooterRight(velRight);
                 flipper.setPosition(1);
                 sleep(1000);
                 fireShooterLeft(velLeft-1);
-            } else if (goalTag.getObelisk().equals("GPP")) {
+            } else if (limelight.getObelisk().equals("GPP")) {
                 fireShooterRight(velRight);
                 fireShooterLeft(velLeft);
                 flipper.setPosition(1);
                 sleep(1000);
                 fireShooterLeft(velLeft);
-            } else if (goalTag.getObelisk().equals("PPG")) {
+            } else if (limelight.getObelisk().equals("PPG")) {
                 fireShooterLeft(velLeft);
                 sleep(1000);
                 flipper.setPosition(1);
@@ -180,7 +185,7 @@ public class MecanumAutoFar extends LinearOpMode {
                 fireShooterRight(velRight);
             }
             flipper.setPosition(0.525);
-            if (goalTag.getGoalTagID() == 20) {
+            if (teamID == 20) {
                 turn(0.3, 200);
             } else {
                 turn(0.3,200);

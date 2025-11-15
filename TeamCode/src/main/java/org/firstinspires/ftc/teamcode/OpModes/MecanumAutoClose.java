@@ -41,6 +41,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
+import org.firstinspires.ftc.teamcode.GoalTagLimelight;
 import org.firstinspires.ftc.teamcode.Shooter;
 
 @Autonomous(name="Mecanum Auto Close", group="Linear OpMode")
@@ -67,9 +68,11 @@ public class MecanumAutoClose extends LinearOpMode {
     double yawImu;
     YawPitchRollAngles orientation;
 
-    GoalTag goalTag;
+//    GoalTag goalTag;
+    GoalTagLimelight limelight;
 
     private boolean shooting = false;
+    private int teamID;
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
@@ -114,25 +117,33 @@ public class MecanumAutoClose extends LinearOpMode {
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        goalTag = new GoalTag();
-        goalTag.init(hardwareMap);
+//        goalTag = new GoalTag();
+//        goalTag.init(hardwareMap);
+
+        limelight = new GoalTagLimelight();
+        limelight.init(hardwareMap,telemetry);
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
 
         do {
-            goalTag.initProcessNoGoal();
-            GlobalStorage.setPattern(goalTag.getObelisk());
-            telemetry.addData("Pattern", goalTag.getObelisk());
-            telemetry.addData("team ID", goalTag.getGoalTagID());
+            //goalTag.initProcessNoGoal();
+            limelight.readObelisk(telemetry);
+            //GlobalStorage.setPattern(goalTag.getObelisk());
+            GlobalStorage.setPattern(limelight.getObelisk());
+
+
+            telemetry.addData("Pattern", limelight.getObelisk());
+            telemetry.addData("team ID", teamID);
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
-            telemetry.addData("Your Team:", goalTag.getGoalTagID());
             telemetry.addData("Start Delay", startDelay);
             telemetry.update();
             if (gamepad1.bWasPressed()) {
-                goalTag.targetAprilTagID = 24;
+                //goalTag.targetAprilTagID = 24;
+                teamID = 24;
                 GlobalStorage.setAlliance(24);
             } else if (gamepad1.xWasPressed()) {
-                goalTag.targetAprilTagID = 20;
+                //goalTag.targetAprilTagID = 20;
+                teamID = 20;
                 GlobalStorage.setAlliance(20);
             } else if (gamepad1.yWasPressed()) {
                 startDelay += 2;
@@ -146,8 +157,13 @@ public class MecanumAutoClose extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            if (teamID == 24) {
+                limelight.setTeam(24);
+            } else if (teamID == 20) {
+                limelight.setTeam(20);
+            }
             sleep(startDelay*1000);
-            if (goalTag.getGoalTagID() == 24) {
+            if (limelight.getID() == 24) {
                 turn(0.5, 1300);
                 //moveForward(-0.5, 1600);
                 moveForward(-0.5, 1200);
@@ -156,21 +172,21 @@ public class MecanumAutoClose extends LinearOpMode {
                 moveForward(-0.5, 1200);
             }
 
-            if (goalTag.getObelisk().equals("PGP")) {
+            if (limelight.getObelisk().equals("PGP")) {
                 fireShooterLeft(27);
                 fireShooterRight(28);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
-            } else if (goalTag.getObelisk().equals("GPP")) {
+            } else if (limelight.getObelisk().equals("GPP")) {
                 fireShooterRight(28);
                 fireShooterLeft(27);
                 flipper.setPosition(1);
                 sleep(1000);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
-            } else if (goalTag.getObelisk().equals("PPG")) {
+            } else if (limelight.getObelisk().equals("PPG")) {
                 fireShooterLeft(27);
                 sleep(1000);
                 flipper.setPosition(1);
@@ -307,6 +323,15 @@ public class MecanumAutoClose extends LinearOpMode {
         launchFlapRight.setPosition(0.4);
         while (timer.seconds() < 3) {
             shooterRight.overridePower();
+        }
+    }
+    public void turnToTag() {
+        if (limelight.getTx() > 0.6 || limelight.getTx() < -0.6) {
+            if (limelight.getTx() > 0.6) { // rotate left
+                turn(-0.25,100);
+            } else if (limelight.getTx() < -0.6) { // rotate right
+                turn(0.25,100);
+            }
         }
     }
 }

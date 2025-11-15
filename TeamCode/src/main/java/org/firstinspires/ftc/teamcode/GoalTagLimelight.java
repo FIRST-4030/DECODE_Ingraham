@@ -22,9 +22,9 @@ public class GoalTagLimelight {
     public boolean PPG = false; // id 23
     private double tx;
     private double ty;
-    private double camera_height = 16.25; // in
-    private double target_height = 26.5; // in
-    private double camera_angle = 0; // degrees
+    private double camera_height = 15.625; // in
+    private double target_height = 29.5; // in
+    private double camera_angle = 0.0418; // radians
 
     public boolean isDataCurrent;
     //Pipeline 5 is 20(blue) pipeline 1 is 24(red)
@@ -76,7 +76,10 @@ public class GoalTagLimelight {
                 telemetry.addData("boty", y);
 
                 goalYaw = botpose.getOrientation().getYaw();
-                goalRange = (target_height - camera_height) / Math.tan(Math.toRadians(camera_angle + ty));
+                goalRange = (target_height - camera_height) / (Math.tan(Math.toRadians(ty)+camera_angle));
+                double denom = Math.tan(Math.toRadians(camera_angle + ty));
+                telemetry.addData("denom", denom);
+
                 isDataCurrent = true;
 
                 telemetry.addData("MT1 Location", "(" + x + ", " + y + ")");

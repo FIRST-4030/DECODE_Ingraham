@@ -22,12 +22,12 @@ public class GoalTagLimelight {
     public boolean PPG = false; // id 23
     private double tx;
     private double ty;
-    private double camera_height = 17.5; // in
-    private double target_height = 34; // in
+    private double camera_height = 16.25; // in
+    private double target_height = 26.5; // in
     private double camera_angle = 0; // degrees
 
     public boolean isDataCurrent;
-    //Pipeline 0 is 20(blue) pipeline 1 is 24(red)
+    //Pipeline 5 is 20(blue) pipeline 1 is 24(red)
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -71,7 +71,9 @@ public class GoalTagLimelight {
             Pose3D botpose = result.getBotpose();
             if (botpose != null) {
                 double x = botpose.getPosition().x;
+                telemetry.addData("botx", x);
                 double y = botpose.getPosition().y;
+                telemetry.addData("boty", y);
 
                 goalYaw = botpose.getOrientation().getYaw();
                 goalRange = (target_height - camera_height) / Math.tan(Math.toRadians(camera_angle + ty));
@@ -84,6 +86,7 @@ public class GoalTagLimelight {
 
             telemetry.addData("Target X", tx);
             telemetry.addData("Target Y", ty);
+            telemetry.addData("pipeline", result.getPipelineIndex());
             telemetry.addData("limelight Range", goalRange);
             telemetry.addData("Target Area", ta);
         } else {

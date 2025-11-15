@@ -86,7 +86,7 @@ public class MecanumTeleOp7462 extends OpMode {
     Servo launchFlapLeft;
     Servo launchFlapRight;
     Servo flipper;
-    GoalTag goalTag;
+    //GoalTag goalTag;
 
     // Timers
     ElapsedTime timerLeft = new ElapsedTime();
@@ -148,8 +148,8 @@ public class MecanumTeleOp7462 extends OpMode {
         //because the logo or the usb could be facing up/down or right/left depending on how
         //they could fit the control hub on the robot
 
-        goalTag = new GoalTag();
-        goalTag.init(hardwareMap);
+//        goalTag = new GoalTag();
+//        goalTag.init(hardwareMap);
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", false);
         collectorFront.setControllerValues(0.3,0.0243);
@@ -169,7 +169,7 @@ public class MecanumTeleOp7462 extends OpMode {
         limelight.init(hardwareMap, telemetry);
 
         if ((GlobalStorage.getAlliance() != -1)) {
-            goalTag.targetAprilTagID = GlobalStorage.getAlliance();
+            //goalTag.targetAprilTagID = GlobalStorage.getAlliance();
             limelight.setTeam(GlobalStorage.getAlliance());
         }
         timerLeft.reset();
@@ -191,15 +191,15 @@ public class MecanumTeleOp7462 extends OpMode {
 // Move to auto
     @Override
     public void init_loop() {
-        telemetry.addData("Pattern", goalTag.getObelisk());
-        telemetry.addData("team ID", goalTag.getGoalTagID());
+//        telemetry.addData("Pattern", goalTag.getObelisk());
+//        telemetry.addData("team ID", goalTag.getGoalTagID());
         telemetry.addLine("Press b for red, x for blue");
         telemetry.update();
         if (gamepad1.bWasPressed()) {
-            goalTag.targetAprilTagID = 24;
+//            goalTag.targetAprilTagID = 24;
             limelight.setTeam(24);
         } else if (gamepad1.xWasPressed()) {
-            goalTag.targetAprilTagID = 20;
+            //goalTag.targetAprilTagID = 20;
             limelight.setTeam(20);
         }
     }
@@ -207,7 +207,7 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void loop() {
-        goalTag.process();
+        //goalTag.process();
         limelight.process(telemetry);
         collectorFront.overridePower();
         collectorBack.overridePower();
@@ -220,10 +220,12 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
-        telemetry.addData("AprilTagRange", goalTag.getRange());
-        telemetry.addData("AprilTagBearing", goalTag.getBearing());
 
-        telemetry.addData("See Goal?", goalTag.isDataCurrent);
+
+//        telemetry.addData("AprilTagRange", goalTag.getRange());
+//        telemetry.addData("AprilTagBearing", goalTag.getBearing());
+//
+//        telemetry.addData("See Goal?", goalTag.isDataCurrent);
         telemetry.addData("TimerLeft", timerLeft.seconds());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
@@ -295,23 +297,22 @@ public class MecanumTeleOp7462 extends OpMode {
         }
 
     }
-    public void turnToAprilTag() {
-        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
-            if (goalTag.getBearing() > 0.6) { // rotate left
-                moveAllMotors(-0.5,0.5,-0.5,0.5);
-            } else if (goalTag.getBearing() < -0.6) { // rotate right
-                moveAllMotors(0.5,-0.5,0.5,-0.5);
-
-            }
-        }
-    }
+//    public void turnToAprilTag() {
+//        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
+//            if (goalTag.getBearing() > 0.6) { // rotate left
+//                moveAllMotors(-0.5,0.5,-0.5,0.5);
+//            } else if (goalTag.getBearing() < -0.6) { // rotate right
+//                moveAllMotors(0.5,-0.5,0.5,-0.5);
+//
+//            }
+//        }
+//    }
     public void turnToAprilTagLimelight() {
         if (limelight.getTx() > 0.6 || limelight.getTx() < -0.6) {
             if (limelight.getTx() > 0.6) { // rotate left
-                moveAllMotors(-0.5,0.5,-0.5,0.5);
-            } else if (limelight.getTx() < -0.6) { // rotate right
                 moveAllMotors(0.5,-0.5,0.5,-0.5);
-
+            } else if (limelight.getTx() < -0.6) { // rotate right
+                moveAllMotors(-0.5,0.5,-0.5,0.5);
             }
         }
     }

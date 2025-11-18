@@ -235,13 +235,15 @@ public class MecanumTeleOp7462 extends OpMode {
         // Driver Controls
         if (gamepad1.leftBumperWasPressed()) {
             // do math here
-            shooterLeft.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
+            //shooterLeft.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
+            shooterLeft.targetVelocity = 0.1067*limelight.getRange()+24.336;
             leftIsRunning = true;
             timerLeft.reset();
         }
         if (gamepad1.rightBumperWasPressed()) {
             // do math here
-            shooterRight.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
+            //shooterRight.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
+            shooterRight.targetVelocity = 0.1067*limelight.getRange()+24.336;
             rightIsRunning = true;
             timerRight.reset();
         }
@@ -298,22 +300,15 @@ public class MecanumTeleOp7462 extends OpMode {
         }
 
     }
-//    public void turnToAprilTag() {
-//        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
-//            if (goalTag.getBearing() > 0.6) { // rotate left
-//                moveAllMotors(-0.5,0.5,-0.5,0.5);
-//            } else if (goalTag.getBearing() < -0.6) { // rotate right
-//                moveAllMotors(0.5,-0.5,0.5,-0.5);
-//
-//            }
-//        }
-//    }
     public void turnToAprilTagLimelight() {
-        if (limelight.getTx() > 0.6 || limelight.getTx() < -0.6) {
-            if (limelight.getTx() > 0.6) { // rotate left
-                moveAllMotors(0.5,-0.5,0.5,-0.5);
-            } else if (limelight.getTx() < -0.6) { // rotate right
-                moveAllMotors(-0.5,0.5,-0.5,0.5);
+        if (limelight.getTx() > 0.5 || limelight.getTx() < -0.5) {
+            double kP = 0.1;
+            double power = kP*limelight.getTx();
+            power = -Math.min(Math.abs(power),1);
+            if (limelight.getTx() > 0.5) { // rotate left
+                moveAllMotors(-power,power,-power,power);
+            } else if (limelight.getTx() < -0.5) { // rotate right
+                moveAllMotors(power,-power,power,-power);
             }
         }
     }

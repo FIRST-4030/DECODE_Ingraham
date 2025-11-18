@@ -201,6 +201,21 @@ public class MecanumAutoClose extends LinearOpMode {
             flipper.setPosition(0.525);
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
+            //move to x=11, same y
+            // turn to face artifacts
+            // collect artifacts
+            if (teamID == 24)
+            {
+               moveForward(-0.5,200);
+               turn(0.5,1300);
+               moveForward(0.5, 900);
+            }
+            else
+            {
+                moveForward(-0.5,200);
+                turn(-0.5,1300);
+                moveForward(0.5, 900);
+            }
 
             break;
         }

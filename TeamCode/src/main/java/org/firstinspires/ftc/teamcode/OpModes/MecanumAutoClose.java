@@ -29,10 +29,12 @@
 
 package org.firstinspires.ftc.teamcode.OpModes;
 
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -42,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.GoalTagLimelight;
+import org.firstinspires.ftc.teamcode.SensorGoBildaPinpoint;
 import org.firstinspires.ftc.teamcode.Shooter;
 
 @Autonomous(name="Mecanum Auto Close", group="Linear OpMode")
@@ -76,6 +79,8 @@ public class MecanumAutoClose extends LinearOpMode {
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
+
+    SensorGoBildaPinpoint pinpoint;
 
     @Override
     public void runOpMode() {
@@ -124,6 +129,9 @@ public class MecanumAutoClose extends LinearOpMode {
         limelight.init(hardwareMap,telemetry);
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
+
+        pinpoint = new SensorGoBildaPinpoint();
+        pinpoint.initOdometry(hardwareMap);
 
         do {
             //goalTag.initProcessNoGoal();

@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.app.slice.SliceMetrics;
 
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -44,6 +45,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.GoalTagLimelight;
+import org.firstinspires.ftc.teamcode.SensorGoBildaPinpoint;
 import org.firstinspires.ftc.teamcode.Shooter;
 
 @Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
@@ -77,6 +79,8 @@ public class MecanumAutoFar extends LinearOpMode {
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
+
+    SensorGoBildaPinpoint pinpoint;
 
     @Override
     public void runOpMode() {
@@ -124,6 +128,9 @@ public class MecanumAutoFar extends LinearOpMode {
 
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
+
+        pinpoint = new SensorGoBildaPinpoint();
+        pinpoint.initOdometry(hardwareMap);
 
         do {
             limelight.readObelisk(telemetry);

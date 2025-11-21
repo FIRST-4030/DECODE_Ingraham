@@ -45,7 +45,7 @@ public class SensorGoBildaPinpoint {
     //make the following class variable above in our auto opmode
 
     //call this for init
-    public void initOdometry(HardwareMap hardwareMap) {
+    public void initOdometry(HardwareMap hardwareMap, int x, int y, double ang) {
         // Get a reference to the sensor
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
@@ -53,7 +53,9 @@ public class SensorGoBildaPinpoint {
         configurePinpoint();
 
         // Set the location of the robot - this should be the place you are starting the robot from
-        pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, ang));
+        // x and y is how much away from the center of the field
+        //ang is the angle the robot is facing from the audience
     }
 
     //do statements below for loop while Opmode is Active for auto

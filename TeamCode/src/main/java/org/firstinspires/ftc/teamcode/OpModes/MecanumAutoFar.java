@@ -130,7 +130,7 @@ public class MecanumAutoFar extends LinearOpMode {
         GlobalStorage.setAlliance(-1);
 
         pinpoint = new SensorGoBildaPinpoint();
-        pinpoint.initOdometry(hardwareMap);
+        pinpoint.initOdometry(hardwareMap, 0, 0, 0);
 
         do {
             limelight.readObelisk(telemetry);

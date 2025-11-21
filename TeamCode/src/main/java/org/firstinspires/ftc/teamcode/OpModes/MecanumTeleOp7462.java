@@ -152,12 +152,12 @@ public class MecanumTeleOp7462 extends OpMode {
 //        goalTag.init(hardwareMap);
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", false);
-        collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = frontVel;
+        //collectorFront.setControllerValues(0.3,0.0243);
+        //collectorFront.targetVelocity = frontVel;
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", false);
-        collectorBack.setControllerValues(0.3,0.0243);
-        collectorBack.targetVelocity = backVel;
+//        collectorBack.setControllerValues(0.3,0.0243);
+//        collectorBack.targetVelocity = backVel;
 
         shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
         shooterLeft.setControllerValues(0.3,0.0243);
@@ -210,8 +210,11 @@ public class MecanumTeleOp7462 extends OpMode {
     public void loop() {
         //goalTag.process();
         limelight.process(telemetry);
-        collectorFront.overridePower();
-        collectorBack.overridePower();
+        //collectorFront.overridePower();
+        collectorFront.setPower(0.5);
+        collectorBack.setPower(0.5);
+        //collectorBack.overridePower();
+
 
         shooterRight.overridePower();
         shooterLeft.overridePower();
@@ -304,7 +307,7 @@ public class MecanumTeleOp7462 extends OpMode {
         if (limelight.getTx() > 0.5 || limelight.getTx() < -0.5) {
             double kP = 0.1;
             double power = kP*limelight.getTx();
-            power = -Math.min(Math.abs(power),1);
+            power = -Math.max(0.1,Math.min(Math.abs(power),1));
             if (limelight.getTx() > 0.5) { // rotate left
                 moveAllMotors(-power,power,-power,power);
             } else if (limelight.getTx() < -0.5) { // rotate right

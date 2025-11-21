@@ -67,4 +67,7 @@ public class Shooter {
             return false;
         }
     }
+    public void setPower(double power) {
+        shooter.setPower(power);
+    }
 }

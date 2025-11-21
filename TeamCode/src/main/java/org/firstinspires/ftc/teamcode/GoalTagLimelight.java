@@ -25,7 +25,7 @@ public class GoalTagLimelight {
     private double ty;
     private double camera_height = 15.625; // in
     private double target_height = 29.5; // in
-    private double camera_angle = 0.0418; // radians
+    private double camera_angle = 0.04009; // radians old was 0.0418
 
     public boolean isDataCurrent;
     //Pipeline 5 is 20(blue) pipeline 1 is 24(red)

@@ -211,8 +211,8 @@ public class MecanumTeleOp7462 extends OpMode {
         //goalTag.process();
         limelight.process(telemetry);
         //collectorFront.overridePower();
-        collectorFront.setPower(0.5);
-        collectorBack.setPower(0.5);
+        collectorFront.setPower(0.6);
+        collectorBack.setPower(0.6);
         //collectorBack.overridePower();
 
 
@@ -259,8 +259,8 @@ public class MecanumTeleOp7462 extends OpMode {
             timerFlipper.reset();
         }
         if (gamepad2.dpadUpWasPressed()) {
-            collectorBack.targetVelocity = -10;
-            collectorFront.targetVelocity = -10;
+            collectorBack.setPower(-1);
+            collectorFront.setPower(-1);
         }
         if (gamepad2.dpadUpWasReleased()) {
             collectorFront.targetVelocity = frontVel;
@@ -292,11 +292,11 @@ public class MecanumTeleOp7462 extends OpMode {
         // Servo Reset
         if (timerLeft.seconds() > 2) {
             launchFlapLeft.setPosition(0.3);
-            //shooterLeft.targetVelocity = 0;
+            shooterLeft.targetVelocity = 0;
         }
         if (timerRight.seconds() > 2) {
             launchFlapRight.setPosition(0.4);
-            //shooterRight.targetVelocity = 0;
+            shooterRight.targetVelocity = 0;
         }
         if (timerFlipper.seconds() > 0.5) {
             flipper.setPosition(0.525);
@@ -305,8 +305,9 @@ public class MecanumTeleOp7462 extends OpMode {
     }
     public void turnToAprilTagLimelight() {
         if (limelight.getTx() > 0.5 || limelight.getTx() < -0.5) {
-            double kP = 0.1;
+            double kP = 0.15;
             double power = kP*limelight.getTx();
+            telemetry.addData("turn power", power);
             power = -Math.max(0.1,Math.min(Math.abs(power),1));
             if (limelight.getTx() > 0.5) { // rotate left
                 moveAllMotors(-power,power,-power,power);

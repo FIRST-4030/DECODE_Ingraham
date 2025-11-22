@@ -313,7 +313,8 @@ public class MecanumTeleOp7462 extends OpMode {
 
     }
     public void turnToAprilTagLimelight() {
-        if (limelight.getTx() > 0.5 || limelight.getTx() < -0.5) {
+        // close
+        if (limelight.getTx() > 0.5 && limelight.getRange() < 100|| limelight.getTx() < -0.5 && limelight.getRange() < 100) {
             double kP = 0.15;
             double power = kP*limelight.getTx();
             telemetry.addData("turn power", power);
@@ -324,6 +325,39 @@ public class MecanumTeleOp7462 extends OpMode {
                 moveAllMotors(power,-power,power,-power);
             }
         }
+        // far blue aim for 2 degrees +- 1, so from 1.5 to 2.5
+        if (limelight.getID() == 20) {
+            if (limelight.getRange() < 100) {
+                if (limelight.getTx() > 2.5 || limelight.getTx() < 1.5) {
+                    double kP = 0.15;
+                    double power = kP*limelight.getTx();
+                    telemetry.addData("turn power", power);
+                    power = -Math.max(0.1,Math.min(Math.abs(power),1));
+                    if (limelight.getTx() > 2.5) { // rotate left
+                        moveAllMotors(-power,power,-power,power);
+                    } else if (limelight.getTx() < 1.5) { // rotate right
+                        moveAllMotors(power,-power,power,-power);
+                    }
+                }
+            }
+        }
+        // far red aim for -2 ish degrees
+        else if (limelight.getID() == 24) {
+            if (limelight.getRange() > 100) {
+                if (limelight.getTx() > -2.5|| limelight.getTx() < -1.5) {
+                    double kP = 0.15;
+                    double power = kP*limelight.getTx();
+                    telemetry.addData("turn power", power);
+                    power = -Math.max(0.1,Math.min(Math.abs(power),1));
+                    if (limelight.getTx() > -2.5) { // rotate left
+                        moveAllMotors(-power,power,-power,power);
+                    } else if (limelight.getTx() < -1.5) { // rotate right
+                        moveAllMotors(power,-power,power,-power);
+                    }
+                }
+            }
+        }
+
 
     }
     // Thanks to FTC16072 for sharing this code!!

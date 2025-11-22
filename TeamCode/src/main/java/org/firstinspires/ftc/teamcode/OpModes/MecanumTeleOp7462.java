@@ -211,9 +211,11 @@ public class MecanumTeleOp7462 extends OpMode {
         //goalTag.process();
         limelight.process(telemetry);
         //collectorFront.overridePower();
-        collectorFront.setPower(0.6);
-        collectorBack.setPower(0.6);
         //collectorBack.overridePower();
+//        if (!gamepad2.dpadUpWasPressed()) {
+//            collectorFront.setPower(0.6);
+//            collectorBack.setPower(0.6);
+//        }
 
 
         shooterRight.overridePower();
@@ -238,15 +240,15 @@ public class MecanumTeleOp7462 extends OpMode {
         // Driver Controls
         if (gamepad1.leftBumperWasPressed()) {
             // do math here
-            //shooterLeft.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
-            shooterLeft.targetVelocity = 0.1067*limelight.getRange()+24.336;
+            shooterLeft.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
+            //shooterLeft.targetVelocity = 0.1067*limelight.getRange()+24.336;
             leftIsRunning = true;
             timerLeft.reset();
         }
         if (gamepad1.rightBumperWasPressed()) {
             // do math here
-            //shooterRight.targetVelocity = (limelight.getRange() + 202.17) / 8.92124;
-            shooterRight.targetVelocity = 0.1067*limelight.getRange()+24.336;
+            shooterRight.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
+            //shooterRight.targetVelocity = 0.1067*limelight.getRange()+24.336;
             rightIsRunning = true;
             timerRight.reset();
         }
@@ -259,12 +261,12 @@ public class MecanumTeleOp7462 extends OpMode {
             timerFlipper.reset();
         }
         if (gamepad2.dpadUpWasPressed()) {
-            collectorBack.setPower(-1);
-            collectorFront.setPower(-1);
+            collectorBack.setPower(-0.6);
+            collectorFront.setPower(-0.6);
         }
         if (gamepad2.dpadUpWasReleased()) {
-            collectorFront.targetVelocity = frontVel;
-            collectorBack.targetVelocity = backVel;
+            collectorFront.setPower(0.6);
+            collectorBack.setPower(0.6);
         }
 //        if (gamepad1.a && goalTag.isDataCurrent) {
 //            turnToAprilTag();

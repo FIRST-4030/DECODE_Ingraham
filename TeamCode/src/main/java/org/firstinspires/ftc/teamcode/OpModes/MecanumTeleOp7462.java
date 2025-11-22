@@ -231,8 +231,8 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
-        telemetry.addData("collectorFrontCurrentVelocity", collectorFront.getVelocity());
-        telemetry.addData("collectorBackCurrentVelocity", collectorBack.getVelocity());
+        telemetry.addData("collectorFrontCurrentPower", collectorFront.getPower());
+        telemetry.addData("collectorBackCurrentPower", collectorBack.getPower());
 
 
 //        telemetry.addData("AprilTagRange", goalTag.getRange());

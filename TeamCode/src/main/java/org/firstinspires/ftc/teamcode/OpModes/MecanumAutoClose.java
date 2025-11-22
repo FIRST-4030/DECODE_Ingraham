@@ -130,8 +130,8 @@ public class MecanumAutoClose extends LinearOpMode {
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
 
-        pinpoint = new SensorGoBildaPinpoint();
-        pinpoint.initOdometry(hardwareMap, 0, 0, 0);
+//        pinpoint = new SensorGoBildaPinpoint();
+//        pinpoint.initOdometry(hardwareMap, 0, 0, 0);
 
         do {
             //goalTag.initProcessNoGoal();

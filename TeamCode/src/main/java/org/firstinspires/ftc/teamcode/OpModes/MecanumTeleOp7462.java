@@ -205,6 +205,11 @@ public class MecanumTeleOp7462 extends OpMode {
         }
     }
 
+    @Override
+    public void start() {
+        collectorFront.setPower(0.6);
+        collectorBack.setPower(0.6);
+    }
 
     @Override
     public void loop() {

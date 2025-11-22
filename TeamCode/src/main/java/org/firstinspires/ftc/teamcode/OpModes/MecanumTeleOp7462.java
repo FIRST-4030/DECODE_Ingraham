@@ -99,7 +99,7 @@ public class MecanumTeleOp7462 extends OpMode {
     private double frontVel = 15;
     private double backVel = 15;
     private double kP = 0.15;
-    private double kD = 0.005;
+    private double kD = 0.038;
     private boolean leftIsRunning;
     private boolean rightIsRunning;
 
@@ -229,6 +229,8 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
         telemetry.addData("collectorFrontCurrentPower", collectorFront.getPower());
         telemetry.addData("collectorBackCurrentPower", collectorBack.getPower());
+        telemetry.addData("Kp", kP);
+        telemetry.addData("KD", kD);
         telemetry.addData("TimerLeft", timerLeft.seconds());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
@@ -309,69 +311,41 @@ public class MecanumTeleOp7462 extends OpMode {
 
     }
     public void turnToAprilTagLimelight() {
-        long lastTime = System.nanoTime();
+        if (limelight.getRange() < 100) {
+            turnTo(0.5, 0.5);
+        } else {
+            if (limelight.getID() == 20) {
+                turnTo(0.5, 2);
+            } else if (limelight.getID() == 24) {
+                turnTo(0.5, -2);
+            }
+        }
+    }
+    private void turnTo(double variance, double setPoint) {
+        long lastTime = System.currentTimeMillis();
+        double currentAngle = limelight.getTx();
+        double error = setPoint - currentAngle;
 
-        // close
-        if (limelight.getTx() > 0.5 && limelight.getRange() < 100|| limelight.getTx() < -0.5 && limelight.getRange() < 100) {
+        if (Math.abs(error) > variance) {
             double derivative;
             double deltaTime;
-            long now = System.nanoTime();
-            deltaTime = (now - lastTime) / 1e9;
+            long now = System.currentTimeMillis();
+            deltaTime = (now - lastTime) / 1000.0;
             lastTime = now;
 
-            derivative = (limelight.getTx()- lastError) / deltaTime;
 
-            double power = kP*limelight.getTx() + kD*derivative;
-            //double power = kP*limelight.getTx();
+            derivative = (currentAngle - lastError) / deltaTime;
+            lastError = currentAngle;
+
+            double power = kP*error + kD*derivative;
             telemetry.addData("turn power", power);
-            power = -Math.max(0.1,Math.min(Math.abs(power),1));
-            if (limelight.getTx() > 0.5) { // rotate left
-                moveAllMotors(-power,power,-power,power);
-            } else if (limelight.getTx() < -0.5) { // rotate right
-                moveAllMotors(power,-power,power,-power);
-            }
+            moveAllMotors(power,-power,power,-power);
+//            if (error > rightBound) { // rotate left
+//                moveAllMotors(-power,power,-power,power);
+//            } else if (error < leftBound) { // rotate right
+//                moveAllMotors(power,-power,power,-power);
+//            }
         }
-        // far blue aim for 2 degrees +- 1, so from 1.5 to 2.5
-        if (limelight.getID() == 20) {
-            if (limelight.getRange() > 100) {
-                if (limelight.getTx() > 2.5 || limelight.getTx() < 1.5) {
-                    double derivative;
-                    double deltaTime;
-                    long now = System.nanoTime();
-                    deltaTime = (now - lastTime) / 1e9;
-                    lastTime = now;
-
-                    derivative = (limelight.getTx()- lastError) / deltaTime;
-
-                    double power = kP*limelight.getTx() + kD*derivative;
-
-                    telemetry.addData("turn power", power);
-                    power = -Math.max(0.1,Math.min(Math.abs(power),1));
-                    if (limelight.getTx() > 2.5) { // rotate left
-                        moveAllMotors(-power,power,-power,power);
-                    } else if (limelight.getTx() < 1.5) { // rotate right
-                        moveAllMotors(power,-power,power,-power);
-                    }
-                }
-            }
-        }
-        // far red aim for -2 ish degrees
-        else if (limelight.getID() == 24) {
-            if (limelight.getRange() > 100) {
-                if (limelight.getTx() > -2.5|| limelight.getTx() < -1.5) {
-                    double power = kP*limelight.getTx();
-                    telemetry.addData("turn power", power);
-                    power = -Math.max(0.1,Math.min(Math.abs(power),1));
-                    if (limelight.getTx() > -2.5) { // rotate left
-                        moveAllMotors(-power,power,-power,power);
-                    } else if (limelight.getTx() < -1.5) { // rotate right
-                        moveAllMotors(power,-power,power,-power);
-                    }
-                }
-            }
-        }
-
-
     }
     // Thanks to FTC16072 for sharing this code!!
     public void drive(double forward, double right, double rotate) {

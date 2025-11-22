@@ -227,7 +227,7 @@ public class MecanumAutoClose extends LinearOpMode {
             {
                 moveForward(-0.5,1000);
                 //600
-                turn(0.5,1200);
+                turn(-0.5,1200);
                 //pw
                 //-0.5
                 //ms

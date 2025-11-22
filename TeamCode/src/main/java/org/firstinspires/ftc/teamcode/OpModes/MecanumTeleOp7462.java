@@ -215,13 +215,6 @@ public class MecanumTeleOp7462 extends OpMode {
     public void loop() {
         //goalTag.process();
         limelight.process(telemetry);
-        //collectorFront.overridePower();
-        //collectorBack.overridePower();
-//        if (!gamepad2.dpadUpWasPressed()) {
-//            collectorFront.setPower(0.6);
-//            collectorBack.setPower(0.6);
-//        }
-
 
         shooterRight.overridePower();
         shooterLeft.overridePower();
@@ -233,12 +226,6 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
         telemetry.addData("collectorFrontCurrentPower", collectorFront.getPower());
         telemetry.addData("collectorBackCurrentPower", collectorBack.getPower());
-
-
-//        telemetry.addData("AprilTagRange", goalTag.getRange());
-//        telemetry.addData("AprilTagBearing", goalTag.getBearing());
-//
-//        telemetry.addData("See Goal?", goalTag.isDataCurrent);
         telemetry.addData("TimerLeft", timerLeft.seconds());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
@@ -275,9 +262,6 @@ public class MecanumTeleOp7462 extends OpMode {
             collectorFront.setPower(0.6);
             collectorBack.setPower(0.6);
         }
-//        if (gamepad1.a && goalTag.isDataCurrent) {
-//            turnToAprilTag();
-//        }
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
         }
@@ -299,11 +283,11 @@ public class MecanumTeleOp7462 extends OpMode {
             }
         }
         // Servo Reset
-        if (timerLeft.seconds() > 2) {
+        if (timerLeft.seconds() > 2 && !leftIsRunning) {
             launchFlapLeft.setPosition(0.3);
             shooterLeft.targetVelocity = 0;
         }
-        if (timerRight.seconds() > 2) {
+        if (timerRight.seconds() > 2 && !rightIsRunning) {
             launchFlapRight.setPosition(0.4);
             shooterRight.targetVelocity = 0;
         }
@@ -327,7 +311,7 @@ public class MecanumTeleOp7462 extends OpMode {
         }
         // far blue aim for 2 degrees +- 1, so from 1.5 to 2.5
         if (limelight.getID() == 20) {
-            if (limelight.getRange() < 100) {
+            if (limelight.getRange() > 100) {
                 if (limelight.getTx() > 2.5 || limelight.getTx() < 1.5) {
                     double kP = 0.15;
                     double power = kP*limelight.getTx();

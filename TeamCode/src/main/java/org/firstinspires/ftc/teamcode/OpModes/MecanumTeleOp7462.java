@@ -339,7 +339,7 @@ public class MecanumTeleOp7462 extends OpMode {
 
             double power = kP*error + kD*derivative;
             telemetry.addData("turn power", power);
-            moveAllMotors(power,-power,power,-power);
+            moveAllMotors(-power,power,-power,power);
 //            if (error > rightBound) { // rotate left
 //                moveAllMotors(-power,power,-power,power);
 //            } else if (error < leftBound) { // rotate right

@@ -95,8 +95,11 @@ public class MecanumTeleOp7462 extends OpMode {
 
     // Just for tuning
     private double Kvelo;
+    private double lastError = 0;
     private double frontVel = 15;
     private double backVel = 15;
+    private double kP = 0.15;
+    private double kD = 0.005;
     private boolean leftIsRunning;
     private boolean rightIsRunning;
 
@@ -265,6 +268,15 @@ public class MecanumTeleOp7462 extends OpMode {
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
         }
+        if (gamepad2.yWasPressed()) {
+            kP += 0.05;
+        } else if (gamepad2.aWasPressed()) {
+            kP -= 0.05;
+        } else if (gamepad2.bWasPressed()) {
+            kD += 0.0005;
+        } else if (gamepad2.xWasPressed()) {
+            kD -= 0.0005;
+        }
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         // Shoot when at speed
@@ -297,10 +309,20 @@ public class MecanumTeleOp7462 extends OpMode {
 
     }
     public void turnToAprilTagLimelight() {
+        long lastTime = System.nanoTime();
+
         // close
         if (limelight.getTx() > 0.5 && limelight.getRange() < 100|| limelight.getTx() < -0.5 && limelight.getRange() < 100) {
-            double kP = 0.15;
-            double power = kP*limelight.getTx();
+            double derivative;
+            double deltaTime;
+            long now = System.nanoTime();
+            deltaTime = (now - lastTime) / 1e9;
+            lastTime = now;
+
+            derivative = (limelight.getTx()- lastError) / deltaTime;
+
+            double power = kP*limelight.getTx() + kD*derivative;
+            //double power = kP*limelight.getTx();
             telemetry.addData("turn power", power);
             power = -Math.max(0.1,Math.min(Math.abs(power),1));
             if (limelight.getTx() > 0.5) { // rotate left
@@ -313,8 +335,16 @@ public class MecanumTeleOp7462 extends OpMode {
         if (limelight.getID() == 20) {
             if (limelight.getRange() > 100) {
                 if (limelight.getTx() > 2.5 || limelight.getTx() < 1.5) {
-                    double kP = 0.15;
-                    double power = kP*limelight.getTx();
+                    double derivative;
+                    double deltaTime;
+                    long now = System.nanoTime();
+                    deltaTime = (now - lastTime) / 1e9;
+                    lastTime = now;
+
+                    derivative = (limelight.getTx()- lastError) / deltaTime;
+
+                    double power = kP*limelight.getTx() + kD*derivative;
+
                     telemetry.addData("turn power", power);
                     power = -Math.max(0.1,Math.min(Math.abs(power),1));
                     if (limelight.getTx() > 2.5) { // rotate left
@@ -329,7 +359,6 @@ public class MecanumTeleOp7462 extends OpMode {
         else if (limelight.getID() == 24) {
             if (limelight.getRange() > 100) {
                 if (limelight.getTx() > -2.5|| limelight.getTx() < -1.5) {
-                    double kP = 0.15;
                     double power = kP*limelight.getTx();
                     telemetry.addData("turn power", power);
                     power = -Math.max(0.1,Math.min(Math.abs(power),1));

@@ -60,6 +60,8 @@ public class MecanumAutoFar extends LinearOpMode {
     Shooter shooterRight;
     Servo launchFlapLeft;
     Servo launchFlapRight;
+    Shooter collectorBack;
+    Shooter collectorFront;
     Servo flipper;
     private int velLeft = 35;
     private int velRight = 34;
@@ -88,6 +90,10 @@ public class MecanumAutoFar extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "rightFront");
         backLeftDrive = hardwareMap.get(DcMotor.class, "leftBack");
         backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
+
+        collectorFront = new Shooter(hardwareMap,"collectorFront", false);
+
+        collectorBack = new Shooter(hardwareMap,"collectorBack", false);
 
         flipper = hardwareMap.get(Servo.class, "flipper");
 
@@ -166,10 +172,10 @@ public class MecanumAutoFar extends LinearOpMode {
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
             if (teamID == 20) {
-                turn(-0.3,450);
+                turn(-0.3,400);
             } else {
-                turn(0.3,450);
-            }
+                turn(0.3,400);
+            } // 450
             // P is left
             if (limelight.getObelisk().equals("PGP")) {
                 fireShooterLeft(velLeft);
@@ -203,13 +209,16 @@ public class MecanumAutoFar extends LinearOpMode {
             //1200
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
+            collectorFront.setPower(0.6);
+            collectorBack.setPower(0.6);
+
 
             if (teamID == 24)
             {
 
                 turn(0.5,800);
                 //1300
-                moveForward(0.5, 200);
+                moveForward(0.5, 250);
                 //ms
                 //900
             }
@@ -220,9 +229,10 @@ public class MecanumAutoFar extends LinearOpMode {
                 //-0.5
                 //ms
                 //1300
-                moveForward(0.5, 200);
+                moveForward(0.5, 250);
                 //ms
                 //900
+                //200 low
             }
 
             break;

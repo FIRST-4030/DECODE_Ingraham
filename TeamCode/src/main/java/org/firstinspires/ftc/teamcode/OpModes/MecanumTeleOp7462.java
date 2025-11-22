@@ -98,7 +98,7 @@ public class MecanumTeleOp7462 extends OpMode {
     private double lastError = 0;
     private double frontVel = 15;
     private double backVel = 15;
-    private double kP = 0.15;
+    private double kP = 0.14;
     private double kD = 0.038;
     private boolean leftIsRunning;
     private boolean rightIsRunning;
@@ -271,9 +271,9 @@ public class MecanumTeleOp7462 extends OpMode {
             turnToAprilTagLimelight();
         }
         if (gamepad2.yWasPressed()) {
-            kP += 0.05;
+            kP += 0.005;
         } else if (gamepad2.aWasPressed()) {
-            kP -= 0.05;
+            kP -= 0.005;
         } else if (gamepad2.bWasPressed()) {
             kD += 0.0005;
         } else if (gamepad2.xWasPressed()) {
@@ -312,12 +312,12 @@ public class MecanumTeleOp7462 extends OpMode {
     }
     public void turnToAprilTagLimelight() {
         if (limelight.getRange() < 100) {
-            turnTo(0.5, 0.5);
+            turnTo(0.25, 0.5);
         } else {
             if (limelight.getID() == 20) {
-                turnTo(0.5, 2);
+                turnTo(0.25, 2);
             } else if (limelight.getID() == 24) {
-                turnTo(0.5, -2);
+                turnTo(0.25, -2);
             }
         }
     }
@@ -334,10 +334,11 @@ public class MecanumTeleOp7462 extends OpMode {
             lastTime = now;
 
 
-            derivative = (currentAngle - lastError) / deltaTime;
+            derivative = (lastError-currentAngle) / deltaTime;
             lastError = currentAngle;
 
-            double power = kP*error + kD*derivative;
+            double power = kP*error;
+            //kD*derivative;
             telemetry.addData("turn power", power);
             moveAllMotors(-power,power,-power,power);
 //            if (error > rightBound) { // rotate left

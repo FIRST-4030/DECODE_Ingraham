@@ -197,10 +197,24 @@ public class MecanumAutoFar extends LinearOpMode {
             } else {
                 turn(0.3,200);
             }
-            moveForward(0.5, 400);
-
+            //moveForward(0.5, 400);
+            moveForward(0.5,1200);
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
+
+            if (teamID == 24)
+            {
+
+                turn(0.5,800);
+                //1300
+                moveForward(0.5, 900);
+            }
+            else
+            {
+                turn(-0.5,800);
+                //1300
+                moveForward(0.5, 900);
+            }
 
             break;
         }

@@ -66,6 +66,7 @@ public class MecanumAutoClose extends LinearOpMode {
 
     ElapsedTime runtime = new ElapsedTime();
     private int startDelay = 0;
+
     public static int decimation = 3;
     public static double power = 0.7;
     double yawImu;
@@ -226,7 +227,10 @@ public class MecanumAutoClose extends LinearOpMode {
             {
                 moveForward(-0.5,1000);
                 //600
-                turn(-0.5,1200);
+                turn(0.5,1200);
+                //pw
+                //-0.5
+                //ms
                 //800
                 //1300
                 moveForward(0.5, 400);

@@ -198,7 +198,9 @@ public class MecanumAutoFar extends LinearOpMode {
                 turn(0.3,200);
             }
             //moveForward(0.5, 400);
-            moveForward(0.5,1200);
+            moveForward(0.5,1100);
+            //ms
+            //1200
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
 
@@ -207,13 +209,20 @@ public class MecanumAutoFar extends LinearOpMode {
 
                 turn(0.5,800);
                 //1300
-                moveForward(0.5, 900);
+                moveForward(0.5, 200);
+                //ms
+                //900
             }
             else
             {
-                turn(-0.5,800);
+                turn(0.5,800);
+                //pw
+                //-0.5
+                //ms
                 //1300
-                moveForward(0.5, 900);
+                moveForward(0.5, 200);
+                //ms
+                //900
             }
 
             break;

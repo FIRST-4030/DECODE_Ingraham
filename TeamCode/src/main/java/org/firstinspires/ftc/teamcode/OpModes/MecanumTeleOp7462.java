@@ -231,6 +231,8 @@ public class MecanumTeleOp7462 extends OpMode {
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
+        telemetry.addData("collectorFrontCurrentVelocity", collectorFront.getVelocity());
+        telemetry.addData("collectorBackCurrentVelocity", collectorBack.getVelocity());
 
 
 //        telemetry.addData("AprilTagRange", goalTag.getRange());
@@ -322,6 +324,7 @@ public class MecanumTeleOp7462 extends OpMode {
                 moveAllMotors(power,-power,power,-power);
             }
         }
+
     }
     // Thanks to FTC16072 for sharing this code!!
     public void drive(double forward, double right, double rotate) {

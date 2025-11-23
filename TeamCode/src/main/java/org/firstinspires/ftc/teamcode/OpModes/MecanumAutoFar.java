@@ -203,8 +203,8 @@ public class MecanumAutoFar extends LinearOpMode {
             } else {
                 turn(0.3,200);
             }
-            //moveForward(0.5, 400);
-            moveForward(0.5,900);
+            moveForward(0.5, 400);
+            //moveForward(0.5,900);
             //ms
             //1200
             shooterLeft.targetVelocity = 0;
@@ -213,27 +213,27 @@ public class MecanumAutoFar extends LinearOpMode {
             collectorBack.setPower(0.6);
 
 
-            if (teamID == 24)
-            {
-
-                turn(0.5,800);
-                //1300
-                moveForward(0.5, 250);
-                //ms
-                //900
-            }
-            else
-            {
-                turn(-0.5,800);
-                //pw
-                //-0.5
-                //ms
-                //1300
-                moveForward(0.5, 250);
-                //ms
-                //900
-                //200 low
-            }
+//            if (teamID == 24)
+//            {
+//
+//                turn(0.5,800);
+//                //1300
+//                moveForward(0.5, 250);
+//                //ms
+//                //900
+//            }
+//            else
+//            {
+//                turn(-0.5,800);
+//                //pw
+//                //-0.5
+//                //ms
+//                //1300
+//                moveForward(0.5, 250);
+//                //ms
+//                //900
+//                //200 low
+//            }
 
             break;
         }

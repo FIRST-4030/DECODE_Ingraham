@@ -213,30 +213,31 @@ public class MecanumAutoClose extends LinearOpMode {
             //move to x=11, same y
             // turn to face artifacts
             // collect artifacts
+
+            if (teamID == 24)
+            {
+               moveForward(-0.5,1000);
+               //600
+               turn(0.5,1200);
+               //800
+                //1300
+               moveForward(0.5, 400);
+               //900
+            }
+            else {
+                moveForward(-0.5, 1000);
+                //600
+                turn(-0.5, 1200);
+                //pw
+                //-0.5
+                //ms
+                //800
+                //1300
+                moveForward(0.5, 400);
+                //900
+
             break;
-//            if (teamID == 24)
-//            {
-//               moveForward(-0.5,1000);
-//               //600
-//               turn(0.5,1200);
-//               //800
-//                //1300
-//               moveForward(0.5, 400);
-//               //900
-//            }
-//            else
-//            {
-//                moveForward(-0.5,1000);
-//                //600
-//                turn(-0.5,1200);
-//                //pw
-//                //-0.5
-//                //ms
-//                //800
-//                //1300
-//                moveForward(0.5, 400);
-//                //900
-//            }
+            }
 
         }
     }

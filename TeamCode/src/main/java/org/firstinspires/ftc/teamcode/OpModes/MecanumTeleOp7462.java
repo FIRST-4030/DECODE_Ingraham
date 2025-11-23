@@ -270,15 +270,15 @@ public class MecanumTeleOp7462 extends OpMode {
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
         }
-        if (gamepad2.yWasPressed()) {
-            kP += 0.005;
-        } else if (gamepad2.aWasPressed()) {
-            kP -= 0.005;
-        } else if (gamepad2.bWasPressed()) {
-            kD += 0.0005;
-        } else if (gamepad2.xWasPressed()) {
-            kD -= 0.0005;
-        }
+//        if (gamepad2.yWasPressed()) {
+//            kP += 0.005;
+//        } else if (gamepad2.aWasPressed()) {
+//            kP -= 0.005;
+//        } else if (gamepad2.bWasPressed()) {
+//            kD += 0.0005;
+//        } else if (gamepad2.xWasPressed()) {
+//            kD -= 0.0005;
+//        }
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         // Shoot when at speed

@@ -96,12 +96,15 @@ public class MecanumTeleOp7462 extends OpMode {
     // Just for tuning
     private double Kvelo;
     private double lastError = 0;
+    private double debugPower;
     private double frontVel = 15;
     private double backVel = 15;
     private double kP = 0.14;
     private double kD = 0.038;
     private boolean leftIsRunning;
     private boolean rightIsRunning;
+    private double maxPower = 1.0;
+    private double maxSpeed = 1.0;
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
@@ -210,14 +213,18 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void start() {
-        collectorFront.setPower(0.6);
-        collectorBack.setPower(0.6);
+        collectorFront.setPower(debugPower);
+        collectorBack.setPower(debugPower);
     }
 
     @Override
     public void loop() {
         //goalTag.process();
         limelight.process(telemetry);
+        // remove this later
+        collectorFront.setPower(debugPower);
+        collectorBack.setPower(debugPower);
+
 
         shooterRight.overridePower();
         shooterLeft.overridePower();
@@ -225,6 +232,7 @@ public class MecanumTeleOp7462 extends OpMode {
 
         telemetry.addData("shooterLeftCurrentVelocity", shooterLeft.getVelocity());
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
+        telemetry.addData("power", debugPower);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
         telemetry.addData("collectorFrontCurrentPower", collectorFront.getPower());
@@ -260,12 +268,12 @@ public class MecanumTeleOp7462 extends OpMode {
             timerFlipper.reset();
         }
         if (gamepad2.dpadUpWasPressed()) {
-            collectorBack.setPower(-0.6);
-            collectorFront.setPower(-0.6);
+            collectorBack.setPower(-0.2);
+            collectorFront.setPower(-0.2);
         }
         if (gamepad2.dpadUpWasReleased()) {
-            collectorFront.setPower(0.6);
-            collectorBack.setPower(0.6);
+            collectorFront.setPower(0.2);
+            collectorBack.setPower(0.2);
         }
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
@@ -279,6 +287,18 @@ public class MecanumTeleOp7462 extends OpMode {
 //        } else if (gamepad2.xWasPressed()) {
 //            kD -= 0.0005;
 //        }
+        if (gamepad2.yWasPressed()) {
+            debugPower += 0.05;
+        } else if (gamepad2.aWasPressed()) {
+            debugPower -= 0.05;
+        }
+        if (gamepad1.right_trigger == 1) {
+            maxPower = 0.5;
+            maxSpeed = 0.5;
+        } else {
+            maxPower = 1.0;
+            maxSpeed = 1.0;
+        }
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         // Shoot when at speed
@@ -297,15 +317,15 @@ public class MecanumTeleOp7462 extends OpMode {
             }
         }
         // Servo Reset
-        if (timerLeft.seconds() > 2 && !leftIsRunning) {
+        if (timerLeft.seconds() > 0.5 && !leftIsRunning) {
             launchFlapLeft.setPosition(0.3);
-            shooterLeft.targetVelocity = 0;
+            shooterLeft.targetVelocity = 20;
         }
-        if (timerRight.seconds() > 2 && !rightIsRunning) {
+        if (timerRight.seconds() > 0.5 && !rightIsRunning) {
             launchFlapRight.setPosition(0.4);
-            shooterRight.targetVelocity = 0;
+            shooterRight.targetVelocity = 20;
         }
-        if (timerFlipper.seconds() > 0.5) {
+        if (timerFlipper.seconds() > 0.25) {
             flipper.setPosition(0.525);
         }
 
@@ -357,8 +377,7 @@ public class MecanumTeleOp7462 extends OpMode {
         double backRightPower = forward + right - rotate;
         double backLeftPower = forward - right + rotate;
 
-        double maxPower = 1.0;
-        double maxSpeed = 1.0;  // make this slower for outreaches
+        // make this slower for outreaches
 
         // This is needed to make sure we don't pass > 1.0 to any wheel
         // It allows us to keep all of the motors in proportion to what they should

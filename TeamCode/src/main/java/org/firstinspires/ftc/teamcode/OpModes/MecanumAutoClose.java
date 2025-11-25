@@ -216,16 +216,16 @@ public class MecanumAutoClose extends LinearOpMode {
 
             if (teamID == 24)
             {
-               moveForward(-0.5,1000);
+              // moveForward(-0.5,1000);
                //600
                turn(0.5,1200);
                //800
                 //1300
-               moveForward(0.5, 400);
+               moveForward(0.5, 1000);
                //900
             }
             else {
-                moveForward(-0.5, 1000);
+                //moveForward(-0.5, 1000);
                 //600
                 turn(-0.5, 1200);
                 //pw
@@ -233,11 +233,10 @@ public class MecanumAutoClose extends LinearOpMode {
                 //ms
                 //800
                 //1300
-                moveForward(0.5, 400);
+                moveForward(0.5, 1000);
                 //900
-
-            break;
             }
+            break;
 
         }
     }

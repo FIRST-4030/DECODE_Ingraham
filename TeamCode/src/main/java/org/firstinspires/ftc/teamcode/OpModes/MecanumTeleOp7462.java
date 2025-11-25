@@ -236,15 +236,15 @@ public class MecanumTeleOp7462 extends OpMode {
 
 
 
-        // Driver Controls
-        if (gamepad1.leftBumperWasPressed()) {
+        // Driver Controlstelemetry.addData("Is Tag Recent", limelight.seeObelisk);
+        if (gamepad1.leftBumperWasPressed() && (limelight.isDataCurrent)) {
             // do math here
             shooterLeft.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
             //shooterLeft.targetVelocity = 0.1067*limelight.getRange()+24.336;
             leftIsRunning = true;
             timerLeft.reset();
         }
-        if (gamepad1.rightBumperWasPressed()) {
+        if (gamepad1.rightBumperWasPressed() && (limelight.isDataCurrent)) {
             // do math here
             shooterRight.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
             //shooterRight.targetVelocity = 0.1067*limelight.getRange()+24.336;

@@ -142,6 +142,7 @@ public class MecanumAutoClose extends LinearOpMode {
 
 
             telemetry.addData("Pattern", limelight.getObelisk());
+            telemetry.addData("Is Tag Recent", limelight.seeObelisk);
             telemetry.addData("team ID", teamID);
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
             telemetry.addData("Start Delay", startDelay);

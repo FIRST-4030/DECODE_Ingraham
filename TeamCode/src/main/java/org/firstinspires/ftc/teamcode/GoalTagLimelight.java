@@ -21,6 +21,7 @@ public class GoalTagLimelight {
     public boolean GPP = false; // id 21
     public boolean PGP = false; // id 22
     public boolean PPG = false; // id 23
+    public boolean seeObelisk = false;
     private double tx;
     private double ty;
     private double camera_height = 15.625; // in
@@ -40,28 +41,11 @@ public class GoalTagLimelight {
     public void readObelisk(Telemetry telemetry) {
         limelight.pipelineSwitch(6); //targets closest
         LLResult result = limelight.getLatestResult();
-//        if (result != null) {
-//            PGP = true;
-//            PPG = false;
-//            GPP = false;
-//            } else {
-//            limelight.pipelineSwitch(4); //PPG
-//            LLResult result2 = limelight.getLatestResult();
-//            if (result2 != null) {
-//                PGP = false;
-//                PPG = true;
-//                GPP = false;
-//            } else {
-//                limelight.pipelineSwitch(2); //GPP
-//                LLResult result3 = limelight.getLatestResult();
-//                if (result3 != null) {
-//                    PGP = false;
-//                    PPG = false;
-//                    GPP = true;
-//                }
-//            }
-//        }
+
         List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+        if (fiducials.isEmpty()) {
+            seeObelisk = false;
+        }
 
         for (LLResultTypes.FiducialResult fiducial : fiducials) {
             int tagId = fiducial.getFiducialId();
@@ -70,16 +54,19 @@ public class GoalTagLimelight {
                 PGP = false;
                 PPG = false;
                 GPP = true;
+                seeObelisk = true;
             } else if (tagId == 22) {
                 telemetry.addData("Detected", "Tag ID 22");
                 PGP = true;
                 PPG = false;
                 GPP = false;
+                seeObelisk = true;
             } else if (tagId == 23) {
                 telemetry.addData("Detected", "Tag ID 23");
                 PGP = false;
                 PPG = true;
                 GPP = false;
+                seeObelisk = true;
             }
         }
     }

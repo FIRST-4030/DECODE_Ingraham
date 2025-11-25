@@ -95,6 +95,7 @@ public class MecanumTeleOp7462 extends OpMode {
 
     // Just for tuning
     private double Kvelo;
+    private double idlePower = 20;
     private double lastError = 0;
     private double frontVel = 15;
     private double backVel = 15;
@@ -102,6 +103,7 @@ public class MecanumTeleOp7462 extends OpMode {
     private double kD = 0.038;
     private boolean leftIsRunning;
     private boolean rightIsRunning;
+    private boolean emergencyMode = false;
     private double maxPower = 1.0;
     private double maxSpeed = 1.0;
 
@@ -239,14 +241,14 @@ public class MecanumTeleOp7462 extends OpMode {
 
 
         // Driver Controlstelemetry.addData("Is Tag Recent", limelight.seeObelisk);
-        if (gamepad1.leftBumperWasPressed() && (limelight.isDataCurrent)) {
+        if (gamepad1.leftBumperWasPressed() && (limelight.isDataCurrent || emergencyMode)) {
             // do math here
             shooterLeft.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
             //shooterLeft.targetVelocity = 0.1067*limelight.getRange()+24.336;
             leftIsRunning = true;
             timerLeft.reset();
         }
-        if (gamepad1.rightBumperWasPressed() && (limelight.isDataCurrent)) {
+        if (gamepad1.rightBumperWasPressed() && (limelight.isDataCurrent || emergencyMode)) {
             // do math here
             shooterRight.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
             //shooterRight.targetVelocity = 0.1067*limelight.getRange()+24.336;
@@ -281,6 +283,7 @@ public class MecanumTeleOp7462 extends OpMode {
 //        } else if (gamepad2.xWasPressed()) {
 //            kD -= 0.0005;
 //        }
+        // Parking mode
         if (gamepad1.right_trigger == 1) {
             maxPower = 0.5;
             maxSpeed = 0.5;
@@ -308,16 +311,22 @@ public class MecanumTeleOp7462 extends OpMode {
         // Servo Reset
         if (timerLeft.seconds() > 0.5 && !leftIsRunning) {
             launchFlapLeft.setPosition(0.3);
-            shooterLeft.targetVelocity = 20;
+            shooterLeft.targetVelocity = idlePower;
         }
         if (timerRight.seconds() > 0.5 && !rightIsRunning) {
             launchFlapRight.setPosition(0.4);
-            shooterRight.targetVelocity = 20;
+            shooterRight.targetVelocity = idlePower;
         }
         if (timerFlipper.seconds() > 0.25) {
             flipper.setPosition(0.525);
         }
-
+        // If camera not working press this and shoot near point of close V.
+        if (gamepad1.leftStickButtonWasPressed()) {
+            shooterLeft.targetVelocity = 30;
+            shooterRight.targetVelocity = 30;
+            idlePower = 30;
+            emergencyMode = true;
+        }
     }
     public void turnToAprilTagLimelight() {
         if (limelight.getRange() < 100) {

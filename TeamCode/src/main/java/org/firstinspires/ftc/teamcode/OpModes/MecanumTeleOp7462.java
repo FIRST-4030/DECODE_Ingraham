@@ -96,7 +96,6 @@ public class MecanumTeleOp7462 extends OpMode {
     // Just for tuning
     private double Kvelo;
     private double lastError = 0;
-    private double debugPower;
     private double frontVel = 15;
     private double backVel = 15;
     private double kP = 0.14;
@@ -213,18 +212,14 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void start() {
-        collectorFront.setPower(debugPower);
-        collectorBack.setPower(debugPower);
+        collectorFront.setPower(0.5);
+        collectorBack.setPower(0.5);
     }
 
     @Override
     public void loop() {
         //goalTag.process();
         limelight.process(telemetry);
-        // remove this later
-        collectorFront.setPower(debugPower);
-        collectorBack.setPower(debugPower);
-
 
         shooterRight.overridePower();
         shooterLeft.overridePower();
@@ -232,7 +227,6 @@ public class MecanumTeleOp7462 extends OpMode {
 
         telemetry.addData("shooterLeftCurrentVelocity", shooterLeft.getVelocity());
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
-        telemetry.addData("power", debugPower);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
         telemetry.addData("collectorFrontCurrentPower", collectorFront.getPower());
@@ -268,12 +262,12 @@ public class MecanumTeleOp7462 extends OpMode {
             timerFlipper.reset();
         }
         if (gamepad2.dpadUpWasPressed()) {
-            collectorBack.setPower(-0.2);
-            collectorFront.setPower(-0.2);
+            collectorBack.setPower(-0.5);
+            collectorFront.setPower(-0.5);
         }
         if (gamepad2.dpadUpWasReleased()) {
-            collectorFront.setPower(0.2);
-            collectorBack.setPower(0.2);
+            collectorFront.setPower(0.5);
+            collectorBack.setPower(0.5);
         }
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
@@ -287,11 +281,6 @@ public class MecanumTeleOp7462 extends OpMode {
 //        } else if (gamepad2.xWasPressed()) {
 //            kD -= 0.0005;
 //        }
-        if (gamepad2.yWasPressed()) {
-            debugPower += 0.05;
-        } else if (gamepad2.aWasPressed()) {
-            debugPower -= 0.05;
-        }
         if (gamepad1.right_trigger == 1) {
             maxPower = 0.5;
             maxSpeed = 0.5;

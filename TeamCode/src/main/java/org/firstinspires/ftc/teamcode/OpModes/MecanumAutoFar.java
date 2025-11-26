@@ -63,8 +63,8 @@ public class MecanumAutoFar extends LinearOpMode {
     Shooter collectorBack;
     Shooter collectorFront;
     Servo flipper;
-    private int velLeft = 35;
-    private int velRight = 34;
+    private double velLeft = 35;
+    private double velRight = 34;
 
     ElapsedTime runtime = new ElapsedTime();
     public static int decimation = 3;
@@ -76,6 +76,7 @@ public class MecanumAutoFar extends LinearOpMode {
     GoalTagLimelight limelight;
     private int startDelay = 0;
     private int teamID;
+    private boolean testingMode = false;
 
     private boolean shooting = false;
 
@@ -146,6 +147,7 @@ public class MecanumAutoFar extends LinearOpMode {
             telemetry.addData("Pattern", limelight.getObelisk());
             telemetry.addData("Is Tag Recent", limelight.seeObelisk);
             telemetry.addData("team ID", teamID);
+            telemetry.addData("Testing Mode", testingMode);
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
             telemetry.addData("Start Delay", startDelay);
             telemetry.update();
@@ -161,6 +163,8 @@ public class MecanumAutoFar extends LinearOpMode {
                 startDelay += 2;
             } else if (gamepad1.aWasPressed()) {
                 startDelay -= 1;
+            } else if (gamepad1.leftStickButtonWasPressed()) {
+                testingMode = true;
             }
         } while (opModeInInit());
 
@@ -169,6 +173,8 @@ public class MecanumAutoFar extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            launchFlapLeft.setPosition(0.3);
+            launchFlapRight.setPosition(0.4);
             sleep(startDelay*1000);
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
@@ -177,49 +183,72 @@ public class MecanumAutoFar extends LinearOpMode {
             } else {
                 turn(0.3,400);
             } // 450
+            runtime.reset();
+            while (runtime.seconds() < 1) {
+                limelight.setTeam(teamID);
+                limelight.process(telemetry);
+                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
+                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
+                telemetry.addData("Range", limelight.getRange());
+                telemetry.update();
+            }
+
+            telemetry.addData("Range", limelight.getRange());
+            telemetry.update();
             // P is left
-            if (limelight.getObelisk().equals("PGP")) {
+            if (limelight.getObelisk().equals("PGP") && !testingMode) {
                 fireShooterLeft(velLeft);
                 fireShooterRight(velRight);
                 flipper.setPosition(1);
-                sleep(1000);
+                sleep(100);
                 fireShooterLeft(velLeft-1);
-            } else if (limelight.getObelisk().equals("GPP")) {
+            } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
                 fireShooterRight(velRight);
                 fireShooterLeft(velLeft);
                 flipper.setPosition(1);
-                sleep(1000);
+                sleep(100);
                 fireShooterLeft(velLeft);
-            } else if (limelight.getObelisk().equals("PPG")) {
+            } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
                 fireShooterLeft(velLeft);
-                sleep(1000);
+                sleep(100);
                 flipper.setPosition(1);
-                sleep(2000);
+                sleep(100);
                 fireShooterLeft(velLeft);
                 fireShooterRight(velRight);
             }
             flipper.setPosition(0.525);
-            if (teamID == 20) {
-                turn(0.3, 200);
-            } else {
-                turn(0.3,200);
-            }
-            moveForward(0.5, 400);
+//            if (teamID == 20) {
+//                turn(0.3, 200);
+//            } else {
+//                turn(0.3,200);
+//            }
+            // moveForward(0.5, 400);
             //moveForward(0.5,900);
             //ms
             //1200
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
-            collectorFront.setPower(0.6);
-            collectorBack.setPower(0.6);
+            collectorFront.setPower(0.5);
+            collectorBack.setPower(0.5);
 
+            if (teamID == 24) {
+                turn(-0.3,400);
+                moveForward(0.5,900);
+                turn(0.5,900);
+                moveForward(0.5, 600);
+            } else {
+                turn(0.3,400);
+                moveForward(0.5,900);
+                turn(0.5,900);
+                moveForward(0.5, 600);
+            }
 
 //            if (teamID == 24)
 //            {
 //
 //                turn(0.5,800);
 //                //1300
-//                moveForward(0.5, 250);
+//                moveForward(0.5, 300);
 //                //ms
 //                //900
 //            }
@@ -230,7 +259,7 @@ public class MecanumAutoFar extends LinearOpMode {
 //                //-0.5
 //                //ms
 //                //1300
-//                moveForward(0.5, 250);
+//                moveForward(0.5, 300);
 //                //ms
 //                //900
 //                //200 low
@@ -333,11 +362,11 @@ public class MecanumAutoFar extends LinearOpMode {
         }
         timer.reset();
         launchFlapLeft.setPosition(0);
-        while (timer.seconds() < 2) {
+        while (timer.seconds() < 0.5) {
             shooterLeft.overridePower();
         }
         launchFlapLeft.setPosition(0.3);
-        while (timer.seconds() < 3) {
+        while (timer.seconds() < 1) {
             shooterLeft.overridePower();
         }
     }
@@ -351,11 +380,11 @@ public class MecanumAutoFar extends LinearOpMode {
         }
         timer.reset();
         launchFlapRight.setPosition(0.7);
-        while (timer.seconds() < 2) {
+        while (timer.seconds() < 0.5) {
             shooterRight.overridePower();
         }
         launchFlapRight.setPosition(0.4);
-        while (timer.seconds() < 3) {
+        while (timer.seconds() < 1) {
             shooterRight.overridePower();
         }
     }

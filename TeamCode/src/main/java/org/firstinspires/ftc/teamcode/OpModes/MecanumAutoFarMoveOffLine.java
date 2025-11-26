@@ -45,7 +45,7 @@ import org.firstinspires.ftc.teamcode.GoalTagLimelight;
 import org.firstinspires.ftc.teamcode.SensorGoBildaPinpoint;
 import org.firstinspires.ftc.teamcode.Shooter;
 
-@Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
+@Autonomous(name="Mecanum Auto Far Move Off Line", group="Linear OpMode")
 public class MecanumAutoFarMoveOffLine extends LinearOpMode {
 
     // Declare OpMode members.

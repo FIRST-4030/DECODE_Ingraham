@@ -31,7 +31,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.app.slice.SliceMetrics;
 
-
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -41,6 +41,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
@@ -83,7 +85,8 @@ public class MecanumAutoFar extends LinearOpMode {
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
 
-    SensorGoBildaPinpoint pinpoint;
+    SensorGoBildaPinpoint pinpointc;
+    GoBildaPinpointDriver pinpoint;
 
     @Override
     public void runOpMode() {
@@ -136,8 +139,10 @@ public class MecanumAutoFar extends LinearOpMode {
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
 
-//        pinpoint = new SensorGoBildaPinpoint();
-//        pinpoint.initOdometry(hardwareMap, 0, 0, 0);
+        pinpointc = new SensorGoBildaPinpoint();
+        pinpointc.initOdometry(hardwareMap, 0, 0, 0);
+
+//        pinpoint = new GoBildaPinpointDriver();
 
         do {
             limelight.readObelisk(telemetry);
@@ -267,6 +272,21 @@ public class MecanumAutoFar extends LinearOpMode {
 
             break;
         }
+    }
+
+    private void movePinpoint() {
+        telemetry.addLine("Push your robot around to see it track");
+        telemetry.addLine("Press A to reset the position");
+        if(gamepad1.a){
+            // You could use readings from April Tags here to give a new known position to the pinpoint
+            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        }
+        pinpoint.update();
+        Pose2D pose2D = pinpoint.getPosition();
+
+        telemetry.addData("X coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
+        telemetry.addData("Y coordinate (IN)", pose2D.getY(DistanceUnit.INCH));
+        telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
     }
 
     private void moveForward(double power, double mseconds){

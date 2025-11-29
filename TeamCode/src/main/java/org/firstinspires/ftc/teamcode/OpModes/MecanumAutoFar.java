@@ -71,6 +71,8 @@ public class MecanumAutoFar extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     public static int decimation = 3;
     public static double power = 0.7;
+    private double lastError = 0;
+    private double kP = 0.14;
     double yawImu;
     YawPitchRollAngles orientation;
 
@@ -183,10 +185,17 @@ public class MecanumAutoFar extends LinearOpMode {
             sleep(startDelay*1000);
             //rotateTo(-(aprilTags.getBearing()));
             // if 20 look left
+            ElapsedTime turnLength = new ElapsedTime();
             if (teamID == 20) {
-                turn(-0.3,400);
+                while (turnLength.seconds() < 3) {
+                    turnToAprilTagLimelight();
+                }
+                //turn(-0.3,400);
             } else {
-                turn(0.3,400);
+                while (turnLength.seconds() < 3) {
+                    turnToAprilTagLimelight();
+                }
+                //turn(0.3,400);
             } // 450
             runtime.reset();
             while (runtime.seconds() < 1) {
@@ -198,8 +207,6 @@ public class MecanumAutoFar extends LinearOpMode {
                 telemetry.update();
             }
 
-            telemetry.addData("Range", limelight.getRange());
-            telemetry.update();
             // P is left
             if (limelight.getObelisk().equals("PGP") && !testingMode) {
                 fireShooterLeft(velLeft);
@@ -407,5 +414,44 @@ public class MecanumAutoFar extends LinearOpMode {
         while (timer.seconds() < 1) {
             shooterRight.overridePower();
         }
+    }
+    public void turnToAprilTagLimelight() {
+        if (limelight.getRange() < 100) {
+            turnTo(0.25, 0.5);
+        } else {
+            if (limelight.getID() == 20) {
+                turnTo(0.25, 2);
+            } else if (limelight.getID() == 24) {
+                turnTo(0.25, -2);
+            }
+        }
+    }
+    private void turnTo(double variance, double setPoint) {
+        long lastTime = System.currentTimeMillis();
+        double currentAngle = limelight.getTx();
+        double error = setPoint - currentAngle;
+
+        if (Math.abs(error) > variance) {
+            double derivative;
+            double deltaTime;
+            long now = System.currentTimeMillis();
+            deltaTime = (now - lastTime) / 1000.0;
+            lastTime = now;
+
+
+            derivative = (lastError - currentAngle) / deltaTime;
+            lastError = currentAngle;
+
+            double power = kP * error;
+            //kD*derivative;
+            telemetry.addData("turn power", power);
+            moveAllMotors(-power, power, -power, power);
+        }
+    }
+    public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
+        frontLeftDrive.setPower(frontleftpower);
+        frontRightDrive.setPower(frontrightpower);
+        backLeftDrive.setPower(backleftpower);
+        backRightDrive.setPower(backrightpower);
     }
 }

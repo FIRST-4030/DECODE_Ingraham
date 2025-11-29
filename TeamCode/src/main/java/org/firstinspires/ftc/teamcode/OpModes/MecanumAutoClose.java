@@ -192,21 +192,21 @@ public class MecanumAutoClose extends LinearOpMode {
                 fireShooterLeft(27);
                 fireShooterRight(28);
                 flipper.setPosition(1);
-                sleep(1000);
+                sleep(100);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
             } else if (limelight.getObelisk().equals("GPP")) {
                 fireShooterRight(28);
                 fireShooterLeft(27);
                 flipper.setPosition(1);
-                sleep(1000);
+                sleep(100);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
             } else if (limelight.getObelisk().equals("PPG")) {
                 fireShooterLeft(27);
-                sleep(1000);
+                sleep(100);
                 flipper.setPosition(1);
-                sleep(1000);
+                sleep(100);
                 flipper.setPosition(0);
                 fireShooterLeft(27);
                 fireShooterRight( 28);
@@ -356,11 +356,11 @@ public class MecanumAutoClose extends LinearOpMode {
         }
         timer.reset();
         launchFlapLeft.setPosition(0);
-        while (timer.seconds() < 2) {
+        while (timer.seconds() < 0.5) {
             shooterLeft.overridePower();
         }
         launchFlapLeft.setPosition(0.3);
-        while (timer.seconds() < 3) {
+        while (timer.seconds() < 1) {
             shooterLeft.overridePower();
         }
     }
@@ -374,21 +374,12 @@ public class MecanumAutoClose extends LinearOpMode {
         }
         timer.reset();
         launchFlapRight.setPosition(0.7);
-        while (timer.seconds() < 2) {
+        while (timer.seconds() < 0.5) {
             shooterRight.overridePower();
         }
         launchFlapRight.setPosition(0.4);
-        while (timer.seconds() < 3) {
+        while (timer.seconds() < 1) {
             shooterRight.overridePower();
-        }
-    }
-    public void turnToTag() {
-        if (limelight.getTx() > 0.6 || limelight.getTx() < -0.6) {
-            if (limelight.getTx() > 0.6) { // rotate left
-                turn(-0.25,100);
-            } else if (limelight.getTx() < -0.6) { // rotate right
-                turn(0.25,100);
-            }
         }
     }
 }

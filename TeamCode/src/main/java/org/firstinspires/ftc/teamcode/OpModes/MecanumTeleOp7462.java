@@ -106,6 +106,7 @@ public class MecanumTeleOp7462 extends OpMode {
     private boolean emergencyMode = false;
     private double maxPower = 1.0;
     private double maxSpeed = 1.0;
+    private double collectorPower = 0.5;
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
@@ -225,6 +226,9 @@ public class MecanumTeleOp7462 extends OpMode {
 
         shooterRight.overridePower();
         shooterLeft.overridePower();
+        //Testing remove this
+        collectorFront.setPower(collectorPower);
+        collectorBack.setPower(collectorPower);
 
 
         telemetry.addData("shooterLeftCurrentVelocity", shooterLeft.getVelocity());
@@ -274,11 +278,11 @@ public class MecanumTeleOp7462 extends OpMode {
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
         }
-//        if (gamepad2.yWasPressed()) {
-//            kP += 0.005;
-//        } else if (gamepad2.aWasPressed()) {
-//            kP -= 0.005;
-//        } else if (gamepad2.bWasPressed()) {
+        if (gamepad2.yWasPressed()) {
+            collectorPower += 0.05;
+        } else if (gamepad2.aWasPressed()) {
+            collectorPower -= 0.05;
+        } //else if (gamepad2.bWasPressed()) {
 //            kD += 0.0005;
 //        } else if (gamepad2.xWasPressed()) {
 //            kD -= 0.0005;

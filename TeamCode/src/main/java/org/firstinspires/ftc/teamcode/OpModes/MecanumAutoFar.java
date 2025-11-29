@@ -83,9 +83,10 @@ public class MecanumAutoFar extends LinearOpMode {
     private boolean testingMode = false;
 
     private boolean shooting = false;
+    private double collectorPower = 0.6;
 
     // This declares the IMU needed to get the current direction the robot is facing
-    IMU imu;
+    //IMU imu;
 
     SensorGoBildaPinpoint pinpointc;
     GoBildaPinpointDriver pinpoint;
@@ -122,15 +123,15 @@ public class MecanumAutoFar extends LinearOpMode {
 
         launchFlapRight= hardwareMap.get(Servo.class, "launchFlapRight");
 
-        imu = hardwareMap.get(IMU.class, "imu");
-        // This needs to be changed to match the orientation on your robot
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
-        RevHubOrientationOnRobot orientationOnRobot = new
-                RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
+//        imu = hardwareMap.get(IMU.class, "imu");
+//        // This needs to be changed to match the orientation on your robot
+//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
+//                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
+//                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+//        RevHubOrientationOnRobot orientationOnRobot = new
+//                RevHubOrientationOnRobot(logoDirection, usbDirection);
+//        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 //        goalTag = new GoalTag();
 //        goalTag.init(hardwareMap);
@@ -144,8 +145,6 @@ public class MecanumAutoFar extends LinearOpMode {
         pinpointc = new SensorGoBildaPinpoint();
         pinpointc.initOdometry(hardwareMap, 0, 0, 0);
 
-//        pinpoint = new GoBildaPinpointDriver();
-
         do {
             limelight.readObelisk(telemetry);
             //GlobalStorage.setPattern(goalTag.getObelisk());
@@ -157,6 +156,7 @@ public class MecanumAutoFar extends LinearOpMode {
             telemetry.addData("Testing Mode", testingMode);
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
             telemetry.addData("Start Delay", startDelay);
+            telemetry.addData("collectorPower", collectorPower);
             telemetry.update();
             if (gamepad1.bWasPressed()) {
                 //goalTag.targetAprilTagID = 24;
@@ -173,10 +173,17 @@ public class MecanumAutoFar extends LinearOpMode {
             } else if (gamepad1.leftStickButtonWasPressed()) {
                 testingMode = true;
             }
+
+            //Testing remove later
+            if (gamepad2.yWasPressed()) {
+                collectorPower += 0.05;
+            } else if (gamepad2.aWasPressed()) {
+                collectorPower -= 0.05;
+            }
         } while (opModeInInit());
 
         runtime.reset();
-        imu.resetYaw();
+        //imu.resetYaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -187,18 +194,22 @@ public class MecanumAutoFar extends LinearOpMode {
             // if 20 look left
             ElapsedTime turnLength = new ElapsedTime();
             if (teamID == 20) {
-                while (turnLength.seconds() < 3) {
-                    turnToAprilTagLimelight();
-                }
-                //turn(-0.3,400);
+//                while (turnLength.seconds() < 2) {
+//                    limelight.setTeam(teamID);
+//                    limelight.process(telemetry);
+//                    turnToAprilTagLimelight();
+//                }
+                turn(-0.3,400);
             } else {
-                while (turnLength.seconds() < 3) {
-                    turnToAprilTagLimelight();
-                }
-                //turn(0.3,400);
+//                while (turnLength.seconds() < 2) {
+//                    limelight.setTeam(teamID);
+//                    limelight.process(telemetry);
+//                    turnToAprilTagLimelight();
+//                }
+                turn(0.3,400);
             } // 450
             runtime.reset();
-            while (runtime.seconds() < 1) {
+            while (runtime.seconds() < 0.25) {
                 limelight.setTeam(teamID);
                 limelight.process(telemetry);
                 velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
@@ -213,7 +224,7 @@ public class MecanumAutoFar extends LinearOpMode {
                 fireShooterRight(velRight);
                 flipper.setPosition(1);
                 sleep(100);
-                fireShooterLeft(velLeft-1);
+                fireShooterLeft(velLeft);
             } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
                 fireShooterRight(velRight);
                 fireShooterLeft(velLeft);
@@ -240,19 +251,49 @@ public class MecanumAutoFar extends LinearOpMode {
             //1200
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
-            collectorFront.setPower(0.5);
-            collectorBack.setPower(0.5);
+            collectorFront.setPower(collectorPower);
+            collectorBack.setPower(collectorPower);
 
             if (teamID == 24) {
                 turn(-0.3,400);
                 moveForward(0.5,900);
                 turn(0.5,900);
-                moveForward(0.5, 600);
+                moveForward(0.5, 500);
+
+                sleep(500);
+                flipper.setPosition(1);
+                sleep(250);
+                flipper.setPosition(0.525);
+                moveForward(0.5, 100);
+                sleep(500);
+                flipper.setPosition(0);
+                sleep(250);
+                flipper.setPosition(0.525);
+                moveForward(0.5,120);
+
+                moveForward(-0.5, 720);
+                turn(-0.5,900);
+//                moveForward(-0.5, 900);
+//                turn(0.3,400);
             } else {
                 turn(0.3,400);
                 moveForward(0.5,900);
-                turn(0.5,900);
-                moveForward(0.5, 600);
+                turn(-0.5,900);
+                moveForward(0.5, 500);
+
+                sleep(500);
+                flipper.setPosition(1);
+                sleep(250);
+                flipper.setPosition(0.525);
+                moveForward(0.5, 100);
+                sleep(500);
+                flipper.setPosition(0);
+                sleep(250);
+                flipper.setPosition(0.525);
+                moveForward(0.5,120);
+
+                moveForward(-0.5, 720);
+                turn(-0.5,900);
             }
 
 //            if (teamID == 24)
@@ -323,54 +364,54 @@ public class MecanumAutoFar extends LinearOpMode {
         stopMotors();
     }
 
-    private void rotateTo(double targetAngle) {
-        double Kp = 0.03;  // Proportional gain (tune this)
-        double Kd = 0.0;  // derivative gain
-        double minPower = 0.3;
-        double maxPower = 0.5;
-        double tolerance = 3.0; // degrees
-        double lastError = 0;
-        double derivative;
-        double currentAngle, error, turnPower;
-
-        long lastTime = System.nanoTime();
-
-        while (true) {
-            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-            error = -targetAngle - currentAngle;
-            error = (error + 540) % 360 - 180; // Wrap error to [-180, 180] range
-
-            long now = System.nanoTime();
-            double deltaTime = (now - lastTime) / 1e9;
-            lastTime = now;
-
-            derivative = (error - lastError) / deltaTime;
-            lastError = error;
-
-            if (Math.abs(error) < tolerance) break;
-
-            turnPower = Kp * error + Kd * derivative;
-
-            // Enforce minimum power
-            if (Math.abs(turnPower) < minPower) {
-                turnPower = Math.signum(turnPower) * minPower;
-            }
-            // Clamp maximum power
-            turnPower = Math.max(-maxPower, Math.min(maxPower, turnPower));
-
-            telemetry.addData("Target (deg)", "%.2f", targetAngle);
-            telemetry.addData("Current (deg)", "%.2f", currentAngle);
-            telemetry.addData("Error", "%.2f", error);
-            telemetry.addData("Turn Power", "%.2f", turnPower);
-            telemetry.update();
-
-            frontLeftDrive.setPower(-turnPower);
-            backLeftDrive.setPower(-turnPower);
-            frontRightDrive.setPower(turnPower);
-            backRightDrive.setPower(turnPower);
-        }
-    }
+//    private void rotateTo(double targetAngle) {
+//        double Kp = 0.03;  // Proportional gain (tune this)
+//        double Kd = 0.0;  // derivative gain
+//        double minPower = 0.3;
+//        double maxPower = 0.5;
+//        double tolerance = 3.0; // degrees
+//        double lastError = 0;
+//        double derivative;
+//        double currentAngle, error, turnPower;
+//
+//        long lastTime = System.nanoTime();
+//
+//        while (true) {
+//            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+//
+//            error = -targetAngle - currentAngle;
+//            error = (error + 540) % 360 - 180; // Wrap error to [-180, 180] range
+//
+//            long now = System.nanoTime();
+//            double deltaTime = (now - lastTime) / 1e9;
+//            lastTime = now;
+//
+//            derivative = (error - lastError) / deltaTime;
+//            lastError = error;
+//
+//            if (Math.abs(error) < tolerance) break;
+//
+//            turnPower = Kp * error + Kd * derivative;
+//
+//            // Enforce minimum power
+//            if (Math.abs(turnPower) < minPower) {
+//                turnPower = Math.signum(turnPower) * minPower;
+//            }
+//            // Clamp maximum power
+//            turnPower = Math.max(-maxPower, Math.min(maxPower, turnPower));
+//
+//            telemetry.addData("Target (deg)", "%.2f", targetAngle);
+//            telemetry.addData("Current (deg)", "%.2f", currentAngle);
+//            telemetry.addData("Error", "%.2f", error);
+//            telemetry.addData("Turn Power", "%.2f", turnPower);
+//            telemetry.update();
+//
+//            frontLeftDrive.setPower(-turnPower);
+//            backLeftDrive.setPower(-turnPower);
+//            frontRightDrive.setPower(turnPower);
+//            backRightDrive.setPower(turnPower);
+//        }
+//    }
 
     private void stopMotors() {
         frontLeftDrive.setPower(0);

@@ -88,8 +88,8 @@ public class MecanumAutoFar extends LinearOpMode {
     // This declares the IMU needed to get the current direction the robot is facing
     //IMU imu;
 
-    SensorGoBildaPinpoint pinpointc;
-    GoBildaPinpointDriver pinpoint;
+//    SensorGoBildaPinpoint pinpointc;
+//    GoBildaPinpointDriver pinpoint;
 
     @Override
     public void runOpMode() {
@@ -141,9 +141,9 @@ public class MecanumAutoFar extends LinearOpMode {
 
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
-
-        pinpointc = new SensorGoBildaPinpoint();
-        pinpointc.initOdometry(hardwareMap, 0, 0, 0);
+//
+//        pinpointc = new SensorGoBildaPinpoint();
+//        pinpointc.initOdometry(hardwareMap, 0, 0, 0);
 
         do {
             limelight.readObelisk(telemetry);
@@ -260,18 +260,18 @@ public class MecanumAutoFar extends LinearOpMode {
                 turn(0.5,900);
                 moveForward(0.5, 500);
 
-                sleep(500);
+                sleep(2000);
                 flipper.setPosition(1);
                 sleep(250);
                 flipper.setPosition(0.525);
                 moveForward(0.5, 100);
-                sleep(500);
+                sleep(2000);
                 flipper.setPosition(0);
                 sleep(250);
                 flipper.setPosition(0.525);
-                moveForward(0.5,120);
+                moveForward(0.5,250);
 
-                moveForward(-0.5, 720);
+                moveForward(-0.5, 800);
                 turn(-0.5,900);
 //                moveForward(-0.5, 900);
 //                turn(0.3,400);
@@ -281,12 +281,12 @@ public class MecanumAutoFar extends LinearOpMode {
                 turn(-0.5,900);
                 moveForward(0.5, 500);
 
-                sleep(500);
+                sleep(2000);
                 flipper.setPosition(1);
                 sleep(250);
                 flipper.setPosition(0.525);
                 moveForward(0.5, 100);
-                sleep(500);
+                sleep(2000);
                 flipper.setPosition(0);
                 sleep(250);
                 flipper.setPosition(0.525);
@@ -322,20 +322,20 @@ public class MecanumAutoFar extends LinearOpMode {
         }
     }
 
-    private void movePinpoint() {
-        telemetry.addLine("Push your robot around to see it track");
-        telemetry.addLine("Press A to reset the position");
-        if(gamepad1.a){
-            // You could use readings from April Tags here to give a new known position to the pinpoint
-            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
-        }
-        pinpoint.update();
-        Pose2D pose2D = pinpoint.getPosition();
-
-        telemetry.addData("X coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
-        telemetry.addData("Y coordinate (IN)", pose2D.getY(DistanceUnit.INCH));
-        telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
-    }
+//    private void movePinpoint() {
+//        telemetry.addLine("Push your robot around to see it track");
+//        telemetry.addLine("Press A to reset the position");
+//        if(gamepad1.a){
+//            // You could use readings from April Tags here to give a new known position to the pinpoint
+//            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+//        }
+//        pinpoint.update();
+//        Pose2D pose2D = pinpoint.getPosition();
+//
+//        telemetry.addData("X coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
+//        telemetry.addData("Y coordinate (IN)", pose2D.getY(DistanceUnit.INCH));
+//        telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
+//    }
 
     private void moveForward(double power, double mseconds){
         ElapsedTime timer = new ElapsedTime();

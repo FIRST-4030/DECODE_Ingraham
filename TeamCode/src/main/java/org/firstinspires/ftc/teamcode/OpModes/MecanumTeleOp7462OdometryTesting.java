@@ -28,31 +28,17 @@
  */
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import android.opengl.EGLObjectHandle;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.teamcode.Datalogger;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
-import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.GoalTagLimelight;
 import org.firstinspires.ftc.teamcode.Shooter;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-
-import java.util.List;
 
 /*
  * This OpMode illustrates how to program your robot to drive field relative.  This means
@@ -70,7 +56,7 @@ import java.util.List;
  */
 @TeleOp(name = "Mecanum TeleOp 7462", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
-public class MecanumTeleOp7462 extends OpMode {
+public class MecanumTeleOp7462OdometryTesting extends OpMode {
     GoalTagLimelight limelight;
     // This declares the four motors needed
     DcMotor frontLeftDrive;
@@ -109,7 +95,7 @@ public class MecanumTeleOp7462 extends OpMode {
     private double collectorPower = 0.5;
 
     // This declares the IMU needed to get the current direction the robot is facing
-//    IMU imu;
+    IMU imu;
 
 
     @Override
@@ -140,16 +126,16 @@ public class MecanumTeleOp7462 extends OpMode {
         //encoder uses ticks which is revolutions which tells how much to move
 
         //connecting our name for the orientation code to the android phone to tell it about the robot orientation (imu)
-//        imu = hardwareMap.get(IMU.class, "imu");
-//        // This needs to be changed to match the orientation on your robot
-//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-//                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-//                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
-//
-//        RevHubOrientationOnRobot orientationOnRobot = new
-//                RevHubOrientationOnRobot(logoDirection, usbDirection);
-//        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu = hardwareMap.get(IMU.class, "imu");
+        // This needs to be changed to match the orientation on your robot
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
+                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+
+        RevHubOrientationOnRobot orientationOnRobot = new
+                RevHubOrientationOnRobot(logoDirection, usbDirection);
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
         //we know the orientation of the robot by knowing the orientation of how the control hub
         //is placed on the robot with what orientation the logo is facing and what side
         //the usb ports are facing

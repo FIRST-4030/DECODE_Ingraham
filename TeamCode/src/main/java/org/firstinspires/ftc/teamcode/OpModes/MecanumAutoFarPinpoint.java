@@ -66,8 +66,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
     private double velRight = 34;
 
     private double currentX;
-    private double targetX;
-    private double error;
+    private double currentAngle;
     ElapsedTime runtime = new ElapsedTime();
     public static int decimation = 3;
     public static double power = 0.7;
@@ -199,11 +198,15 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             launchFlapLeft.setPosition(0.3);
             launchFlapRight.setPosition(0.4);
             sleep(startDelay*1000);
-            moveForward( 26);
+
+
+            moveForward( 26,0.3);
             sleep(2000);
             pinpoint.odo.resetPosAndIMU();
+            turnTo(90, 0.3);
             sleep(2000);
-            moveForward( 12);
+            pinpoint.odo.resetPosAndIMU();
+            moveForward( 12,0.3);
 //            sleep(2000);
 //            pinpoint.odo.resetPosAndIMU();
 //            pinpoint.odo.update();
@@ -362,57 +365,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 //    }
 
 
-
-
-//    private void rotateTo(double targetAngle) {
-//        double Kp = 0.03;  // Proportional gain (tune this)
-//        double Kd = 0.0;  // derivative gain
-//        double minPower = 0.3;
-//        double maxPower = 0.5;
-//        double tolerance = 3.0; // degrees
-//        double lastError = 0;
-//        double derivative;
-//        double currentAngle, error, turnPower;
-//
-//        long lastTime = System.nanoTime();
-//
-//        while (true) {
-//            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-//
-//            error = -targetAngle - currentAngle;
-//            error = (error + 540) % 360 - 180; // Wrap error to [-180, 180] range
-//
-//            long now = System.nanoTime();
-//            double deltaTime = (now - lastTime) / 1e9;
-//            lastTime = now;
-//
-//            derivative = (error - lastError) / deltaTime;
-//            lastError = error;
-//
-//            if (Math.abs(error) < tolerance) break;
-//
-//            turnPower = Kp * error + Kd * derivative;
-//
-//            // Enforce minimum power
-//            if (Math.abs(turnPower) < minPower) {
-//                turnPower = Math.signum(turnPower) * minPower;
-//            }
-//            // Clamp maximum power
-//            turnPower = Math.max(-maxPower, Math.min(maxPower, turnPower));
-//
-//            telemetry.addData("Target (deg)", "%.2f", targetAngle);
-//            telemetry.addData("Current (deg)", "%.2f", currentAngle);
-//            telemetry.addData("Error", "%.2f", error);
-//            telemetry.addData("Turn Power", "%.2f", turnPower);
-//            telemetry.update();
-//
-//            frontLeftDrive.setPower(-turnPower);
-//            backLeftDrive.setPower(-turnPower);
-//            frontRightDrive.setPower(turnPower);
-//            backRightDrive.setPower(turnPower);
-//        }
-//    }
-
     public void fireShooterLeft(double velocity) {
         shooting = true;
         shooterLeft.targetVelocity = velocity;
@@ -460,48 +412,48 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             }
         }
     }
-    private void turnTo(double variance, double setPoint) {
-        long lastTime = System.currentTimeMillis();
-        double currentAngle = limelight.getTx();
-        double error = setPoint - currentAngle;
+    private void turnTo(double t_angle, double power) {
+        while (true) {
+            pinpoint.odo.update();
+            Pose2D pose = pinpoint.odo.getPosition();
+            currentAngle = pose.getHeading(AngleUnit.DEGREES); // I forget if this was the right way to get heading and not oscillate
 
-        if (Math.abs(error) > variance) {
-            double derivative;
-            double deltaTime;
-            long now = System.currentTimeMillis();
-            deltaTime = (now - lastTime) / 1000.0;
-            lastTime = now;
+            double error = t_angle-currentAngle;
+
+            telemetry.addData("current angle",currentAngle);
+            telemetry.addData("target angle", t_angle);
+            telemetry.addData("error", error);
+            telemetry.update();
+            if (Math.abs(error) < 0.25) {
+                ch.stopMotors();
+                break;
+            }
+            if (error >= 0) {
+                ch.moveAllMotors(power,-power,power,-power);
+            } else {
+                ch.moveAllMotors(-power,power,-power,power);
+            }
 
 
-            derivative = (lastError - currentAngle) / deltaTime;
-            lastError = currentAngle;
-
-            double power = kP * error;
-            //kD*derivative;
-            telemetry.addData("turn power", power);
-            ch.moveAllMotors(-power, power, -power, power);
         }
     }
-    private void moveForward(double inches) {
-        telemetry.addData("x",currentX);
-        telemetry.addData("xtarget",inches);
-        telemetry.update();
+    private void moveForward(double inches, double power) {
         while (true) {
             pinpoint.odo.update();
             Pose2D pose = pinpoint.odo.getPosition();
             currentX = pose.getX(DistanceUnit.INCH);
 
-            error = inches-currentX;
+            double error = inches-currentX;
 
             telemetry.addData("x",currentX);
             telemetry.addData("target inches",inches);
             telemetry.addData("error", error);
             telemetry.update();
-            if (Math.abs(error) < 2) {
-                ch.moveAllMotors(0,0,0,0);
+            if (Math.abs(error) < 0.25) {
+                ch.stopMotors();
                 break;
             }
-            ch.moveAllMotors(0.3,0.3,0.3,0.3);
+            ch.moveAllMotors(power,power,power,power);
 
         }
     }

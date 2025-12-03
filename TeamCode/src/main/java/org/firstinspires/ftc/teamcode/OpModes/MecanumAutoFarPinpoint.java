@@ -29,14 +29,11 @@
 
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import android.app.slice.SliceMetrics;
+import static java.lang.Math.abs;
 
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -46,19 +43,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
-import org.firstinspires.ftc.teamcode.GoalTag;
+import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.GoalTagLimelight;
-import org.firstinspires.ftc.teamcode.SensorGoBildaPinpoint;
+import org.firstinspires.ftc.teamcode.Pinpoint;
 import org.firstinspires.ftc.teamcode.Shooter;
 
-@Autonomous(name="Mecanum Auto Far", group="Linear OpMode")
-public class MecanumAutoFar extends LinearOpMode {
+@Autonomous(name="Mecanum Auto Far Pinpoint", group="Linear OpMode")
+public class MecanumAutoFarPinpoint extends LinearOpMode {
 
     // Declare OpMode members.
-    DcMotor frontLeftDrive;
-    DcMotor frontRightDrive;
-    DcMotor backLeftDrive;
-    DcMotor backRightDrive;
+
     Shooter shooterLeft;
     Shooter shooterRight;
     Servo launchFlapLeft;
@@ -67,15 +61,20 @@ public class MecanumAutoFar extends LinearOpMode {
     Shooter collectorFront;
     Servo flipper;
     Chassis ch;
+    Pinpoint pinpoint;
     private double velLeft = 35;
     private double velRight = 34;
 
+    private double currentX;
+    private double targetX;
+    private double error;
     ElapsedTime runtime = new ElapsedTime();
     public static int decimation = 3;
     public static double power = 0.7;
     private double lastError = 0;
     private double kP = 0.14;
     double yawImu;
+
     YawPitchRollAngles orientation;
 
     //GoalTag goalTag;
@@ -97,6 +96,8 @@ public class MecanumAutoFar extends LinearOpMode {
     public void runOpMode() {
         ch = new Chassis(hardwareMap);
 
+        pinpoint = new Pinpoint(hardwareMap,ch,telemetry,0,0,false);
+
         collectorFront = new Shooter(hardwareMap,"collectorFront", false);
 
         collectorBack = new Shooter(hardwareMap,"collectorBack", false);
@@ -110,6 +111,26 @@ public class MecanumAutoFar extends LinearOpMode {
 
         launchFlapRight= hardwareMap.get(Servo.class, "launchFlapRight");
 
+        pinpoint.setEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
+        Pose2D pose = pinpoint.odo.getPosition();
+
+        pinpoint.odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES,0));
+        // One calibration does not necessarily clear the hardware
+        while ((abs(pose.getX(DistanceUnit.INCH))>0.1) &&
+                (abs(pose.getX(DistanceUnit.INCH))>0.1)) {
+            pinpoint.odo.update();
+            pinpoint.odo.resetPosAndIMU();
+            pinpoint.odo.recalibrateIMU();
+
+            telemetry.addData("Heading Scalar", pinpoint.odo.getYawScalar());
+            telemetry.addData("Initial X", "%.2f", pinpoint.odo.getPosX(DistanceUnit.INCH));
+            telemetry.addData("Initial Y", "%.2f", pinpoint.odo.getPosY(DistanceUnit.INCH));
+            telemetry.addData("Initial Heading (deg)", "%.1f", pose.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Status",pinpoint.odo.getDeviceStatus());
+            telemetry.update();
+        }
 //        imu = hardwareMap.get(IMU.class, "imu");
 //        // This needs to be changed to match the orientation on your robot
 //        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
@@ -128,9 +149,7 @@ public class MecanumAutoFar extends LinearOpMode {
 
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
-//
-//        pinpointc = new SensorGoBildaPinpoint();
-//        pinpointc.initOdometry(hardwareMap, 0, 0, 0);
+
 
         do {
             limelight.readObelisk(telemetry);
@@ -174,114 +193,132 @@ public class MecanumAutoFar extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            resetRuntime();
+
+            pinpoint.odo.recalibrateIMU();
             launchFlapLeft.setPosition(0.3);
             launchFlapRight.setPosition(0.4);
             sleep(startDelay*1000);
-            //rotateTo(-(aprilTags.getBearing()));
-            // if 20 look left
-            ElapsedTime turnLength = new ElapsedTime();
-            if (teamID == 20) {
-//                while (turnLength.seconds() < 2) {
-//                    limelight.setTeam(teamID);
-//                    limelight.process(telemetry);
-//                    turnToAprilTagLimelight();
-//                }
-                ch.turn(-0.3,400);
-            } else {
-//                while (turnLength.seconds() < 2) {
-//                    limelight.setTeam(teamID);
-//                    limelight.process(telemetry);
-//                    turnToAprilTagLimelight();
-//                }
-                ch.turn(0.3,400);
-            } // 450
-            runtime.reset();
-            while (runtime.seconds() < 0.25) {
-                limelight.setTeam(teamID);
-                limelight.process(telemetry);
-                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
-                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
-                telemetry.addData("Range", limelight.getRange());
-                telemetry.update();
-            }
-
-            // P is left
-            if (limelight.getObelisk().equals("PGP") && !testingMode) {
-                fireShooterLeft(velLeft);
-                fireShooterRight(velRight);
-                flipper.setPosition(1);
-                sleep(100);
-                fireShooterLeft(velLeft);
-            } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
-                fireShooterRight(velRight);
-                fireShooterLeft(velLeft);
-                flipper.setPosition(1);
-                sleep(100);
-                fireShooterLeft(velLeft);
-            } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
-                fireShooterLeft(velLeft);
-                sleep(100);
-                flipper.setPosition(1);
-                sleep(100);
-                fireShooterLeft(velLeft);
-                fireShooterRight(velRight);
-            }
-            flipper.setPosition(0.525);
+            moveForward( 26);
+            sleep(2000);
+            pinpoint.odo.resetPosAndIMU();
+            sleep(2000);
+            moveForward( 12);
+//            sleep(2000);
+//            pinpoint.odo.resetPosAndIMU();
+//            pinpoint.odo.update();
+//            sleep(2000);
+//            moveForward(pose, 5);
+//            sleep(2000);
+//            pinpoint.odo.resetPosAndIMU();
+//            pinpoint.odo.update();
+//            sleep(2000);
+//            moveForward(pose, 5);
+//            //rotateTo(-(aprilTags.getBearing()));
+//            // if 20 look left
+//            ElapsedTime turnLength = new ElapsedTime();
 //            if (teamID == 20) {
-//                turn(0.3, 200);
+////                while (turnLength.seconds() < 2) {
+////                    limelight.setTeam(teamID);
+////                    limelight.process(telemetry);
+////                    turnToAprilTagLimelight();
+////                }
+//                ch.turn(-0.3,400);
 //            } else {
-//                turn(0.3,200);
+////                while (turnLength.seconds() < 2) {
+////                    limelight.setTeam(teamID);
+////                    limelight.process(telemetry);
+////                    turnToAprilTagLimelight();
+////                }
+//                ch.turn(0.3,400);
+//            } // 450
+//            runtime.reset();
+//            while (runtime.seconds() < 0.25) {
+//                limelight.setTeam(teamID);
+//                limelight.process(telemetry);
+//                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
+//                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
+//                telemetry.addData("Range", limelight.getRange());
+//                telemetry.update();
 //            }
-            // moveForward(0.5, 400);
-            //moveForward(0.5,900);
-            //ms
-            //1200
-            shooterLeft.targetVelocity = 0;
-            shooterRight.targetVelocity = 0;
-            collectorFront.setPower(collectorPower);
-            collectorBack.setPower(collectorPower);
-
-            if (teamID == 24) {
-                ch.turn(-0.3,400);
-                ch.moveForward(0.5,900);
-                ch.turn(0.5,900);
-                ch.moveForward(0.5, 500);
-
-                sleep(2000);
-                flipper.setPosition(1);
-                sleep(250);
-                flipper.setPosition(0.525);
-                ch.moveForward(0.5, 100);
-                sleep(2000);
-                flipper.setPosition(0);
-                sleep(250);
-                flipper.setPosition(0.525);
-                ch.moveForward(0.5,250);
-
-                ch.moveForward(-0.5, 800);
-                ch.turn(-0.5,900);
-//                moveForward(-0.5, 900);
-//                turn(0.3,400);
-            } else {
-                ch.turn(0.3,400);
-                ch.moveForward(0.5,900);
-                ch.turn(-0.5,900);
-                ch.moveForward(0.5, 500);
-
-                sleep(2000);
-                flipper.setPosition(1);
-                sleep(250);
-                flipper.setPosition(0.525);
-                ch.moveForward(0.5, 100);
-                sleep(2000);
-                flipper.setPosition(0);
-                sleep(250);
-                flipper.setPosition(0.525);
-                ch.moveForward(0.5,120);
-
-                ch.moveForward(-0.5, 720);
-                ch.turn(-0.5,900);
-            }
+//
+//            // P is left
+//            if (limelight.getObelisk().equals("PGP") && !testingMode) {
+//                fireShooterLeft(velLeft);
+//                fireShooterRight(velRight);
+//                flipper.setPosition(1);
+//                sleep(100);
+//                fireShooterLeft(velLeft);
+//            } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
+//                fireShooterRight(velRight);
+//                fireShooterLeft(velLeft);
+//                flipper.setPosition(1);
+//                sleep(100);
+//                fireShooterLeft(velLeft);
+//            } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
+//                fireShooterLeft(velLeft);
+//                sleep(100);
+//                flipper.setPosition(1);
+//                sleep(100);
+//                fireShooterLeft(velLeft);
+//                fireShooterRight(velRight);
+//            }
+//            flipper.setPosition(0.525);
+////            if (teamID == 20) {
+////                turn(0.3, 200);
+////            } else {
+////                turn(0.3,200);
+////            }
+//            // moveForward(0.5, 400);
+//            //moveForward(0.5,900);
+//            //ms
+//            //1200
+//            shooterLeft.targetVelocity = 0;
+//            shooterRight.targetVelocity = 0;
+//            collectorFront.setPower(collectorPower);
+//            collectorBack.setPower(collectorPower);
+//
+//            if (teamID == 24) {
+//                ch.turn(-0.3,400);
+//                ch.moveForward(0.5,900);
+//                ch.turn(0.5,900);
+//                ch.moveForward(0.5, 500);
+//
+//                sleep(2000);
+//                flipper.setPosition(1);
+//                sleep(250);
+//                flipper.setPosition(0.525);
+//                ch.moveForward(0.5, 100);
+//                sleep(2000);
+//                flipper.setPosition(0);
+//                sleep(250);
+//                flipper.setPosition(0.525);
+//                ch.moveForward(0.5,250);
+//
+//                ch.moveForward(-0.5, 800);
+//                ch.turn(-0.5,900);
+////                moveForward(-0.5, 900);
+////                turn(0.3,400);
+//            } else {
+//                ch.turn(0.3,400);
+//                ch.moveForward(0.5,900);
+//                ch.turn(-0.5,900);
+//                ch.moveForward(0.5, 500);
+//
+//                sleep(2000);
+//                flipper.setPosition(1);
+//                sleep(250);
+//                flipper.setPosition(0.525);
+//                ch.moveForward(0.5, 100);
+//                sleep(2000);
+//                flipper.setPosition(0);
+//                sleep(250);
+//                flipper.setPosition(0.525);
+//                ch.moveForward(0.5,120);
+//
+//                ch.moveForward(-0.5, 720);
+//                ch.turn(-0.5,900);
+//            }
 
 //            if (teamID == 24)
 //            {
@@ -443,6 +480,29 @@ public class MecanumAutoFar extends LinearOpMode {
             //kD*derivative;
             telemetry.addData("turn power", power);
             ch.moveAllMotors(-power, power, -power, power);
+        }
+    }
+    private void moveForward(double inches) {
+        telemetry.addData("x",currentX);
+        telemetry.addData("xtarget",inches);
+        telemetry.update();
+        while (true) {
+            pinpoint.odo.update();
+            Pose2D pose = pinpoint.odo.getPosition();
+            currentX = pose.getX(DistanceUnit.INCH);
+
+            error = inches-currentX;
+
+            telemetry.addData("x",currentX);
+            telemetry.addData("target inches",inches);
+            telemetry.addData("error", error);
+            telemetry.update();
+            if (Math.abs(error) < 2) {
+                ch.moveAllMotors(0,0,0,0);
+                break;
+            }
+            ch.moveAllMotors(0.3,0.3,0.3,0.3);
+
         }
     }
 }

@@ -37,7 +37,7 @@ public class Pinpoint {
     double headingError, uncorrectedHeading;
     Pose2D pose;
 
-    public Pinpoint(HardwareMap hw, Chassis ch, Telemetry tele, double offsetX, double offsetY, boolean log) {
+    public Pinpoint(HardwareMap hw, Chassis ch, Telemetry tele, boolean log) {
 
         chassis = ch;
         telemetry = tele;

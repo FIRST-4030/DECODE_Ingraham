@@ -84,6 +84,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 
     private boolean shooting = false;
     private double collectorPower = 0.5;
+    private static double turnOffset = 3.8;
 
     // This declares the IMU needed to get the current direction the robot is facing
     //IMU imu;
@@ -95,7 +96,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
     public void runOpMode() {
         ch = new Chassis(hardwareMap);
 
-        pinpoint = new Pinpoint(hardwareMap,ch,telemetry,0,0,false);
+        pinpoint = new Pinpoint(hardwareMap,ch,telemetry,false);
 
         collectorFront = new Shooter(hardwareMap,"collectorFront", false);
 
@@ -117,19 +118,21 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 
         pinpoint.odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES,0));
         // One calibration does not necessarily clear the hardware
-        while ((abs(pose.getX(DistanceUnit.INCH))>0.1) &&
-                (abs(pose.getX(DistanceUnit.INCH))>0.1)) {
-            pinpoint.odo.update();
-            pinpoint.odo.resetPosAndIMU();
-            pinpoint.odo.recalibrateIMU();
+//        int i = 0;
+//        while (i < 10) {
+//            i++;
 
-            telemetry.addData("Heading Scalar", pinpoint.odo.getYawScalar());
-            telemetry.addData("Initial X", "%.2f", pinpoint.odo.getPosX(DistanceUnit.INCH));
-            telemetry.addData("Initial Y", "%.2f", pinpoint.odo.getPosY(DistanceUnit.INCH));
-            telemetry.addData("Initial Heading (deg)", "%.1f", pose.getHeading(AngleUnit.DEGREES));
-            telemetry.addData("Status",pinpoint.odo.getDeviceStatus());
-            telemetry.update();
-        }
+        pinpoint.odo.recalibrateIMU();
+        pinpoint.odo.resetPosAndIMU();
+        pinpoint.odo.update();
+
+        telemetry.addData("Heading Scalar", pinpoint.odo.getYawScalar());
+        telemetry.addData("Initial X", "%.2f", pinpoint.odo.getPosX(DistanceUnit.INCH));
+        telemetry.addData("Initial Y", "%.2f", pinpoint.odo.getPosY(DistanceUnit.INCH));
+        telemetry.addData("Initial Heading (deg)", "%.1f", pose.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Status", pinpoint.odo.getDeviceStatus());
+        telemetry.update();
+        //}
 //        imu = hardwareMap.get(IMU.class, "imu");
 //        // This needs to be changed to match the orientation on your robot
 //        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
@@ -193,30 +196,62 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             resetRuntime();
+            while (runtime.seconds() < 0.25) {
+                limelight.setTeam(teamID);
+                limelight.process(telemetry);
+                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
+                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
+                telemetry.addData("Range", limelight.getRange());
+                telemetry.update();
+            }
 
-            pinpoint.odo.recalibrateIMU();
+
+            collectorBack.setPower(0.6);
+            collectorFront.setPower(0.6);
+
             launchFlapLeft.setPosition(0.3);
             launchFlapRight.setPosition(0.4);
             sleep(startDelay*1000);
 
 
-            moveForward( 26,0.3);
-            sleep(2000);
             pinpoint.odo.resetPosAndIMU();
-            turnTo(90, 0.3);
-            sleep(2000);
+            sleep(500);
+            moveForward(2, 0.3);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            turnTo(-20/turnOffset, 0.3);
+            fireVolleySorted();
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            //turnTo(20/turnOffset, 0.3);
+            //sleep(500);
+            //pinpoint.odo.resetPosAndIMU();
+            moveForward( 26,0.3);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            turnTo(-80/turnOffset, 0.3);
+            sleep(500);
             pinpoint.odo.resetPosAndIMU();
             moveForward( 12,0.3);
-//            sleep(2000);
-//            pinpoint.odo.resetPosAndIMU();
-//            pinpoint.odo.update();
-//            sleep(2000);
-//            moveForward(pose, 5);
-//            sleep(2000);
-//            pinpoint.odo.resetPosAndIMU();
-//            pinpoint.odo.update();
-//            sleep(2000);
-//            moveForward(pose, 5);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            moveForward(5, 0.3);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            moveForward(5,0.3);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            moveForward(-22, -0.3);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            turnTo(80/turnOffset,0.3);
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            moveForward(-26,-0.3);
+            fireVolleySorted();
+            sleep(500);
+            pinpoint.odo.resetPosAndIMU();
+            moveForward(5,0.3);
 //            //rotateTo(-(aprilTags.getBearing()));
 //            // if 20 look left
 //            ElapsedTime turnLength = new ElapsedTime();
@@ -245,27 +280,8 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 //                telemetry.update();
 //            }
 //
-//            // P is left
-//            if (limelight.getObelisk().equals("PGP") && !testingMode) {
-//                fireShooterLeft(velLeft);
-//                fireShooterRight(velRight);
-//                flipper.setPosition(1);
-//                sleep(100);
-//                fireShooterLeft(velLeft);
-//            } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
-//                fireShooterRight(velRight);
-//                fireShooterLeft(velLeft);
-//                flipper.setPosition(1);
-//                sleep(100);
-//                fireShooterLeft(velLeft);
-//            } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
-//                fireShooterLeft(velLeft);
-//                sleep(100);
-//                flipper.setPosition(1);
-//                sleep(100);
-//                fireShooterLeft(velLeft);
-//                fireShooterRight(velRight);
-//            }
+            // P is left
+
 //            flipper.setPosition(0.525);
 ////            if (teamID == 20) {
 ////                turn(0.3, 200);
@@ -365,6 +381,28 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 //    }
 
 
+    public void fireVolleySorted() {
+        if (limelight.getObelisk().equals("PGP") && !testingMode) {
+            fireShooterLeft(velLeft);
+            fireShooterRight(velRight);
+            flipper.setPosition(1);
+            sleep(100);
+            fireShooterLeft(velLeft);
+        } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
+            fireShooterRight(velRight);
+            fireShooterLeft(velLeft);
+            flipper.setPosition(1);
+            sleep(100);
+            fireShooterLeft(velLeft);
+        } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
+            fireShooterLeft(velLeft);
+            sleep(100);
+            flipper.setPosition(1);
+            sleep(100);
+            fireShooterLeft(velLeft);
+            fireShooterRight(velRight);
+        }
+    }
     public void fireShooterLeft(double velocity) {
         shooting = true;
         shooterLeft.targetVelocity = velocity;
@@ -416,19 +454,19 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
         while (true) {
             pinpoint.odo.update();
             Pose2D pose = pinpoint.odo.getPosition();
-            currentAngle = pose.getHeading(AngleUnit.DEGREES); // I forget if this was the right way to get heading and not oscillate
+            currentAngle = pose.getHeading(AngleUnit.DEGREES);
 
-            double error = t_angle-currentAngle;
+            //double error = t_angle+currentAngle;
 
             telemetry.addData("current angle",currentAngle);
             telemetry.addData("target angle", t_angle);
-            telemetry.addData("error", error);
+            //telemetry.addData("error", error);
             telemetry.update();
-            if (Math.abs(error) < 0.25) {
+            if (Math.abs(t_angle-currentAngle) < 0.5) {
                 ch.stopMotors();
                 break;
             }
-            if (error >= 0) {
+            if (t_angle < 0) {
                 ch.moveAllMotors(power,-power,power,-power);
             } else {
                 ch.moveAllMotors(-power,power,-power,power);

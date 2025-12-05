@@ -215,8 +215,8 @@ public class MecanumTeleOp7462 extends OpMode {
 
     @Override
     public void start() {
-        collectorFront.setPower(0.5);
-        collectorBack.setPower(0.5);
+        collectorFront.setPower(0.6);
+        collectorBack.setPower(0.6);
     }
 
     @Override
@@ -268,12 +268,12 @@ public class MecanumTeleOp7462 extends OpMode {
             timerFlipper.reset();
         }
         if (gamepad2.dpadUpWasPressed()) {
-            collectorBack.setPower(-0.5);
-            collectorFront.setPower(-0.5);
+            collectorBack.setPower(-0.6);
+            collectorFront.setPower(-0.6);
         }
         if (gamepad2.dpadUpWasReleased()) {
-            collectorFront.setPower(0.5);
-            collectorBack.setPower(0.5);
+            collectorFront.setPower(0.6);
+            collectorBack.setPower(0.6);
         }
         if (gamepad1.a && limelight.isDataCurrent) {
             turnToAprilTagLimelight();
@@ -345,23 +345,12 @@ public class MecanumTeleOp7462 extends OpMode {
         }
     }
     private void turnTo(double variance, double setPoint) {
-        long lastTime = System.currentTimeMillis();
         double currentAngle = limelight.getTx();
         double error = setPoint - currentAngle;
 
         if (Math.abs(error) > variance) {
-            double derivative;
-            double deltaTime;
-            long now = System.currentTimeMillis();
-            deltaTime = (now - lastTime) / 1000.0;
-            lastTime = now;
-
-
-            derivative = (lastError-currentAngle) / deltaTime;
-            lastError = currentAngle;
-
             double power = kP*error;
-            //kD*derivative;
+
             telemetry.addData("turn power", power);
             moveAllMotors(-power,power,-power,power);
 //            if (error > rightBound) { // rotate left
@@ -369,6 +358,17 @@ public class MecanumTeleOp7462 extends OpMode {
 //            } else if (error < leftBound) { // rotate right
 //                moveAllMotors(power,-power,power,-power);
 //            }
+        }
+    }
+    GoalTag goalTag;
+    public void turnToAprilTag() {
+        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
+            if (goalTag.getBearing() > 0.6) { // rotate left
+                moveAllMotors(-0.5, 0.5, -0.5, 0.5);
+            } else if (goalTag.getBearing() < -0.6) { // rotate right
+                moveAllMotors(0.5, -0.5, 0.5, -0.5);
+
+            }
         }
     }
     // Thanks to FTC16072 for sharing this code!!

@@ -219,8 +219,14 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             moveForward(2, 0.3);
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
-            turnTo(-20/turnOffset, 0.3);
+            if (teamID == 24) {
+                turnTo(-20/turnOffset, 0.3);
+            } else {
+                turnTo(20/turnOffset, 0.3);
+            }
+
             fireVolleySorted();
+            flipper.setPosition(0.525);
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
             //turnTo(20/turnOffset, 0.3);
@@ -229,13 +235,25 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             moveForward( 26,0.3);
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
-            turnTo(-80/turnOffset, 0.3);
+            if (teamID == 24) {
+                turnTo(-80/turnOffset, 0.3);
+            } else {
+                turnTo(80/turnOffset, 0.3);
+            }
+
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
             moveForward( 12,0.3);
             sleep(500);
+            flipper.setPosition(1);
+            sleep(250);
+            flipper.setPosition(0.525);
             pinpoint.odo.resetPosAndIMU();
             moveForward(5, 0.3);
+            sleep(500);
+            flipper.setPosition(0);
+            sleep(250);
+            flipper.setPosition(0.525);
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
             moveForward(5,0.3);
@@ -244,7 +262,12 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             moveForward(-22, -0.3);
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
-            turnTo(80/turnOffset,0.3);
+            if (teamID == 24) {
+                turnTo(80/turnOffset,0.3);
+            } else {
+                turnTo(-80/turnOffset,0.3);
+            }
+
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
             moveForward(-26,-0.3);
@@ -252,115 +275,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             sleep(500);
             pinpoint.odo.resetPosAndIMU();
             moveForward(5,0.3);
-//            //rotateTo(-(aprilTags.getBearing()));
-//            // if 20 look left
-//            ElapsedTime turnLength = new ElapsedTime();
-//            if (teamID == 20) {
-////                while (turnLength.seconds() < 2) {
-////                    limelight.setTeam(teamID);
-////                    limelight.process(telemetry);
-////                    turnToAprilTagLimelight();
-////                }
-//                ch.turn(-0.3,400);
-//            } else {
-////                while (turnLength.seconds() < 2) {
-////                    limelight.setTeam(teamID);
-////                    limelight.process(telemetry);
-////                    turnToAprilTagLimelight();
-////                }
-//                ch.turn(0.3,400);
-//            } // 450
-//            runtime.reset();
-//            while (runtime.seconds() < 0.25) {
-//                limelight.setTeam(teamID);
-//                limelight.process(telemetry);
-//                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
-//                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
-//                telemetry.addData("Range", limelight.getRange());
-//                telemetry.update();
-//            }
-//
-            // P is left
-
-//            flipper.setPosition(0.525);
-////            if (teamID == 20) {
-////                turn(0.3, 200);
-////            } else {
-////                turn(0.3,200);
-////            }
-//            // moveForward(0.5, 400);
-//            //moveForward(0.5,900);
-//            //ms
-//            //1200
-//            shooterLeft.targetVelocity = 0;
-//            shooterRight.targetVelocity = 0;
-//            collectorFront.setPower(collectorPower);
-//            collectorBack.setPower(collectorPower);
-//
-//            if (teamID == 24) {
-//                ch.turn(-0.3,400);
-//                ch.moveForward(0.5,900);
-//                ch.turn(0.5,900);
-//                ch.moveForward(0.5, 500);
-//
-//                sleep(2000);
-//                flipper.setPosition(1);
-//                sleep(250);
-//                flipper.setPosition(0.525);
-//                ch.moveForward(0.5, 100);
-//                sleep(2000);
-//                flipper.setPosition(0);
-//                sleep(250);
-//                flipper.setPosition(0.525);
-//                ch.moveForward(0.5,250);
-//
-//                ch.moveForward(-0.5, 800);
-//                ch.turn(-0.5,900);
-////                moveForward(-0.5, 900);
-////                turn(0.3,400);
-//            } else {
-//                ch.turn(0.3,400);
-//                ch.moveForward(0.5,900);
-//                ch.turn(-0.5,900);
-//                ch.moveForward(0.5, 500);
-//
-//                sleep(2000);
-//                flipper.setPosition(1);
-//                sleep(250);
-//                flipper.setPosition(0.525);
-//                ch.moveForward(0.5, 100);
-//                sleep(2000);
-//                flipper.setPosition(0);
-//                sleep(250);
-//                flipper.setPosition(0.525);
-//                ch.moveForward(0.5,120);
-//
-//                ch.moveForward(-0.5, 720);
-//                ch.turn(-0.5,900);
-//            }
-
-//            if (teamID == 24)
-//            {
-//
-//                turn(0.5,800);
-//                //1300
-//                moveForward(0.5, 300);
-//                //ms
-//                //900
-//            }
-//            else
-//            {
-//                turn(-0.5,800);
-//                //pw
-//                //-0.5
-//                //ms
-//                //1300
-//                moveForward(0.5, 300);
-//                //ms
-//                //900
-//                //200 low
-//            }
-
             break;
         }
     }

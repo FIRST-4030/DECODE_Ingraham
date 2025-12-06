@@ -211,20 +211,20 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
                 turnTo(90, 0.25);
             }
 
-            moveY( -15,0.3);
+            moveY( turnSign*15,0.3);
             sleep(500);
             flipper.setPosition(1);
             sleep(250);
             flipper.setPosition(0.525);
-            moveY(-20, 0.3);
+            moveY(turnSign*20, 0.3);
             sleep(500);
             flipper.setPosition(0);
             sleep(250);
             flipper.setPosition(0.525);
             sleep(500);
-            moveY(-25,0.3);
+            moveY(turnSign*25,0.3);
             sleep(500);
-            moveY(0, -0.3);
+            moveY(0, turnSign*0.3);
 
 
             turnTo(turnSign*20,turnSign*0.25);

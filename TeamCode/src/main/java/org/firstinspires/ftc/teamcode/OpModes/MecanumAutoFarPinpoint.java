@@ -110,8 +110,8 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
         limelight = new GoalTagLimelight();
         limelight.init(hardwareMap,telemetry);
 
-        pinpoint.odo.recalibrateIMU();
         pinpoint.odo.resetPosAndIMU();
+        pinpoint.odo.recalibrateIMU();
         pinpoint.odo.update();
 
         Pose2D pose = pinpoint.odo.getPosition();
@@ -132,7 +132,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             telemetry.addLine("Press b for red, x for blue, y adds delay, a removes delay");
             telemetry.addData("Start Delay", startDelay);
             telemetry.addData("collectorPower", collectorPower);
-            telemetry.update();
+
             if (gamepad1.bWasPressed()) {
                 //goalTag.targetAprilTagID = 24;
                 teamID = 24;
@@ -214,18 +214,18 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             }
 
             sleep(500);
-            moveY( 12,0.3);
+            moveY( -12,0.3);
             sleep(500);
             flipper.setPosition(1);
             sleep(250);
             flipper.setPosition(0.525);
-            moveY(17, 0.3);
+            moveY(-17, 0.3);
             sleep(500);
             flipper.setPosition(0);
             sleep(250);
             flipper.setPosition(0.525);
             sleep(500);
-            moveY(22,0.3);
+            moveY(-22,0.3);
             sleep(500);
             moveY(0, -0.3);
             sleep(500);

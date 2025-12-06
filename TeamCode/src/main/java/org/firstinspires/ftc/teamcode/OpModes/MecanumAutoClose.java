@@ -82,7 +82,7 @@ public class MecanumAutoClose extends LinearOpMode {
     private int teamID;
 
     // This declares the IMU needed to get the current direction the robot is facing
-    IMU imu;
+    //IMU imu;
 
     SensorGoBildaPinpoint pinpointc;
     GoBildaPinpointDriver pinpoint;
@@ -117,7 +117,7 @@ public class MecanumAutoClose extends LinearOpMode {
 
         launchFlapRight = hardwareMap.get(Servo.class, "launchFlapRight");
 
-        imu = hardwareMap.get(IMU.class, "imu");
+//        imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
@@ -125,7 +125,7 @@ public class MecanumAutoClose extends LinearOpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
         RevHubOrientationOnRobot orientationOnRobot = new
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
+//        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 //        goalTag = new GoalTag();
 //        goalTag.init(hardwareMap);
@@ -169,7 +169,7 @@ public class MecanumAutoClose extends LinearOpMode {
         } while (opModeInInit());
 
         runtime.reset();
-        imu.resetYaw();
+        //imu.resetYaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -290,54 +290,54 @@ public class MecanumAutoClose extends LinearOpMode {
         stopMotors();
     }
 
-    private void rotateTo(double targetAngle) {
-        double Kp = 0.03;  // Proportional gain (tune this)
-        double Kd = 0.0;  // derivative gain
-        double minPower = 0.3;
-        double maxPower = 0.5;
-        double tolerance = 3.0; // degrees
-        double lastError = 0;
-        double derivative;
-        double currentAngle, error, turnPower;
-
-        long lastTime = System.nanoTime();
-
-        while (true) {
-            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-            error = -targetAngle - currentAngle;
-            error = (error + 540) % 360 - 180; // Wrap error to [-180, 180] range
-
-            long now = System.nanoTime();
-            double deltaTime = (now - lastTime) / 1e9;
-            lastTime = now;
-
-            derivative = (error - lastError) / deltaTime;
-            lastError = error;
-
-            if (Math.abs(error) < tolerance) break;
-
-            turnPower = Kp * error + Kd * derivative;
-
-            // Enforce minimum power
-            if (Math.abs(turnPower) < minPower) {
-                turnPower = Math.signum(turnPower) * minPower;
-            }
-            // Clamp maximum power
-            turnPower = Math.max(-maxPower, Math.min(maxPower, turnPower));
-
-            telemetry.addData("Target (deg)", "%.2f", targetAngle);
-            telemetry.addData("Current (deg)", "%.2f", currentAngle);
-            telemetry.addData("Error", "%.2f", error);
-            telemetry.addData("Turn Power", "%.2f", turnPower);
-            telemetry.update();
-
-            frontLeftDrive.setPower(-turnPower);
-            backLeftDrive.setPower(-turnPower);
-            frontRightDrive.setPower(turnPower);
-            backRightDrive.setPower(turnPower);
-        }
-    }
+//    private void rotateTo(double targetAngle) {
+//        double Kp = 0.03;  // Proportional gain (tune this)
+//        double Kd = 0.0;  // derivative gain
+//        double minPower = 0.3;
+//        double maxPower = 0.5;
+//        double tolerance = 3.0; // degrees
+//        double lastError = 0;
+//        double derivative;
+//        double currentAngle, error, turnPower;
+//
+//        long lastTime = System.nanoTime();
+//
+//        while (true) {
+//            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+//
+//            error = -targetAngle - currentAngle;
+//            error = (error + 540) % 360 - 180; // Wrap error to [-180, 180] range
+//
+//            long now = System.nanoTime();
+//            double deltaTime = (now - lastTime) / 1e9;
+//            lastTime = now;
+//
+//            derivative = (error - lastError) / deltaTime;
+//            lastError = error;
+//
+//            if (Math.abs(error) < tolerance) break;
+//
+//            turnPower = Kp * error + Kd * derivative;
+//
+//            // Enforce minimum power
+//            if (Math.abs(turnPower) < minPower) {
+//                turnPower = Math.signum(turnPower) * minPower;
+//            }
+//            // Clamp maximum power
+//            turnPower = Math.max(-maxPower, Math.min(maxPower, turnPower));
+//
+//            telemetry.addData("Target (deg)", "%.2f", targetAngle);
+//            telemetry.addData("Current (deg)", "%.2f", currentAngle);
+//            telemetry.addData("Error", "%.2f", error);
+//            telemetry.addData("Turn Power", "%.2f", turnPower);
+//            telemetry.update();
+//
+//            frontLeftDrive.setPower(-turnPower);
+//            backLeftDrive.setPower(-turnPower);
+//            frontRightDrive.setPower(turnPower);
+//            backRightDrive.setPower(turnPower);
+//        }
+//    }
 
     private void stopMotors() {
         frontLeftDrive.setPower(0);

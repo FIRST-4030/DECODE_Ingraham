@@ -185,13 +185,13 @@ public class MecanumAutoClosePinpoint extends LinearOpMode {
                 //turn(0.5, 1300);
                 turnTo(-135, 0.5);
                 //moveForward(-0.5, 1200);
-                moveX(-48, 0.5);
+                moveX(48, -0.5);
 
             } else {
                 //turn(-0.5, 1300);
                 turnTo(135, 0.5);
                 //moveForward(-0.5, 1200);
-                moveX(-48, 0.5);
+                moveX(48, -0.5);
             }
 
             if (limelight.getObelisk().equals("PGP")) {

@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -50,6 +51,7 @@ import org.firstinspires.ftc.teamcode.SensorGoBildaPinpoint;
 import org.firstinspires.ftc.teamcode.Shooter;
 import org.firstinspires.ftc.teamcode.Pinpoint;
 
+@Disabled
 @Autonomous(name="Mecanum Auto Close Pinpoint", group="Linear OpMode")
 public class MecanumAutoClosePinpoint extends LinearOpMode {
 

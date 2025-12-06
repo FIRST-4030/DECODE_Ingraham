@@ -102,10 +102,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         pinpoint.odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES,0));
-        // One calibration does not necessarily clear the hardware
-//        int i = 0;
-//        while (i < 10) {
-//            i++;
 
         limelight = new GoalTagLimelight();
         limelight.init(hardwareMap,telemetry);
@@ -122,7 +118,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
         do {
             pinpoint.odo.update();
             limelight.readObelisk(telemetry);
-            //GlobalStorage.setPattern(goalTag.getObelisk());
             GlobalStorage.setPattern(limelight.getObelisk());
 
             telemetry.addData("Pattern", limelight.getObelisk());
@@ -159,7 +154,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             telemetry.addData("Heading Scalar", pinpoint.odo.getYawScalar());
             telemetry.addData("Initial X", "%.2f", pinpoint.odo.getPosX(DistanceUnit.INCH));
             telemetry.addData("Initial Y", "%.2f", pinpoint.odo.getPosY(DistanceUnit.INCH));
-            telemetry.addData("Initial Heading (deg)", "%.1f", pose.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Initial Heading (deg) MAKE SURE ITS 0", "%.1f", pose.getHeading(AngleUnit.DEGREES));
             telemetry.addData("Status", pinpoint.odo.getDeviceStatus());
             telemetry.update();
         } while (opModeInInit());
@@ -170,46 +165,27 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             turnSign = 1;
         }
         runtime.reset();
-        //imu.resetYaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            resetRuntime();
-            while (runtime.seconds() < 0.25) {
-                limelight.setTeam(teamID);
-                limelight.process(telemetry);
-                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
-                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
-                telemetry.addData("Range", limelight.getRange());
-                telemetry.update();
-            }
-
+            limelight.setTeam(teamID);
+            sleep(startDelay*1000);
 
             collectorBack.setPower(collectorPower);
             collectorFront.setPower(collectorPower);
 
             launchFlapLeft.setPosition(0.3);
             launchFlapRight.setPosition(0.4);
-            sleep(startDelay*1000);
-
-
 
             moveX(2, 0.3);
 
-            if (teamID == 24) {
-                turnTo(-20, 0.25);
-            } else {
-                turnTo(20, 0.25);
-            }
+            turnTo(turnSign*20, 0.25);
 
-            fireVolleySorted();
+            if (!testingMode) {fireVolleySorted();}
+
             flipper.setPosition(0.525);
             moveX( 24,0.3);
-            if (teamID == 24) {
-                turnTo(-90, 0.25);
-            } else {
-                turnTo(90, 0.25);
-            }
+            turnTo(turnSign*90, 0.25);
 
             moveY( turnSign*15,0.3);
             sleep(500);
@@ -224,47 +200,29 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             sleep(500);
             moveY(turnSign*25,0.3);
             sleep(500);
-            moveY(turnSign*5, turnSign*-0.3);
+            moveY(turnSign*5, -0.3);
 
-
-            turnTo(turnSign*20,turnSign*-0.25);
+            turnTo(turnSign*20,-0.25);
 
             moveX(2,-0.3);
-            resetRuntime();
-            while (runtime.seconds() < 0.25) {
-                limelight.process(telemetry);
-                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
-                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
-            }
-            fireVolleySorted();
+            if (!testingMode){fireVolleySorted();}
             moveX(20,0.3);
 
             break;
         }
     }
-
-//    private void movePinpoint() {
-//        telemetry.addLine("Push your robot around to see it track");
-//        telemetry.addLine("Press A to reset the position");
-//        if(gamepad1.a){
-//            // You could use readings from April Tags here to give a new known position to the pinpoint
-//            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
-//        }
-//        pinpoint.update();
-//        Pose2D pose2D = pinpoint.getPosition();
-//
-//        telemetry.addData("X coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
-//        telemetry.addData("Y coordinate (IN)", pose2D.getY(DistanceUnit.INCH));
-//        telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
-//    }
-
-
     public void fireVolleySorted() {
+        runtime.reset();
+        while (runtime.seconds() < 0.1) {
+            limelight.process(telemetry);
+            velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
+            velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
+        }
         if (limelight.getObelisk().equals("PGP") && !testingMode) {
             fireShooterLeft(velLeft);
             fireShooterRight(velRight);
             flipper.setPosition(1);
-            sleep(100);
+            sleep(250);
             fireShooterLeft(velLeft);
         } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
             fireShooterRight(velRight);
@@ -314,17 +272,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
         launchFlapRight.setPosition(0.4);
         while (timer.seconds() < 1) {
             shooterRight.overridePower();
-        }
-    }
-    public void turnToAprilTagLimelight() {
-        if (limelight.getRange() < 100) {
-            turnTo(0.25, 0.5);
-        } else {
-            if (limelight.getID() == 20) {
-                turnTo(0.25, 2);
-            } else if (limelight.getID() == 24) {
-                turnTo(0.25, -2);
-            }
         }
     }
     private void turnTo(double t_angle, double power) {

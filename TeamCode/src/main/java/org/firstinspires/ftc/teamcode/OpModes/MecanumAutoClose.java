@@ -44,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.GoalTag;
 import org.firstinspires.ftc.teamcode.GoalTagLimelight;
@@ -54,10 +55,8 @@ import org.firstinspires.ftc.teamcode.Shooter;
 public class MecanumAutoClose extends LinearOpMode {
 
     // Declare OpMode members.
-    DcMotor frontLeftDrive;
-    DcMotor frontRightDrive;
-    DcMotor backLeftDrive;
-    DcMotor backRightDrive;
+
+    Chassis ch;
     Shooter shooterLeft;
     Shooter shooterRight;
     Servo launchFlapLeft;
@@ -89,29 +88,13 @@ public class MecanumAutoClose extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "leftFront");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "rightFront");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "leftBack");
-        backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
 
         flipper = hardwareMap.get(Servo.class, "flipper");
 
         shooterLeft = new Shooter(hardwareMap, "shooterLeft", true);
         shooterRight = new Shooter(hardwareMap, "shooterRight", false);
-        ///shooterLeft.initPower(currentPower);
-        // We set the left motors in reverse which is needed for drive trains where the left
-        // motors are opposite to the right ones.
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
-        // wires, you should remove these
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ch = new Chassis(hardwareMap);
 
         launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
 
@@ -119,12 +102,12 @@ public class MecanumAutoClose extends LinearOpMode {
 
 //        imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
-        RevHubOrientationOnRobot orientationOnRobot = new
-                RevHubOrientationOnRobot(logoDirection, usbDirection);
+//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
+//                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
+//                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+//        RevHubOrientationOnRobot orientationOnRobot = new
+//                RevHubOrientationOnRobot(logoDirection, usbDirection);
 //        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 //        goalTag = new GoalTag();
@@ -173,6 +156,8 @@ public class MecanumAutoClose extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            launchFlapLeft.setPosition(0.3);
+            launchFlapRight.setPosition(0.4);
             if (teamID == 24) {
                 limelight.setTeam(24);
             } else if (teamID == 20) {
@@ -180,40 +165,16 @@ public class MecanumAutoClose extends LinearOpMode {
             }
             sleep(startDelay*1000);
             if (limelight.getID() == 24) {
-                turn(0.5, 1300);
+                ch.turn(0.5, 1300);
                 //moveForward(-0.5, 1600);
-                moveForward(-0.5, 1200);
+                ch.moveForward(-0.5, 1200);
             } else {
-                turn(-0.5, 1300);
-                moveForward(-0.5, 1200);
+                ch.turn(-0.5, 1300);
+                ch.moveForward(-0.5, 1200);
             }
 
-            if (limelight.getObelisk().equals("PGP")) {
-                fireShooterLeft(27);
-                fireShooterRight(28);
-                flipper.setPosition(1);
-                sleep(100);
-                flipper.setPosition(0);
-                fireShooterLeft(27);
-            } else if (limelight.getObelisk().equals("GPP")) {
-                fireShooterRight(28);
-                fireShooterLeft(27);
-                flipper.setPosition(1);
-                sleep(100);
-                flipper.setPosition(0);
-                fireShooterLeft(27);
-            } else if (limelight.getObelisk().equals("PPG")) {
-                fireShooterLeft(27);
-                sleep(100);
-                flipper.setPosition(1);
-                sleep(100);
-                flipper.setPosition(0);
-                fireShooterLeft(27);
-                fireShooterRight( 28);
-            } else {
-                fireShooterLeft(27);
-                fireShooterRight(28);
-            }
+            fireVolleySorted();
+
             flipper.setPosition(0.525);
             shooterLeft.targetVelocity = 0;
             shooterRight.targetVelocity = 0;
@@ -225,22 +186,22 @@ public class MecanumAutoClose extends LinearOpMode {
             {
               // moveForward(-0.5,1000);
                //600
-               turn(0.5,1200);
+               ch.turn(0.5,1200);
                //800
                 //1300
-               moveForward(0.5, 1000);
+               ch.moveForward(0.5, 1000);
                //900
             }
             else {
                 //moveForward(-0.5, 1000);
                 //600
-                turn(-0.5, 1200);
+                ch.turn(-0.5, 1200);
                 //pw
                 //-0.5
                 //ms
                 //800
                 //1300
-                moveForward(0.5, 1000);
+                ch.moveForward(0.5, 1000);
                 //900
             }
             break;
@@ -248,6 +209,35 @@ public class MecanumAutoClose extends LinearOpMode {
         }
     }
 
+    public void fireVolleySorted() {
+        runtime.reset();
+        int velLeft = 27;
+        int velRight = 28;
+        //while (runtime.seconds() < 0.1) {
+//            limelight.process(telemetry);
+//            velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
+//            velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
+//        }
+        if (limelight.getObelisk().equals("PGP")) {
+            fireShooterLeft(velLeft);
+            fireShooterRight(velRight);
+            flipper.setPosition(1);
+            sleep(250);
+            fireShooterLeft(velLeft);
+        } else if (limelight.getObelisk().equals("GPP")) {
+            fireShooterRight(velRight);
+            fireShooterLeft(velLeft);
+            flipper.setPosition(1);
+            sleep(500);
+            fireShooterLeft(velLeft);
+        } else if (limelight.getObelisk().equals("PPG")) {
+            fireShooterLeft(velLeft);
+            sleep(250);
+            flipper.setPosition(1);
+            fireShooterLeft(velLeft);
+            fireShooterRight(velRight);
+        }
+    }
     private void movePinpoint() {
         telemetry.addLine("Push your robot around to see it track");
         telemetry.addLine("Press A to reset the position");
@@ -263,32 +253,20 @@ public class MecanumAutoClose extends LinearOpMode {
         telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
     }
 
-    private void moveForward(double power, double mseconds){
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
+//    private void moveForward(double power, double mseconds){
+//        ElapsedTime timer = new ElapsedTime();
+//        timer.reset();
+//
+//        while (timer.milliseconds() < mseconds) {
+//            frontLeftDrive.setPower(power);
+//            backLeftDrive.setPower(power);
+//            frontRightDrive.setPower(power);
+//            backRightDrive.setPower(power);
+//        }
+//
+//        stopMotors();
+//    }
 
-        while (timer.milliseconds() < mseconds) {
-            frontLeftDrive.setPower(power);
-            backLeftDrive.setPower(power);
-            frontRightDrive.setPower(power);
-            backRightDrive.setPower(power);
-        }
-
-        stopMotors();
-    }
-    private void turn(double power, double mseconds){
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
-
-        while (timer.milliseconds() < mseconds) {
-            frontLeftDrive.setPower(power);
-            backLeftDrive.setPower(power);
-            frontRightDrive.setPower(-power);
-            backRightDrive.setPower(-power);
-        }
-
-        stopMotors();
-    }
 
 //    private void rotateTo(double targetAngle) {
 //        double Kp = 0.03;  // Proportional gain (tune this)
@@ -339,12 +317,7 @@ public class MecanumAutoClose extends LinearOpMode {
 //        }
 //    }
 
-    private void stopMotors() {
-        frontLeftDrive.setPower(0);
-        backLeftDrive.setPower(0);
-        frontRightDrive.setPower(0);
-        backRightDrive.setPower(0);
-    }
+
 
     public void fireShooterLeft(double velocity) {
         shooting = true;

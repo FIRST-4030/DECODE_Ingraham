@@ -92,7 +92,7 @@ public class MecanumAutoClosePinpoint extends LinearOpMode {
     private int teamID;
 
     // This declares the IMU needed to get the current direction the robot is facing
-    IMU imu;
+    //IMU imu;
 
 
 
@@ -128,7 +128,7 @@ public class MecanumAutoClosePinpoint extends LinearOpMode {
 
         launchFlapRight = hardwareMap.get(Servo.class, "launchFlapRight");
 
-        imu = hardwareMap.get(IMU.class, "imu");
+        //imu = hardwareMap.get(IMU.class, "imu");
         // This needs to be changed to match the orientation on your robot
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
@@ -136,7 +136,7 @@ public class MecanumAutoClosePinpoint extends LinearOpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
         RevHubOrientationOnRobot orientationOnRobot = new
                 RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        //imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 //        goalTag = new GoalTag();
 //        goalTag.init(hardwareMap);
@@ -185,7 +185,7 @@ public class MecanumAutoClosePinpoint extends LinearOpMode {
         } while (opModeInInit());
 
         runtime.reset();
-        imu.resetYaw();
+        //imu.resetYaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {

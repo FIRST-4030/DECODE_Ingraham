@@ -76,7 +76,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
     private boolean testingMode = false;
 
     private boolean shooting = false;
-    private double collectorPower = 0.5;
+    private double collectorPower = 0.53;
     private static double turnOffset = 3.8;
 
     @Override
@@ -213,23 +213,29 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 
             moveY( turnSign*15,0.3);
             sleep(500);
-            flipper.setPosition(1);
+            flipper.setPosition(0);
             sleep(250);
             flipper.setPosition(0.525);
             moveY(turnSign*20, 0.3);
             sleep(500);
-            flipper.setPosition(0);
+            flipper.setPosition(1);
             sleep(250);
             flipper.setPosition(0.525);
             sleep(500);
             moveY(turnSign*25,0.3);
             sleep(500);
-            moveY(0, turnSign*0.3);
+            moveY(turnSign*5, turnSign*-0.3);
 
 
-            turnTo(turnSign*20,turnSign*0.25);
+            turnTo(turnSign*20,turnSign*-0.25);
 
             moveX(2,-0.3);
+            resetRuntime();
+            while (runtime.seconds() < 0.25) {
+                limelight.process(telemetry);
+                velLeft = (limelight.getRange() + 202.17 - 10) / 8.92124;
+                velRight = (limelight.getRange() + 202.17 - 10) / 8.92124;
+            }
             fireVolleySorted();
             moveX(20,0.3);
 
@@ -264,13 +270,12 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             fireShooterRight(velRight);
             fireShooterLeft(velLeft);
             flipper.setPosition(1);
-            sleep(100);
+            sleep(500);
             fireShooterLeft(velLeft);
         } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
             fireShooterLeft(velLeft);
-            sleep(100);
+            sleep(250);
             flipper.setPosition(1);
-            sleep(100);
             fireShooterLeft(velLeft);
             fireShooterRight(velRight);
         }

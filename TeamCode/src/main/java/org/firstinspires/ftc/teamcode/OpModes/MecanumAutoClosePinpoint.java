@@ -98,31 +98,14 @@ public class MecanumAutoClosePinpoint extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "leftFront");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "rightFront");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "leftBack");
-        backRightDrive = hardwareMap.get(DcMotor.class, "rightBack");
-
         pinpoint = new Pinpoint(hardwareMap,ch,telemetry,false);
 
         flipper = hardwareMap.get(Servo.class, "flipper");
 
         shooterLeft = new Shooter(hardwareMap, "shooterLeft", true);
         shooterRight = new Shooter(hardwareMap, "shooterRight", false);
-        ///shooterLeft.initPower(currentPower);
-        // We set the left motors in reverse which is needed for drive trains where the left
-        // motors are opposite to the right ones.
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        // This uses RUN_USING_ENCODER to be more accurate.   If you don't have the encoder
-        // wires, you should remove these
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ch = new Chassis(hardwareMap);
 
         launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
 

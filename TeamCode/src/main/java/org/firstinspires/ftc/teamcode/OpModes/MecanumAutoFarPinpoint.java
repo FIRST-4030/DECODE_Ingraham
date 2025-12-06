@@ -112,7 +112,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 
         pinpoint.odo.resetPosAndIMU();
         pinpoint.odo.recalibrateIMU();
-        pinpoint.odo.update();
 
         Pose2D pose = pinpoint.odo.getPosition();
 
@@ -121,6 +120,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 
 
         do {
+            pinpoint.odo.update();
             limelight.readObelisk(telemetry);
             //GlobalStorage.setPattern(goalTag.getObelisk());
             GlobalStorage.setPattern(limelight.getObelisk());
@@ -185,62 +185,53 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             }
 
 
-            collectorBack.setPower(0.6);
-            collectorFront.setPower(0.6);
+            collectorBack.setPower(collectorPower);
+            collectorFront.setPower(collectorPower);
 
             launchFlapLeft.setPosition(0.3);
             launchFlapRight.setPosition(0.4);
             sleep(startDelay*1000);
 
 
-            sleep(500);
+
             moveX(2, 0.3);
-            sleep(500);
+
             if (teamID == 24) {
-                turnTo(-20, 0.3);
+                turnTo(-20, 0.25);
             } else {
-                turnTo(20, 0.3);
+                turnTo(20, 0.25);
             }
 
             fireVolleySorted();
             flipper.setPosition(0.525);
-            sleep(500);
             moveX( 24,0.3);
-            sleep(500);
             if (teamID == 24) {
-                turnTo(-90, 0.3);
+                turnTo(-90, 0.25);
             } else {
-                turnTo(90, 0.3);
+                turnTo(90, 0.25);
             }
 
-            sleep(500);
-            moveY( -12,0.3);
+            moveY( -15,0.3);
             sleep(500);
             flipper.setPosition(1);
             sleep(250);
             flipper.setPosition(0.525);
-            moveY(-17, 0.3);
+            moveY(-20, 0.3);
             sleep(500);
             flipper.setPosition(0);
             sleep(250);
             flipper.setPosition(0.525);
             sleep(500);
-            moveY(-22,0.3);
+            moveY(-25,0.3);
             sleep(500);
             moveY(0, -0.3);
-            sleep(500);
 
-            if (teamID == 24) {
-                turnTo(-20,0.3);
-            } else {
-                turnTo(20,0.3);
-            }
 
-            sleep(500);
-            moveX(-26,-0.3);
+            turnTo(turnSign*20,turnSign*0.25);
+
+            moveX(2,-0.3);
             fireVolleySorted();
-            sleep(500);
-            moveX(5,0.3);
+            moveX(20,0.3);
 
             break;
         }

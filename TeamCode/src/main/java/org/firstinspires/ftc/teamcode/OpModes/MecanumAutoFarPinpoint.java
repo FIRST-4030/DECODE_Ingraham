@@ -62,21 +62,14 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
     Servo flipper;
     Chassis ch;
     Pinpoint pinpoint;
-    private double velLeft = 35;
-    private double velRight = 34;
+    private double velLeft = 0;
+    private double velRight = 0;
 
     private double currentX;
+    private double currentY;
     private double currentAngle;
+    private int turnSign;
     ElapsedTime runtime = new ElapsedTime();
-    public static int decimation = 3;
-    public static double power = 0.7;
-    private double lastError = 0;
-    private double kP = 0.14;
-    double yawImu;
-
-    YawPitchRollAngles orientation;
-
-    //GoalTag goalTag;
     GoalTagLimelight limelight;
     private int startDelay = 0;
     private int teamID;
@@ -85,12 +78,6 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
     private boolean shooting = false;
     private double collectorPower = 0.5;
     private static double turnOffset = 3.8;
-
-    // This declares the IMU needed to get the current direction the robot is facing
-    //IMU imu;
-
-//    SensorGoBildaPinpoint pinpointc;
-//    GoBildaPinpointDriver pinpoint;
 
     @Override
     public void runOpMode() {
@@ -114,40 +101,20 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
         pinpoint.setEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
-        Pose2D pose = pinpoint.odo.getPosition();
-
         pinpoint.odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES,0));
         // One calibration does not necessarily clear the hardware
 //        int i = 0;
 //        while (i < 10) {
 //            i++;
 
+        limelight = new GoalTagLimelight();
+        limelight.init(hardwareMap,telemetry);
+
         pinpoint.odo.recalibrateIMU();
         pinpoint.odo.resetPosAndIMU();
         pinpoint.odo.update();
 
-        telemetry.addData("Heading Scalar", pinpoint.odo.getYawScalar());
-        telemetry.addData("Initial X", "%.2f", pinpoint.odo.getPosX(DistanceUnit.INCH));
-        telemetry.addData("Initial Y", "%.2f", pinpoint.odo.getPosY(DistanceUnit.INCH));
-        telemetry.addData("Initial Heading (deg)", "%.1f", pose.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Status", pinpoint.odo.getDeviceStatus());
-        telemetry.update();
-        //}
-//        imu = hardwareMap.get(IMU.class, "imu");
-//        // This needs to be changed to match the orientation on your robot
-//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-//                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-//                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
-//        RevHubOrientationOnRobot orientationOnRobot = new
-//                RevHubOrientationOnRobot(logoDirection, usbDirection);
-//        imu.initialize(new IMU.Parameters(orientationOnRobot));
-
-//        goalTag = new GoalTag();
-//        goalTag.init(hardwareMap);
-        limelight = new GoalTagLimelight();
-        limelight.init(hardwareMap,telemetry);
-
+        Pose2D pose = pinpoint.odo.getPosition();
 
         GlobalStorage.setPattern(null);
         GlobalStorage.setAlliance(-1);
@@ -188,8 +155,20 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             } else if (gamepad2.aWasPressed()) {
                 collectorPower -= 0.05;
             }
+
+            telemetry.addData("Heading Scalar", pinpoint.odo.getYawScalar());
+            telemetry.addData("Initial X", "%.2f", pinpoint.odo.getPosX(DistanceUnit.INCH));
+            telemetry.addData("Initial Y", "%.2f", pinpoint.odo.getPosY(DistanceUnit.INCH));
+            telemetry.addData("Initial Heading (deg)", "%.1f", pose.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Status", pinpoint.odo.getDeviceStatus());
+            telemetry.update();
         } while (opModeInInit());
 
+        if (teamID == 24) {
+            turnSign = -1;
+        } else {
+            turnSign = 1;
+        }
         runtime.reset();
         //imu.resetYaw();
 
@@ -214,67 +193,55 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             sleep(startDelay*1000);
 
 
-            pinpoint.odo.resetPosAndIMU();
             sleep(500);
-            moveForward(2, 0.3);
+            moveX(2, 0.3);
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
             if (teamID == 24) {
-                turnTo(-20/turnOffset, 0.3);
+                turnTo(-20, 0.3);
             } else {
-                turnTo(20/turnOffset, 0.3);
+                turnTo(20, 0.3);
             }
 
             fireVolleySorted();
             flipper.setPosition(0.525);
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
-            //turnTo(20/turnOffset, 0.3);
-            //sleep(500);
-            //pinpoint.odo.resetPosAndIMU();
-            moveForward( 26,0.3);
+            moveX( 24,0.3);
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
             if (teamID == 24) {
-                turnTo(-80/turnOffset, 0.3);
+                turnTo(-90, 0.3);
             } else {
-                turnTo(80/turnOffset, 0.3);
+                turnTo(90, 0.3);
             }
 
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
-            moveForward( 12,0.3);
+            moveY( 12,0.3);
             sleep(500);
             flipper.setPosition(1);
             sleep(250);
             flipper.setPosition(0.525);
-            pinpoint.odo.resetPosAndIMU();
-            moveForward(5, 0.3);
+            moveY(17, 0.3);
             sleep(500);
             flipper.setPosition(0);
             sleep(250);
             flipper.setPosition(0.525);
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
-            moveForward(5,0.3);
+            moveY(22,0.3);
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
-            moveForward(-22, -0.3);
+            moveY(0, -0.3);
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
+
             if (teamID == 24) {
-                turnTo(80/turnOffset,0.3);
+                turnTo(-20,0.3);
             } else {
-                turnTo(-80/turnOffset,0.3);
+                turnTo(20,0.3);
             }
 
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
-            moveForward(-26,-0.3);
+            moveX(-26,-0.3);
             fireVolleySorted();
             sleep(500);
-            pinpoint.odo.resetPosAndIMU();
-            moveForward(5,0.3);
+            moveX(5,0.3);
+
             break;
         }
     }
@@ -389,7 +356,7 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
 
         }
     }
-    private void moveForward(double inches, double power) {
+    private void moveX (double inches, double power) {
         while (true) {
             pinpoint.odo.update();
             Pose2D pose = pinpoint.odo.getPosition();
@@ -398,6 +365,26 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             double error = inches-currentX;
 
             telemetry.addData("x",currentX);
+            telemetry.addData("target inches",inches);
+            telemetry.addData("error", error);
+            telemetry.update();
+            if (Math.abs(error) < 0.25) {
+                ch.stopMotors();
+                break;
+            }
+            ch.moveAllMotors(power,power,power,power);
+
+        }
+    }
+    private void moveY (double inches, double power) {
+        while (true) {
+            pinpoint.odo.update();
+            Pose2D pose = pinpoint.odo.getPosition();
+            currentY = pose.getY(DistanceUnit.INCH);
+
+            double error = inches-currentY;
+
+            telemetry.addData("y",currentY);
             telemetry.addData("target inches",inches);
             telemetry.addData("error", error);
             telemetry.update();

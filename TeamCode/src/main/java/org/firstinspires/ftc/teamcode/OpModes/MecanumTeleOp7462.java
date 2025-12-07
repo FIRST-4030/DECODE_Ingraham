@@ -360,17 +360,6 @@ public class MecanumTeleOp7462 extends OpMode {
 //            }
         }
     }
-    GoalTag goalTag;
-    public void turnToAprilTag() {
-        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
-            if (goalTag.getBearing() > 0.6) { // rotate left
-                moveAllMotors(-0.5, 0.5, -0.5, 0.5);
-            } else if (goalTag.getBearing() < -0.6) { // rotate right
-                moveAllMotors(0.5, -0.5, 0.5, -0.5);
-
-            }
-        }
-    }
     // Thanks to FTC16072 for sharing this code!!
     public void drive(double forward, double right, double rotate) {
         // This calculates the power needed for each wheel based on the amount of forward,

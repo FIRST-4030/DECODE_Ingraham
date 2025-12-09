@@ -222,18 +222,20 @@ public class MecanumAutoFarPinpoint extends LinearOpMode {
             fireShooterLeft(velLeft);
             fireShooterRight(velRight);
             flipper.setPosition(1);
-            sleep(250);
+            sleep(1000);
             fireShooterLeft(velLeft);
         } else if (limelight.getObelisk().equals("GPP") && !testingMode) {
             fireShooterRight(velRight);
             fireShooterLeft(velLeft);
+            sleep(1000);
             flipper.setPosition(1);
-            sleep(500);
+            sleep(1000);
             fireShooterLeft(velLeft);
         } else if (limelight.getObelisk().equals("PPG") && !testingMode) {
             fireShooterLeft(velLeft);
             sleep(250);
             flipper.setPosition(1);
+            sleep(1000);
             fireShooterLeft(velLeft);
             fireShooterRight(velRight);
         }

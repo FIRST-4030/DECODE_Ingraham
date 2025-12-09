@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OldStuff;
 
 /* Copyright (c) 2024 Dryw Wade. All rights reserved.
  *
@@ -31,11 +31,10 @@ package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -67,8 +66,9 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-
-public class ConceptAprilTagLocalization_7462class {
+@TeleOp(name = "J7462 Concept: AprilTag Localization", group = "Concept")
+@Disabled
+public class ConceptAprilTagLocalization_7462 extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
@@ -109,25 +109,47 @@ public class ConceptAprilTagLocalization_7462class {
     /**
      * The variable to store our instance of the vision portal.
      */
-    public VisionPortal visionPortal;
+    private VisionPortal visionPortal;
 
-    private Telemetry telemetry;
+    @Override
+    public void runOpMode() {
 
+        initAprilTag();
 
-    public void runAprilTag() {
-        telemetryAprilTag();
-    } // end method runAprilTag()
+        // Wait for the DS start button to be touched.
+        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+        telemetry.addData(">", "Touch START to start OpMode");
+        telemetry.update();
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            telemetryAprilTag();
+
+            // Push telemetry to the Driver Station.
+            telemetry.update();
+
+            // Save CPU resources; can resume streaming when needed.
+            if (gamepad1.dpad_down) {
+                visionPortal.stopStreaming();
+            } else if (gamepad1.dpad_up) {
+                visionPortal.resumeStreaming();
+            }
+
+            // Share the CPU.
+            sleep(20);
+        }
 
         // Save more CPU resources when camera is no longer needed.
-        //visionPortal.close();
+        visionPortal.close();
 
+    }   // end method runOpMode()
 
     /**
      * Initialize the AprilTag processor.
      */
-    public void initAprilTag(HardwareMap hardwareMap, Telemetry tele) {
+    private void initAprilTag() {
 
-        telemetry = tele;
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
 

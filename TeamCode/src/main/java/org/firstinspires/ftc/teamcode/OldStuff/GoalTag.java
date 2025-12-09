@@ -1,12 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OldStuff;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -14,26 +10,25 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+
 import java.util.List;
-
-//@TeleOp(name = "BotLoc")
-//@Disabled
-
-/*
-
- */
-
-public class BotLoc {
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+public class GoalTag {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
+    private double goalRange; // inches
+    public int targetAprilTagID;
+    private double goalBearing; // radians
+
+
+    public boolean GPP = false; // id 21
+    public boolean PGP = false; // id 22
+    public boolean PPG = false; // id 23
+    public boolean isDataCurrent;
 
     private double BotX; // inches
 
-    private double BotY; // radians
-    private int goalTagID;
-    public void init(int passedGoalTagID) {
-        goalTagID = passedGoalTagID;
+    private double BotY;
+    public void init(HardwareMap hardwareMap) {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
@@ -66,13 +61,6 @@ public class BotLoc {
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-
         // Choose a camera resolution. Not all cameras support all resolutions.
         //builder.setCameraResolution(new Size(640, 480));
 
@@ -86,6 +74,7 @@ public class BotLoc {
         // If set "true", monitor shows solid orange screen if no processors enabled.
         // If set "false", monitor shows camera view without annotations.
         //builder.setAutoStopLiveView(false);
+        builder.setCamera(hardwareMap.get(WebcamName.class,"Webcam 1"));
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
@@ -94,30 +83,107 @@ public class BotLoc {
         visionPortal = builder.build();
 
         // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
+        visionPortal.setProcessorEnabled(aprilTag, true);
 
     }   // end method initAprilTag()
     public void process() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-
+        if (currentDetections.isEmpty()) {
+            isDataCurrent = false;
+        }
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null && detection.id == goalTagID) {
-                BotX = detection.robotPose.getPosition().x;
-                BotY = detection.robotPose.getPosition().y;
-                /*
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
-                        getBotX(),
-                        getBotY()
-                        ));
-                 */
-
+            if (detection.metadata != null) {
+                if (detection.id == targetAprilTagID) {
+                    isDataCurrent = true;
+                    goalRange = detection.ftcPose.range;
+                    goalBearing = detection.ftcPose.bearing;
+                    BotX = detection.robotPose.getPosition().x;
+                    BotY = detection.robotPose.getPosition().y;
+                } else {
+                    isDataCurrent = false;
+                }
+            } else {
+                isDataCurrent = false;
             }
         }
     }
+    // Move to auto
+    public void initProcess() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == 21) {
+                    GPP = true;
+                    PGP = false;
+                    PPG = false;
+                } else if (detection.id == 22) {
+                    PGP = true;
+                    GPP = false;
+                    PPG = false;
+                } else if (detection.id == 23) {
+                    PPG = true;
+                    GPP = false;
+                    PGP = false;
+                }
+                // Move to Auto
+                // starting apriltag is the one to aim at
+                if (detection.id == 24) {
+                    targetAprilTagID = 24;
+                } else if (detection.id == 20) {
+                    targetAprilTagID = 20;
+                }
+            }
+        }
+    }
+    public void initProcessNoGoal() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == 21) {
+                    GPP = true;
+                    PGP = false;
+                    PPG = false;
+                } else if (detection.id == 22) {
+                    PGP = true;
+                    GPP = false;
+                    PPG = false;
+                } else if (detection.id == 23) {
+                    PPG = true;
+                    GPP = false;
+                    PGP = false;
+                }
+            }
+        }
+    }
+
+    public double getRange() {
+        return goalRange;
+    }
+
+    public double getBearing() {
+        return goalBearing;
+    }
+    public String getObelisk() {
+        if (PGP) {
+            return "PGP";
+        } else if (GPP) {
+            return "GPP";
+        } else if (PPG) {
+            return "PPG";
+        } else {
+            return "No Tag Detected";
+        }
+    }
+
     public double getBotX() { return BotX; }
 
     public double getBotY() {
         return BotY;
+    }
+    public int getGoalTagID() {
+        return targetAprilTagID;
     }
 }

@@ -1,36 +1,42 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OldStuff;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Datalogger;
 
+/*
+ * Created by Tom on 9/26/17.  Updated 9/24/2021 for PIDF.
+ *  This OpMode uses the extended/enhanced PIDF-related functions of the DcMotorEx class.
+ */
+
 /**
- * This OpMode runs a flywheel shooter motor using a custom feedforward + feedback controller.
- * It also does Datalogging, to review the performance of the shooter.
+ * This OpMode uses the extended/enhanced PIDF-related functions of the DcMotorEx class.
+ * It also does Datalogging, to review the performance of the motor.
  */
 @Disabled
-@TeleOp(name="ShooterController")
-public class ShooterController extends LinearOpMode {
+@TeleOp(name="PIDF_example")
+public class PIDF_Example extends LinearOpMode {
 
     // our DC motor
     DcMotorEx shooter;
 
-    // Feedforward term is Kvelo (velocity term)
-    //    Tune the Kvelo term first.
-    public static final double Kvelo = 0.0243; // power multiplier for rotations per second
-    // FeedBack term is Kp (proportional term)
-    //   Set Kp to zero when tuning the Kvelo term!!
-    public static final double Kp = 0.3;  // no gain in improvement when increasing beyond this
+    public static final double NEW_P = 150; // default is 10.0
+    public static final double NEW_I = 0; // default is 3.0
+    public static final double NEW_D = 0; // default is 0.0
+    public static final double NEW_F = 15; // default is 0.0
 
     static final double   COUNTS_PER_REV = 28 ;  // REV HD Hex 1:1 Motor Encoder
 
-    private double targetVelocity = 10;  // rotations per second (max is ~40)
+    private double targetVelocity = 30;  // rotations per second (max is 60)
+    private DigitalChannel redLED;
+    private DigitalChannel greenLED;
 
     Datalog datalog; // create the data logger object
 
@@ -44,13 +50,41 @@ public class ShooterController extends LinearOpMode {
         shooter = (DcMotorEx) hardwareMap.get(DcMotor.class, "shooter");
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);  // WITH OUT!
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Get the LED colors from the hardwaremap
+        redLED = hardwareMap.get(DigitalChannel.class, "red");
+        greenLED = hardwareMap.get(DigitalChannel.class, "green");
 
         // Initialize the datalog
-        datalog = new Datalog("ShooterLog10_19");
+        datalog = new Datalog("ShooterLog");
+
+        // change LED mode from input to output
+        redLED.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLED.setMode(DigitalChannel.Mode.OUTPUT);
+
+        greenLED.setState(false);
+        redLED.setState(true);
 
         // wait for start command
         waitForStart();
+
+        // Get the PIDF coefficients for the RUN_USING_ENCODER RunMode.
+        PIDFCoefficients pidfOrig = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Change coefficients using methods included with DcMotorEx class.
+        PIDFCoefficients pidfNew = new PIDFCoefficients(NEW_P, NEW_I, NEW_D, NEW_F);
+        shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfNew);
+
+        // Re-read coefficients and verify change.
+        PIDFCoefficients pidfModified = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Not sure if setVelocity is working properly
+        // angular rate in counts (ticks) per second
+        shooter.setVelocity(targetVelocity*COUNTS_PER_REV);
+
+        // setPower is required, in addition to setVelocity
+        shooter.setPower(targetVelocity/55); // max speed is about 55 RPS (empirically determined)
 
         runtime.reset(); // reset the clock
 
@@ -59,21 +93,23 @@ public class ShooterController extends LinearOpMode {
 
             i++;
 
-            if (gamepad1.xWasPressed()) targetVelocity += 5; // closed value (0.98 for blocks)
-            if (gamepad1.bWasPressed()) targetVelocity -= 5; // open value (WAS 0.35)
-
             double currentVelocity = shooter.getVelocity(AngleUnit.DEGREES)/COUNTS_PER_REV;
 
-            double veloError = targetVelocity - currentVelocity;
+            // Change LEDs based on shooter velocity being in the "good" band
+            if (currentVelocity > 0.9*targetVelocity && currentVelocity < 1.1*targetVelocity) {
+                greenLED.setState(true);
+                redLED.setState(false);
+            } else {
+                greenLED.setState(false);
+                redLED.setState(true);
+            }
 
-            // CONTROLLER:  feedfoward = Kvelo + feedback = Kpos
-            double setPower = targetVelocity * Kvelo  + veloError * Kp;
-
-            shooter.setPower(setPower);
-
-            telemetry.addData("shooter Velocity Target X and B", targetVelocity);
-            telemetry.addData("shooter Velocity Actual", currentVelocity);
-            telemetry.addData("setPower value", setPower);
+            telemetry.addData("Runtime (sec)", "%.01f", getRuntime());
+            telemetry.addData("P,I,D,F (orig)", "%.04f, %.04f, %.04f, %.04f",
+                    pidfOrig.p, pidfOrig.i, pidfOrig.d, pidfOrig.f);
+            telemetry.addData("P,I,D,F (modified)", "%.04f, %.04f, %.04f, %.04f",
+                    pidfModified.p, pidfModified.i, pidfModified.d, pidfModified.f);
+            telemetry.addData("shooterVelocity", currentVelocity);
 
             telemetry.update();
 
@@ -82,8 +118,6 @@ public class ShooterController extends LinearOpMode {
             // does *not* matter! Order is configured inside the Datalog class constructor.
             datalog.loopCounter.set(i);
             datalog.runTime.set(runtime.seconds());
-            datalog.setPower.set(setPower);
-            datalog.posError.set(veloError);
             datalog.shooterVelocity.set(currentVelocity);
             datalog.targetVelocity.set(targetVelocity);
             datalog.writeLine();
@@ -101,9 +135,7 @@ public static class Datalog {
     // Note that order here is NOT important. The order is important in the setFields() call below
     public Datalogger.GenericField loopCounter = new Datalogger.GenericField("LoopCounter");
     public Datalogger.GenericField runTime = new Datalogger.GenericField("RunTime");
-    public Datalogger.GenericField setPower = new Datalogger.GenericField("setPower");
-    public Datalogger.GenericField posError = new Datalogger.GenericField("posError");
-
+    public Datalogger.GenericField deltaTime = new Datalogger.GenericField("deltaTime");
     public Datalogger.GenericField shooterVelocity = new Datalogger.GenericField("shooterVelocity");
     public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("targetVelocity");
 
@@ -123,8 +155,7 @@ public static class Datalog {
                 .setFields(
                         loopCounter,
                         runTime,
-                        setPower,
-                        posError,
+                        deltaTime,
                         shooterVelocity,
                         targetVelocity
                 )

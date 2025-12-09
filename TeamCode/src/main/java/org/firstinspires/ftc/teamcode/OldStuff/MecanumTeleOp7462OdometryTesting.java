@@ -26,7 +26,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.OldStuff;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -37,8 +37,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Datalogger;
-import org.firstinspires.ftc.teamcode.GoalTag;
+import org.firstinspires.ftc.teamcode.GlobalStorage;
+import org.firstinspires.ftc.teamcode.GoalTagLimelight;
 import org.firstinspires.ftc.teamcode.Shooter;
 
 /*
@@ -56,9 +56,10 @@ import org.firstinspires.ftc.teamcode.Shooter;
  *
  */
 @Disabled
-@TeleOp(name = "TUNING Mecanum TeleOp 7462", group = "Robot")
+@TeleOp(name = "Mecanum TeleOp 7462 Odometry", group = "Robot")
 //@Disabled //comment this out when ready to add to android phone
-public class TuningMecanumTeleOp7462 extends OpMode {
+public class MecanumTeleOp7462OdometryTesting extends OpMode {
+    GoalTagLimelight limelight;
     // This declares the four motors needed
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
@@ -72,16 +73,28 @@ public class TuningMecanumTeleOp7462 extends OpMode {
 
     Servo launchFlapLeft;
     Servo launchFlapRight;
-    GoalTag goalTag;
+    Servo flipper;
+    //GoalTag goalTag;
 
     // Timers
     ElapsedTime timerLeft = new ElapsedTime();
     ElapsedTime timerRight = new ElapsedTime();
-
-    Datalog tuningLog;
+    ElapsedTime timerFlipper = new ElapsedTime();
 
     // Just for tuning
     private double Kvelo;
+    private double idlePower = 20;
+    private double lastError = 0;
+    private double frontVel = 15;
+    private double backVel = 15;
+    private double kP = 0.14;
+    private double kD = 0.038;
+    private boolean leftIsRunning;
+    private boolean rightIsRunning;
+    private boolean emergencyMode = false;
+    private double maxPower = 1.0;
+    private double maxSpeed = 1.0;
+    private double collectorPower = 0.5;
 
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
@@ -97,6 +110,7 @@ public class TuningMecanumTeleOp7462 extends OpMode {
 
         launchFlapLeft = hardwareMap.get(Servo.class, "launchFlapLeft");
         launchFlapRight = hardwareMap.get(Servo.class, "launchFlapRight");
+        flipper = hardwareMap.get(Servo.class, "flipper");
 
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
@@ -130,28 +144,36 @@ public class TuningMecanumTeleOp7462 extends OpMode {
         //because the logo or the usb could be facing up/down or right/left depending on how
         //they could fit the control hub on the robot
 
-        goalTag = new GoalTag();
-        goalTag.init(hardwareMap);
+//        goalTag = new GoalTag();
+//        goalTag.init(hardwareMap);
 
-        collectorFront = new Shooter(hardwareMap,"collectorFront", true);
-        collectorFront.setControllerValues(0.3,0.0243);
-        collectorFront.targetVelocity = 0;
+        collectorFront = new Shooter(hardwareMap,"collectorFront", false);
+        //collectorFront.setControllerValues(0.3,0.0243);
+        //collectorFront.targetVelocity = frontVel;
 
-        collectorBack = new Shooter(hardwareMap,"collectorBack", true);
-        collectorBack.setControllerValues(0.3,0.0243);
-        collectorBack.targetVelocity = 0;
+        collectorBack = new Shooter(hardwareMap,"collectorBack", false);
+//        collectorBack.setControllerValues(0.3,0.0243);
+//        collectorBack.targetVelocity = backVel;
 
-        shooterLeft = new Shooter(hardwareMap,"shooterLeft", false);
+        shooterLeft = new Shooter(hardwareMap,"shooterLeft", true);
         shooterLeft.setControllerValues(0.3,0.0243);
-        shooterLeft.targetVelocity = 20;
 
-        shooterRight = new Shooter(hardwareMap,"shooterRight", true);
+        shooterRight = new Shooter(hardwareMap,"shooterRight", false);
         shooterRight.setControllerValues(0.3,0.0243);
 
+        limelight = new GoalTagLimelight();
+        limelight.init(hardwareMap, telemetry);
+
+        if ((GlobalStorage.getAlliance() != -1)) {
+            //goalTag.targetAprilTagID = GlobalStorage.getAlliance();
+            limelight.setTeam(GlobalStorage.getAlliance());
+        }
         timerLeft.reset();
         timerRight.reset();
+        timerFlipper.reset();
 
-        tuningLog = new Datalog("TuningLog");
+
+
 
     }
     public void moveAllMotors(double frontleftpower, double frontrightpower, double backleftpower, double backrightpower) {
@@ -165,112 +187,175 @@ public class TuningMecanumTeleOp7462 extends OpMode {
 // Move to auto
     @Override
     public void init_loop() {
-        goalTag.initProcess();
-        telemetry.addData("Pattern", goalTag.getObelisk());
-        telemetry.addData("team ID", goalTag.getGoalTagID());
+        telemetry.addData("Pattern", limelight.getObelisk());
+        telemetry.addData("team ID", limelight.getID());
+
+        telemetry.addLine("Press b for red, x for blue");
         telemetry.update();
+        if (gamepad1.bWasPressed()) {
+//            goalTag.targetAprilTagID = 24;
+            limelight.setTeam(24);
+        } else if (gamepad1.xWasPressed()) {
+            //goalTag.targetAprilTagID = 20;
+            limelight.setTeam(20);
+        }
+    }
+
+    @Override
+    public void start() {
+        collectorFront.setPower(0.5);
+        collectorBack.setPower(0.5);
     }
 
     @Override
     public void loop() {
-        goalTag.process();
+        //goalTag.process();
+        limelight.process(telemetry);
 
-        collectorFront.overridePower();
-        collectorBack.overridePower();
-
-        // Put line calculation for shooter velocity here
-        // shooterRight.targetVelocity = goalTag.getRange();
         shooterRight.overridePower();
-        // shooterLeft.targetVelocity = goalTag.getRange();
         shooterLeft.overridePower();
+        //Testing remove this
+        collectorFront.setPower(collectorPower);
+        collectorBack.setPower(collectorPower);
+
 
         telemetry.addData("shooterLeftCurrentVelocity", shooterLeft.getVelocity());
         telemetry.addData("shooterLeftTargetVelocity", shooterLeft.targetVelocity);
         telemetry.addData("shooterRightCurrentVelocity", shooterRight.getVelocity());
         telemetry.addData("shooterRightTargetVelocity", shooterRight.targetVelocity);
-        telemetry.addData("GoalTagRange", goalTag.getRange());
+        telemetry.addData("collectorFrontCurrentPower", collectorFront.getPower());
+        telemetry.addData("collectorBackCurrentPower", collectorBack.getPower());
+        telemetry.addData("Kp", kP);
+        telemetry.addData("KD", kD);
+        telemetry.addData("TimerLeft", timerLeft.seconds());
         telemetry.addLine("Bumpers to shoot, a to turntotag");
 
-        telemetry.update();
 
-        // Testing Wiring
-//        if(gamepad1.rightBumperWasPressed()) {
-//            shooterRight.targetVelocity = 1;
-//            shooterRight.overridePower();
-//        }
-//        else if(gamepad1.leftBumperWasPressed()) {
-//            shooterLeft.overridePower();
-//        }
-//        else if(gamepad1.left_bumper) {
-//            collectorBack.targetVelocity = 1;
-//            collectorBack.overridePower();
-//        }
-//        else if(gamepad1.right_bumper) {
-//            collectorFront.targetVelocity = 1;
-//            collectorFront.overridePower();
-//        }
 
-        // Tuning
-//        if (gamepad1.xWasPressed()) {
-//            Kvelo += 0.005;
-//            shooterLeft.setControllerValues(0,Kvelo);
-//        } else if (gamepad1.yWasPressed()) {
-//            Kvelo -= 0.005;
-//            shooterLeft.setControllerValues(0,Kvelo);
-//        }
-        // Driver Controls
-        if (gamepad1.leftBumperWasPressed() && shooterLeft.atSpeed()) {
-            launchFlapLeft.setPosition(0);
+        // Driver Controlstelemetry.addData("Is Tag Recent", limelight.seeObelisk);
+        if (gamepad1.leftBumperWasPressed() && (limelight.isDataCurrent || emergencyMode)) {
+            // do math here
+            shooterLeft.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
+            //shooterLeft.targetVelocity = 0.1067*limelight.getRange()+24.336;
+            leftIsRunning = true;
             timerLeft.reset();
         }
-        if (gamepad1.rightBumperWasPressed() && shooterRight.atSpeed()) {
-            launchFlapRight.setPosition(0.7);
+        if (gamepad1.rightBumperWasPressed() && (limelight.isDataCurrent || emergencyMode)) {
+            // do math here
+            shooterRight.targetVelocity = (limelight.getRange() + 202.17 - 10) / 8.92124;
+            //shooterRight.targetVelocity = 0.1067*limelight.getRange()+24.336;
+            rightIsRunning = true;
             timerRight.reset();
         }
-        if (gamepad1.left_trigger == 1) {
-            tuningLog.goalBool.set(true);
-            tuningLog.goalRange.set(goalTag.getRange());
-            tuningLog.targetVelocity.set(shooterLeft.targetVelocity);
-            tuningLog.writeLine();
-       }
-//        if (gamepad1.right_trigger == 1) {
-//            tuningLog.goalBool.set(true);
-//            tuningLog.goalRange.set(goalTag.getRange());
-//            tuningLog.targetVelocity.set(shooterRight.targetVelocity);
-//            tuningLog.writeLine();
+        if (gamepad2.dpadLeftWasPressed()) {
+            flipper.setPosition(1);
+            timerFlipper.reset();
+        }
+        if (gamepad2.dpadRightWasPressed()) {
+            flipper.setPosition(0.1);
+            timerFlipper.reset();
+        }
+        if (gamepad2.dpadUpWasPressed()) {
+            collectorBack.setPower(-0.5);
+            collectorFront.setPower(-0.5);
+        }
+        if (gamepad2.dpadUpWasReleased()) {
+            collectorFront.setPower(0.5);
+            collectorBack.setPower(0.5);
+        }
+        if (gamepad1.a && limelight.isDataCurrent) {
+            turnToAprilTagLimelight();
+        }
+        if (gamepad2.yWasPressed()) {
+            collectorPower += 0.05;
+        } else if (gamepad2.aWasPressed()) {
+            collectorPower -= 0.05;
+        } //else if (gamepad2.bWasPressed()) {
+//            kD += 0.0005;
+//        } else if (gamepad2.xWasPressed()) {
+//            kD -= 0.0005;
 //        }
-        if (gamepad1.aWasPressed()) {
-            shooterLeft.targetVelocity -= 0.25;
-//            shooterRight.targetVelocity -= 0.25;
+        // Parking mode
+        if (gamepad1.right_trigger == 1) {
+            maxPower = 0.5;
+            maxSpeed = 0.5;
+        } else {
+            maxPower = 1.0;
+            maxSpeed = 1.0;
         }
-        if (gamepad1.yWasPressed()) {
-            shooterLeft.targetVelocity += 0.25;
-//            shooterRight.targetVelocity += 0.25;
-        }
-
         drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
-        if (gamepad1.xWasPressed()) {
-            turnToAprilTag();
+        // Shoot when at speed
+        if (leftIsRunning) {
+            if (shooterLeft.atSpeed()) {
+                timerLeft.reset();
+                launchFlapLeft.setPosition(0);
+                leftIsRunning = false;
+            }
         }
-        // Launch Flap Reset
-        if (timerLeft.seconds() > 2) {
+        if (rightIsRunning) {
+            if (shooterRight.atSpeed()) {
+                timerRight.reset();
+                launchFlapRight.setPosition(0.7);
+                rightIsRunning = false;
+            }
+        }
+        // Servo Reset
+        if (timerLeft.seconds() > 0.5 && !leftIsRunning) {
             launchFlapLeft.setPosition(0.3);
-//            shooterLeft.targetVelocity = 0;
+            shooterLeft.targetVelocity = idlePower;
         }
-        if (timerRight.seconds() > 2) {
+        if (timerRight.seconds() > 0.5 && !rightIsRunning) {
             launchFlapRight.setPosition(0.4);
-//            shooterRight.targetVelocity = 0;
+            shooterRight.targetVelocity = idlePower;
+        }
+        if (timerFlipper.seconds() > 0.25) {
+            flipper.setPosition(0.525);
+        }
+        // If camera not working press this and shoot near point of close V.
+        if (gamepad1.leftStickButtonWasPressed()) {
+            shooterLeft.targetVelocity = 30;
+            shooterRight.targetVelocity = 30;
+            idlePower = 30;
+            emergencyMode = true;
         }
     }
-    public void turnToAprilTag() {
-        if (goalTag.getBearing() > 0.6 || goalTag.getBearing() < -0.6) {
-            if (goalTag.getBearing() > 0.6) { // rotate left
-                moveAllMotors(-0.2,0.2,-0.2,0.2);
-            } else if (goalTag.getBearing() < -0.6) { // rotate right
-                moveAllMotors(0.2,-0.2,0.2,-0.2);
-
+    public void turnToAprilTagLimelight() {
+        if (limelight.getRange() < 100) {
+            turnTo(0.25, 0.5);
+        } else {
+            if (limelight.getID() == 20) {
+                turnTo(0.25, 2);
+            } else if (limelight.getID() == 24) {
+                turnTo(0.25, -2);
             }
+        }
+    }
+    private void turnTo(double variance, double setPoint) {
+        long lastTime = System.currentTimeMillis();
+        double currentAngle = limelight.getTx();
+        double error = setPoint - currentAngle;
+
+        if (Math.abs(error) > variance) {
+            double derivative;
+            double deltaTime;
+            long now = System.currentTimeMillis();
+            deltaTime = (now - lastTime) / 1000.0;
+            lastTime = now;
+
+
+            derivative = (lastError-currentAngle) / deltaTime;
+            lastError = currentAngle;
+
+            double power = kP*error;
+            //kD*derivative;
+            telemetry.addData("turn power", power);
+            moveAllMotors(-power,power,-power,power);
+//            if (error > rightBound) { // rotate left
+//                moveAllMotors(-power,power,-power,power);
+//            } else if (error < leftBound) { // rotate right
+//                moveAllMotors(power,-power,power,-power);
+//            }
         }
     }
     // Thanks to FTC16072 for sharing this code!!
@@ -282,8 +367,7 @@ public class TuningMecanumTeleOp7462 extends OpMode {
         double backRightPower = forward + right - rotate;
         double backLeftPower = forward - right + rotate;
 
-        double maxPower = 1.0;
-        double maxSpeed = 1.0;  // make this slower for outreaches
+        // make this slower for outreaches
 
         // This is needed to make sure we don't pass > 1.0 to any wheel
         // It allows us to keep all of the motors in proportion to what they should
@@ -300,43 +384,5 @@ public class TuningMecanumTeleOp7462 extends OpMode {
         frontRightDrive.setPower(maxSpeed * (frontRightPower / maxPower));
         backLeftDrive.setPower(maxSpeed * (backLeftPower / maxPower));
         backRightDrive.setPower(maxSpeed * (backRightPower / maxPower));
-    }
-    public static class Datalog {
-        // The underlying datalogger object - it cares only about an array of loggable fields
-        private final Datalogger datalogger;
-
-        // These are all of the fields that we want in the datalog.
-        // Note that order here is NOT important. The order is important in the setFields() call below
-        public Datalogger.GenericField goalBool = new Datalogger.GenericField("goalBool");
-        public Datalogger.GenericField goalRange = new Datalogger.GenericField("goalRange");
-        public Datalogger.GenericField targetVelocity = new Datalogger.GenericField("targetVelocity");
-
-        public Datalog(String name) {
-            // Build the underlying datalog object
-            datalogger = new Datalogger.Builder()
-
-                    // Pass through the filename
-                    .setFilename(name)
-
-                    // Request an automatic timestamp field
-                    .setAutoTimestamp(Datalogger.AutoTimestamp.DECIMAL_SECONDS)
-
-                    // Tell it about the fields we care to log.
-                    // Note that order *IS* important here! The order in which we list
-                    // the fields is the order in which they will appear in the log.
-                    .setFields(
-                            goalBool,
-                            targetVelocity,
-                            goalRange
-                    )
-                    .build();
-        }
-
-        // Tell the datalogger to gather the values of the fields
-        // and write a new line in the log.
-
-        public void writeLine() {
-            datalogger.writeLine();
-        }
     }
 }
